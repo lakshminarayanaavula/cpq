@@ -1,0 +1,3012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPQ Module Test Console</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; }
+
+        /* Sidebar */
+        .sidebar { width: 220px; background: #1a1a2e; color: white; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px 18px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-brand { display: flex; flex-direction: column; }
+        .sidebar-brand-title { font-size: 22px; font-weight: 700; color: white; letter-spacing: -0.5px; line-height: 1; }
+        .sidebar-brand-sub { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.3px; }
+        .sidebar-collapse-btn { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; line-height: 1; }
+        .sidebar-collapse-btn:hover { color: white; }
+        .sidebar-nav { flex: 1; padding: 8px 0; }
+        .sidebar-section { padding: 12px 0 4px; }
+        .sidebar-section-title { padding: 0 16px 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.35); }
+        .sidebar-menu { list-style: none; margin: 0; padding: 0; }
+        .sidebar-menu li { }
+        .sidebar-menu a { display: flex; align-items: center; padding: 9px 16px; color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13.5px; transition: all 0.15s; cursor: pointer; gap: 10px; border-left: 3px solid transparent; }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+        .sidebar-menu a.active { background: rgba(255,255,255,0.09); color: white; border-left-color: rgba(255,255,255,0.6); }
+        .sidebar-menu a .icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.75; }
+        .sidebar-menu a.active .icon { opacity: 1; }
+        .sidebar-menu a .badge { margin-left: auto; background: rgba(255,255,255,0.15); padding: 1px 7px; border-radius: 10px; font-size: 10px; color: rgba(255,255,255,0.7); }
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 0; }
+        .sidebar-footer { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-footer input { width: 100%; padding: 7px 9px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); color: white; border-radius: 4px; font-size: 11px; margin-bottom: 6px; box-sizing: border-box; }
+        .sidebar-footer input::placeholder { color: rgba(255,255,255,0.35); }
+        .sidebar-footer .btn { width: 100%; padding: 8px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; }
+        .sidebar-footer .btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Main Content */
+        .main-content { margin-left: 220px; flex: 1; padding: 20px; min-height: 100vh; }
+
+        /* Page Header */
+        .page-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .page-title { font-size: 24px; font-weight: 600; color: #333; }
+        .page-subtitle { color: #666; font-size: 14px; margin-top: 5px; }
+
+        /* Section Headers */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0; }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; }
+        .section-actions { display: flex; gap: 8px; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #1e3a5f; color: white; }
+        .btn-primary:hover { background: #2d5a87; }
+        .btn-success { background: #1a1a2e; color: white; }
+        .btn-success:hover { background: #2d2d4e; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-info:hover { background: #138496; }
+        .btn-outline { background: white; border: 1px solid #ddd; color: #666; }
+        .btn-outline:hover { background: #f5f5f5; border-color: #999; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
+
+        /* Data Tables */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px; }
+        .data-table th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #dee2e6; position: sticky; top: 0; }
+        .data-table td { padding: 10px 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .data-table tr:hover { background: #f8f9fa; }
+        .data-table tr.selected { background: #e3f2fd; }
+        .data-table tr { cursor: pointer; }
+        .data-table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px; margin-bottom: 15px; }
+        .data-table .actions-cell { white-space: nowrap; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+
+        /* Cards */
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-weight: 600; color: #333; }
+
+        /* Forms */
+        .form-row { display: flex; gap: 15px; margin-bottom: 12px; }
+        .form-row > * { flex: 1; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #555; margin-bottom: 4px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1e3a5f; outline: none; }
+        .form-group textarea { min-height: 80px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; }
+        .form-group .checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .form-group input[type="checkbox"] { width: auto; }
+
+        /* Toolbar */
+        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; }
+        .search-box { position: relative; flex: 1; max-width: 300px; }
+        .search-box input { width: 100%; padding: 8px 12px 8px 35px; border: 1px solid #ddd; border-radius: 4px; }
+        .search-box::before { content: "🔍"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+        .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; min-width: 150px; }
+
+        /* Grid Layout */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        .grid-full { grid-column: 1 / -1; }
+
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 8px; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 28px; font-weight: 700; color: #1e3a5f; }
+        .stat-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Page Sections */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        /* Response Panel */
+        .response-panel { background: #1e1e1e; border-radius: 8px; overflow: hidden; position: fixed; bottom: 20px; right: 20px; width: 400px; max-height: 300px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 100; }
+        .response-panel.collapsed { max-height: 40px; }
+        .response-header { background: #2d2d2d; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .response-header span { color: #fff; font-weight: 500; font-size: 14px; }
+        .response-content { padding: 15px; max-height: 250px; overflow: auto; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; color: #d4d4d4; white-space: pre-wrap; }
+        .response-success { color: #4ec9b0; }
+        .response-error { color: #f14c4c; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-weight: 600; font-size: 16px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; color: white; font-size: 14px; z-index: 2000; animation: slideUp 0.3s ease; }
+        .toast-success { background: #28a745; }
+        .toast-error { background: #dc3545; }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Breadcrumb */
+        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px; color: #666; }
+        .breadcrumb a { color: #1e3a5f; text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb span { color: #999; }
+
+        /* Split Panel */
+        .split-panel { display: flex; gap: 20px; }
+        .split-panel .panel-left { flex: 1; }
+        .split-panel .panel-right { width: 350px; }
+
+        /* Quick Reference */
+        .quick-ref { background: #f8f9fa; border-radius: 8px; padding: 15px; font-size: 11px; font-family: monospace; }
+        .quick-ref h4 { font-size: 12px; margin-bottom: 10px; color: #333; }
+        .quick-ref pre { margin: 0; white-space: pre-wrap; }
+
+        /* Product Detail */
+        .detail-back { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; color: #555; cursor: pointer; font-size: 18px; margin-bottom: 16px; background: none; border: none; padding: 0; border-radius: 6px; line-height: 1; }
+        .detail-back:hover { background: #f0f0f0; color: #1a1a2e; }
+        .detail-header { margin-bottom: 20px; }
+        .detail-title { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; }
+        .detail-type-badge { font-size: 13px; font-weight: 500; padding: 3px 12px; border-radius: 12px; background: #f0f0f0; color: #444; }
+        .detail-type-badge.is-bundle { background: #1a1a2e; color: white; }
+        .detail-type-badge.is-dynamic { background: #1a1a2e; color: white; }
+        .detail-breadcrumb { font-size: 13px; color: #888; }
+        .detail-tabs { display: flex; gap: 0; border-bottom: 2px solid #e8e8e8; margin-bottom: 20px; }
+        .detail-tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+        .detail-tab:hover { color: #1a1a2e; }
+        .detail-tab.active { color: #1a1a2e; border-bottom-color: #1a1a2e; }
+        .detail-tab-pane { display: none; }
+        .detail-tab-pane.active { display: block; }
+        .attr-selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-top: 12px; }
+        .attr-card { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: white; }
+        .attr-card:hover { border-color: #1a1a2e; background: #f5f8ff; }
+        .attr-card.selected { border-color: #1a1a2e; background: #eef3ff; }
+        .attr-card input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #1a1a2e; }
+        .attr-card-name { flex: 1; font-weight: 500; font-size: 13px; color: #333; }
+        .attr-card-type { font-size: 11px; color: #888; padding: 2px 7px; background: #f0f0f0; border-radius: 10px; }
+        .layout-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
+        .layout-btn { display: flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1.5px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 13px; background: white; color: #555; font-weight: 500; }
+        .layout-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: white; }
+        .layout-drop-list { display: flex; flex-direction: column; gap: 8px; }
+        .layout-drop-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; }
+        .layout-drop-item .drag-handle { color: #bbb; font-size: 16px; cursor: grab; }
+        /* Feature rows matching screenshot */
+        .feature-row { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; }
+        .feature-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .feature-row-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: #1a1a2e; }
+        .req-badge { font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 10px; background: #f0f0f0; color: #555; }
+        .feature-row-actions { display: flex; gap: 2px; }
+        .feature-row-actions button { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: 5px; font-size: 15px; color: #888; }
+        .feature-row-actions button:hover { background: #f4f4f4; }
+        .feature-row-actions button.del:hover { color: #e53935; }
+        .feature-products-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .feature-chip-default { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: #1a1a2e; color: white; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; }
+        .feature-chip-default:hover { background: #2d2d4e; }
+        .feature-chip-alt { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: #f0f0f0; color: #444; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; }
+        .feature-chip-alt:hover { background: #e4e4e4; }
+        .chip-override-count { background: rgba(255,255,255,0.25); color: inherit; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .feature-chip-alt .chip-override-count { background: rgba(0,0,0,0.1); }
+        .chip-override-hint { opacity: 0.45; font-size: 12px; margin-left: 1px; }
+        /* Attribute Restrictions Modal */
+        .attr-restrict-modal { max-width: 660px; }
+        .attr-restrict-modal .modal-subtitle { font-size: 13px; color: #888; margin-top: 4px; margin-bottom: 20px; }
+        .attr-restrict-block { margin-bottom: 24px; }
+        .attr-restrict-block-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
+        .attr-restrict-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .attr-restrict-row .form-group { margin: 0; }
+        .attr-restrict-row label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 4px; }
+        .attr-restrict-row input, .attr-restrict-row select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .attr-restrict-discrete label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 4px; margin-top: 8px; }
+        .attr-restrict-discrete input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .attr-restrict-options label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 8px; }
+        .ar-options-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .ar-option-check { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; color: #444; cursor: pointer; user-select: none; }
+        .ar-option-check:hover { background: #f0f0f0; }
+        .ar-option-check input[type="checkbox"] { cursor: pointer; accent-color: #1a1a2e; }
+
+        /* Constraint Cards */
+        .constraint-card { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; }
+        .constraint-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .constraint-card-header .spacer { flex: 1; }
+        .constraint-card-actions { display: flex; gap: 2px; }
+        .constraint-card-actions button { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: 5px; font-size: 15px; color: #888; }
+        .constraint-card-actions button:hover { background: #f4f4f4; }
+        .constraint-card-actions button.del:hover { color: #e53935; }
+        .logic-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1.5px solid #ccc; color: #444; background: white; }
+        .logic-badge.if-badge { border-color: #bbb; color: #444; }
+        .logic-badge.or-badge { border-color: #bbb; color: #444; }
+        .logic-badge.and-badge { border-color: #bbb; color: #444; }
+        .action-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
+        .action-badge.suppress { background: #e53935; color: white; }
+        .action-badge.require { background: #1a1a2e; color: white; }
+        .constraint-section-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .constraint-section-table th { text-align: left; padding: 4px 8px 8px; color: #999; font-weight: 500; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+        .constraint-section-table td { padding: 10px 8px; border-bottom: 1px solid #f6f6f6; color: #333; }
+        .constraint-section-table tr:last-child td { border-bottom: none; }
+        .constraint-action-row { margin: 14px 0 10px; }
+        /* Constraint Builder Modal */
+        .constraint-builder-modal { max-width: 780px; }
+        .constraint-builder-section { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px 18px; }
+        .constraint-builder-section + .constraint-builder-section { margin-top: 14px; }
+        .constraint-builder-section .constraint-section-table select { width: 100%; min-width: 110px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #333; background: white; outline: none; }
+        .constraint-builder-section .constraint-section-table select:focus { border-color: #1a1a2e; }
+        .constraint-builder-section .constraint-section-table input[type="text"],
+        .constraint-builder-section .constraint-section-table input[type="number"] { width: 100%; min-width: 80px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
+        .constraint-builder-section .constraint-section-table input:focus { border-color: #1a1a2e; outline: none; }
+        .constraint-row-del { background: none; border: none; color: #ccc; cursor: pointer; font-size: 18px; padding: 0 4px; line-height: 1; border-radius: 4px; }
+        .constraint-row-del:hover { color: #e53935; background: #fff0f0; }
+
+        /* Toggle switch */
+        .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .toggle-label { font-size: 14px; color: #333; font-weight: 500; }
+        .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 24px; transition: 0.2s; }
+        .toggle-slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+        .toggle input:checked + .toggle-slider { background: #1e3a5f; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+        /* Feature product option list */
+        .product-options-label { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .product-options-hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+        .product-option-list { border: 1px solid #e0e0e0; border-radius: 8px; max-height: 220px; overflow-y: auto; }
+        .product-option-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+        .product-option-row:last-child { border-bottom: none; }
+        .product-option-row:hover { background: #f8f9ff; }
+        .product-option-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #1e3a5f; cursor: pointer; flex-shrink: 0; }
+        .product-option-name { flex: 1; font-size: 13px; font-weight: 500; color: #1a1a2e; }
+        .product-option-sku { font-size: 12px; color: #888; margin-right: 6px; }
+        .star-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: #ccc; padding: 0 2px; transition: color 0.15s; }
+        .star-btn.default { color: #f5a623; }
+        .star-btn:hover { color: #f5a623; }
+
+        /* Wider feature modal */
+        .modal-feature { max-width: 700px; }
+
+        /* Attribute modal option pairs */
+        .option-pair-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .option-pair-row input { flex: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .option-pair-row input:focus { border-color: #1e3a5f; outline: none; }
+        .option-remove-btn { background: none; border: none; cursor: pointer; color: #aaa; font-size: 18px; padding: 0 4px; line-height: 1; flex-shrink: 0; }
+        .option-remove-btn:hover { color: #dc3545; }
+        .add-option-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #1e3a5f; font-size: 13px; font-weight: 500; cursor: pointer; padding: 6px 0; }
+        .add-option-btn:hover { text-decoration: underline; }
+        .attr-section-label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .attr-section-hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+        .attr-detail-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #555; background: #f4f4f4; padding: 2px 8px; border-radius: 10px; }
+
+        /* Options popup tooltip */
+        .options-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: #444; cursor: default; position: relative; }
+        .options-pill .pill-count { font-size: 13px; font-weight: 400; color: #444; text-decoration: none; transition: color 0.15s; }
+        .options-pill:hover .pill-count { color: #1a1a2e; text-decoration: underline; cursor: pointer; }
+        .options-popup { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 500; background: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 200px; max-width: 280px; padding: 8px 0; }
+        .options-pill:hover .options-popup { display: block; }
+        .options-popup-title { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 14px 8px; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; }
+        .options-popup-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 14px; font-size: 13px; gap: 10px; }
+        .options-popup-row:hover { background: #f8f9ff; }
+        .options-popup-key { font-weight: 500; color: #1a1a2e; }
+        .options-popup-label { color: #888; font-size: 12px; }
+        .options-popup-empty { padding: 10px 14px; color: #bbb; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-title">CPQ</div>
+                <div class="sidebar-brand-sub">Configure · Price · Quote</div>
+            </div>
+            <button class="sidebar-collapse-btn" title="Toggle sidebar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Dashboard -->
+            <ul class="sidebar-menu">
+                <li><a class="active" data-page="dashboard">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a></li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Product Definition -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Product Definition</div>
+                <ul class="sidebar-menu">
+                    <li><a data-page="product-families">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        Product Families
+                    </a></li>
+                    <li><a data-page="product-lines">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                        Product Lines
+                    </a></li>
+                    <li><a data-page="products">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        Products
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Configuration -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Configuration</div>
+                <ul class="sidebar-menu">
+                    <li><a data-page="global-attributes">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        Attributes
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Pricing -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Pricing</div>
+                <ul class="sidebar-menu">
+                    <li><a data-page="constraint-rules">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Cost Matrices
+                    </a></li>
+                    <li><a data-page="evaluate">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10M7 12h10M7 17h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                        Price Matrices
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Sales -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Sales</div>
+                <ul class="sidebar-menu">
+                    <li><a data-page="product-attributes">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Accounts
+                    </a></li>
+                    <li><a data-page="bundle-features">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Quotes
+                    </a></li>
+                    <li><a data-page="feature-products">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        Orders
+                    </a></li>
+                    <li><a data-page="attribute-options">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        Assets
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <input type="text" id="token" placeholder="JWT Token...">
+            <input type="text" id="baseUrl" value="http://localhost:8081" placeholder="API Base URL">
+            <button class="btn" onclick="loadAllData()">Load All Data</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Dashboard Page -->
+        <div class="page-section active" id="page-dashboard">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">CPQ Dashboard</div>
+                    <div class="page-subtitle">Overview of your Configure Price Quote module</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-value" id="statFamilies">0</div><div class="stat-label">Product Families</div></div>
+                <div class="stat-card"><div class="stat-value" id="statLines">0</div><div class="stat-label">Product Lines</div></div>
+                <div class="stat-card"><div class="stat-value" id="statProducts">0</div><div class="stat-label">Products</div></div>
+                <div class="stat-card"><div class="stat-value" id="statBundles">0</div><div class="stat-label">Bundles</div></div>
+                <div class="stat-card"><div class="stat-value" id="statAttributes">0</div><div class="stat-label">Attributes</div></div>
+                <div class="stat-card"><div class="stat-value" id="statConstraints">0</div><div class="stat-label">Constraints</div></div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Quick Start</h3>
+                <ol style="padding-left: 20px; line-height: 2;">
+                    <li>Enter your JWT token in the sidebar and click "Load All Data"</li>
+                    <li>Create <strong>Product Families</strong> to organize your catalog</li>
+                    <li>Add <strong>Product Lines</strong> within each family</li>
+                    <li>Create <strong>Products</strong> (Standard or Bundle type)</li>
+                    <li>Define <strong>Global Attributes</strong> for product configuration</li>
+                    <li>For Bundles: Add <strong>Features</strong> and <strong>Feature Products</strong></li>
+                    <li>Create <strong>Constraint Rules</strong> for business logic</li>
+                    <li>Test your configuration in <strong>Evaluate Config</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Product Families Page -->
+        <div class="page-section" id="page-product-families">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Product Families</div>
+                    <div class="page-subtitle">Top-level categorization of your products</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadProductFamilies()">Refresh</button>
+                    <button class="btn btn-success" onclick="showFamilyModal()">+ New Family</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="familySearch" placeholder="Search families..." oninput="filterFamilies()">
+                    </div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="productFamilyTable"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="page-info" id="familyPageInfo"></div>
+                    <div id="familyPagination" style="display: flex; gap: 5px; align-items: center;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Lines Page -->
+        <div class="page-section" id="page-product-lines">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Product Lines</div>
+                    <div class="page-subtitle">Organize products within families</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadProductLines()">Refresh</button>
+                    <button class="btn btn-success" onclick="showLineModal()">+ New Line</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="lineSearch" placeholder="Search lines..." oninput="filterLines()">
+                    </div>
+                    <select class="filter-select" id="lineFilterFamily" onchange="filterLines()">
+                        <option value="">All Families</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Family</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="productLineTable"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="page-info" id="linePageInfo"></div>
+                    <div id="linePagination" style="display: flex; gap: 5px; align-items: center;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Page -->
+        <div class="page-section" id="page-products">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Products</div>
+                    <div class="page-subtitle">All products in your catalog</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadProducts()">Refresh</button>
+                    <button class="btn btn-info" onclick="loadAllProducts()">Load All</button>
+                    <button class="btn btn-success" onclick="showProductModal()">+ New Product</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="productSearch" placeholder="Search products..." oninput="filterProducts()">
+                    </div>
+                    <select class="filter-select" id="productFilterLine" onchange="filterProducts()">
+                        <option value="">All Product Lines</option>
+                    </select>
+                    <select class="filter-select" id="productFilterType" onchange="filterProducts()">
+                        <option value="">All Types</option>
+                        <option value="Simple">Simple</option>
+                        <option value="Dynamic">Dynamic</option>
+                        <option value="Bundle">Bundle</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper" style="max-height: 500px;">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>SKU</th><th>Type</th><th>Product Line</th><th>Family</th><th></th></tr></thead>
+                        <tbody id="productTable"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="page-info" id="productPageInfo"></div>
+                    <div id="productPagination" style="display: flex; gap: 5px; align-items: center;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Attributes Page -->
+        <div class="page-section" id="page-global-attributes">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Attribute Definitions</div>
+                    <div class="page-subtitle">Define global attributes that can be assigned to products in the Layout Builder</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadGlobalAttributes()">Refresh</button>
+                    <button class="btn btn-success" onclick="showAttributeModal()">+ Add Attribute</button>
+                </div>
+            </div>
+            <div class="card">
+                <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f0f4ff;border-radius:6px;margin-bottom:16px;font-size:13px;color:#555;">
+                    <span style="font-size:16px;color:#1e3a5f;">&#9432;</span>
+                    Define attributes globally here. Assign them to products and customize labels in the <strong>Layout Builder</strong>.
+                </div>
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="attrSearch" placeholder="Search attributes..." oninput="filterAttributes()">
+                    </div>
+                    <select class="filter-select" id="attrFilterType" onchange="filterAttributes()">
+                        <option value="">All Types</option>
+                        <option value="Dropdown">Dropdown</option>
+                        <option value="Number">Number</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Label</th><th>Type</th><th>Details</th><th>Assigned</th><th></th></tr></thead>
+                        <tbody id="globalAttributeTable"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="page-info" id="attrPageInfo"></div>
+                    <div id="attrPagination" style="display: flex; gap: 5px; align-items: center;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Page -->
+        <div class="page-section" id="page-product-detail">
+            <button class="detail-back" onclick="backToProducts()" title="Back">&#8592;</button>
+            <div class="detail-header">
+                <div class="detail-title">
+                    <span id="detailProductLabel">–</span>
+                    <span class="detail-type-badge" id="detailProductTypeBadge"></span>
+                </div>
+                <div class="detail-breadcrumb" id="detailBreadcrumb"></div>
+            </div>
+            <div class="detail-tabs" id="detailTabs"></div>
+            <!-- Tab: Attributes & Layout -->
+            <div class="detail-tab-pane" id="detailTabAttrs">
+                <div class="card" style="margin-bottom:16px;">
+                    <div style="margin-bottom:8px;">
+                        <div style="font-size:16px;font-weight:600;color:#1a1a2e;">Attribute Selection</div>
+                        <div style="font-size:13px;color:#888;margin-top:3px;">Select which global attributes apply to this product and optionally rename them.</div>
+                    </div>
+                    <div class="attr-selection-grid" id="detailAttrGrid"></div>
+                </div>
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div>
+                            <div style="font-size:16px;font-weight:600;color:#1a1a2e;">Layout Definition</div>
+                            <div style="font-size:13px;color:#888;margin-top:3px;">Add selected attributes to the layout and reorder them by dragging.</div>
+                        </div>
+                        <div class="layout-toggle">
+                            <button class="layout-btn active" id="btn1Col" onclick="setLayout(1)">&#9646; 1 Col</button>
+                            <button class="layout-btn" id="btn2Col" onclick="setLayout(2)">&#9646;&#9646; 2 Col</button>
+                        </div>
+                    </div>
+                    <div class="layout-drop-list" id="detailLayoutList"></div>
+                </div>
+            </div>
+            <!-- Tab: Bundle Features -->
+            <div class="detail-tab-pane" id="detailTabFeatures">
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-success" onclick="showFeatureModalFromDetail()">+ Add Feature</button>
+                </div>
+                <div id="detailFeatureList"></div>
+            </div>
+            <!-- Tab: Constraints -->
+            <div class="detail-tab-pane" id="detailTabConstraints">
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-success" onclick="showDetailConstraintModal()">+ Add Constraint</button>
+                </div>
+                <div id="detailConstraintList"><div style="color:#bbb;font-size:13px;padding:20px 0;">Loading constraints...</div></div>
+            </div>
+        </div>
+
+        <!-- Attribute Options Page -->
+        <div class="page-section" id="page-attribute-options">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Attribute Options</div>
+                    <div class="page-subtitle">Picklist values for attributes</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadAttributeOptions()">Refresh</button>
+                    <button class="btn btn-success" onclick="showOptionModal()">+ New Option</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <select class="filter-select" id="optionFilterAttr" onchange="loadAttributeOptions()" style="min-width: 250px;">
+                        <option value="">Select Attribute...</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Label</th><th>Value</th><th>Sort Order</th><th>Actions</th></tr></thead>
+                        <tbody id="attributeOptionTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Attributes Page -->
+        <div class="page-section" id="page-product-attributes">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Product Attributes</div>
+                    <div class="page-subtitle">Attributes assigned to specific products</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadProductAttributes()">Refresh</button>
+                    <button class="btn btn-success" onclick="showProductAttributeModal()">+ Link Attribute</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <select class="filter-select" id="prodAttrFilterProduct" onchange="loadProductAttributes()" style="min-width: 250px;">
+                        <option value="">Select Product...</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Attribute</th><th>Type</th><th>Required</th><th>Default Value</th><th>Actions</th></tr></thead>
+                        <tbody id="productAttributeTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bundles Page -->
+        <div class="page-section" id="page-bundles">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Bundles</div>
+                    <div class="page-subtitle">Products with type "Bundle" that contain features</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadBundles()">Refresh</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Label</th><th>SKU</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="bundleTable"></tbody>
+                    </table>
+                </div>
+                <p style="font-size: 13px; color: #666; margin-top: 10px;">
+                    To create a bundle, add a new Product with type "Bundle" in the Products page.
+                </p>
+            </div>
+        </div>
+
+        <!-- Bundle Features Page -->
+        <div class="page-section" id="page-bundle-features">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Bundle Features</div>
+                    <div class="page-subtitle">Configure features for a bundle</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadBundleFeatures()">Refresh</button>
+                    <button class="btn btn-success" onclick="showFeatureModal()">+ New Feature</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <select class="filter-select" id="featureBundleSelect" onchange="selectBundleForFeatures()" style="min-width: 250px;">
+                        <option value="">Select Bundle...</option>
+                    </select>
+                    <span id="selectedBundleLabel" style="color: #1e3a5f; font-weight: 500;"></span>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Label</th><th>Description</th><th>Min</th><th>Max</th><th>Required</th><th>Actions</th></tr></thead>
+                        <tbody id="bundleFeatureTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Products Page -->
+        <div class="page-section" id="page-feature-products">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Feature Products</div>
+                    <div class="page-subtitle">Products available within a bundle feature</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadFeatureProducts()">Refresh</button>
+                    <button class="btn btn-success" onclick="showFeatureProductModal()">+ Add Product</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <select class="filter-select" id="fpBundleSelect" onchange="onFPBundleChange()" style="min-width: 200px;">
+                        <option value="">Select Bundle...</option>
+                    </select>
+                    <select class="filter-select" id="fpFeatureSelect" onchange="loadFeatureProducts()" style="min-width: 200px;">
+                        <option value="">Select Feature...</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Product</th><th>SKU</th><th>Default</th><th>Sort Order</th><th>Actions</th></tr></thead>
+                        <tbody id="featureProductTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attribute Overrides Page -->
+        <div class="page-section" id="page-attribute-overrides">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Attribute Overrides</div>
+                    <div class="page-subtitle">Customize attribute behavior within bundles</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadAttributeOverrides()">Refresh</button>
+                    <button class="btn btn-success" onclick="showOverrideModal()">+ New Override</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="toolbar">
+                    <select class="filter-select" id="overrideBundleSelect" onchange="selectBundleForOverrides()" style="min-width: 250px;">
+                        <option value="">Select Bundle...</option>
+                    </select>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Attribute</th><th>Override Type</th><th>Allowed Values</th><th>Default</th><th>Actions</th></tr></thead>
+                        <tbody id="attributeOverrideTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Constraint Rules Page -->
+        <div class="page-section" id="page-constraint-rules">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Constraint Rules</div>
+                    <div class="page-subtitle">Business rules for bundle configuration</div>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-outline" onclick="loadConstraintRules()">Refresh</button>
+                    <button class="btn btn-success" onclick="showConstraintModal()">+ New Rule</button>
+                </div>
+            </div>
+            <div class="split-panel">
+                <div class="panel-left">
+                    <div class="card">
+                        <div class="toolbar">
+                            <select class="filter-select" id="constraintBundleId" onchange="loadConstraintRules()" style="min-width: 250px;">
+                                <option value="">Select Bundle...</option>
+                            </select>
+                        </div>
+                        <div class="data-table-wrapper" style="max-height: 500px;">
+                            <table class="data-table">
+                                <thead><tr><th>Name</th><th>Priority</th><th>Active</th><th>Conditions</th><th>Actions</th><th></th></tr></thead>
+                                <tbody id="constraintRuleTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-right">
+                    <div class="card">
+                        <h4 style="margin-bottom: 10px;">Quick Reference</h4>
+                        <div class="quick-ref">
+<pre><b>Condition Types:</b>
+FEATURE_PRODUCT
+PRODUCT_ATTRIBUTE
+
+<b>Operators:</b>
+EQUALS, NOT_EQUALS
+LESS_THAN, GREATER_THAN
+LESS_THAN_OR_EQUAL
+GREATER_THAN_OR_EQUAL
+
+<b>Action Types:</b>
+RESTRICT_ATTRIBUTE_VALUES
+SUPPRESS_ATTRIBUTE_VALUE
+REQUIRE_PRODUCT
+VALIDATION_ERROR
+VALIDATION_WARNING
+VALIDATION_INFO
+
+<b>Condition Example:</b>
+[{
+  "type": "FEATURE_PRODUCT",
+  "featureId": "uuid",
+  "productId": "uuid",
+  "operator": "EQUALS"
+}]
+
+<b>Action Example:</b>
+[{
+  "type": "VALIDATION_ERROR",
+  "message": "Error msg"
+}]</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluate Page -->
+        <div class="page-section" id="page-evaluate">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Evaluate Configuration</div>
+                    <div class="page-subtitle">Test constraint rules against a bundle configuration</div>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h4 style="margin-bottom: 15px;">Configuration</h4>
+                    <div class="form-group">
+                        <label>Select Bundle</label>
+                        <select id="evalBundleId" onchange="generateSampleSelection()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Selections (JSON)</label>
+                        <textarea id="evalSelections" style="min-height: 300px; font-family: monospace;">{"selections": []}</textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="evaluateConstraints()">Evaluate</button>
+                        <button class="btn btn-info" onclick="generateSampleSelection()">Generate Sample</button>
+                        <button class="btn btn-outline" onclick="formatJson('evalSelections')">Format JSON</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 15px;">Result</h4>
+                    <div id="evalResult" style="font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 400px; background: #f8f9fa; padding: 15px; border-radius: 4px; overflow: auto;">
+                        Select a bundle and click "Evaluate" to test your configuration...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Response Panel -->
+    <div class="response-panel" id="responsePanel">
+        <div class="response-header" onclick="toggleResponsePanel()">
+            <span>API Response</span>
+            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); clearResponse()" style="color: white; border-color: #555;">Clear</button>
+        </div>
+        <div class="response-content" id="responseContent">Ready...</div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalBox">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Form</span>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="modalSaveBtn" onclick="saveModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============= API Endpoints =============
+const API = {
+    productFamilies: '/api/v1/cpq/product-families',
+    productLines: '/api/v1/cpq/product-lines',
+    products: '/api/v1/cpq/products',
+    attributes: '/api/v1/cpq/attributes',
+    bundles: '/api/v1/cpq/bundles',
+    constraints: '/api/v1/cpq/constraints'
+};
+
+// Default page size for pagination
+const PAGE_SIZE = 50;
+
+// ============= State =============
+let state = {
+    families: [], lines: [], products: [], attributes: [], options: [], productAttributes: [],
+    bundles: [], features: [], featureProducts: [], overrides: [], constraints: [],
+    selectedBundleId: null, selectedFeatureId: null, selectedAttributeId: null, selectedProductId: null,
+    currentModal: null,
+    // Pagination state
+    pagination: {
+        families: { page: 0, totalPages: 0, totalElements: 0 },
+        lines: { page: 0, totalPages: 0, totalElements: 0 },
+        products: { page: 0, totalPages: 0, totalElements: 0 },
+        attributes: { page: 0, totalPages: 0, totalElements: 0 }
+    }
+};
+
+// ============= Utility Functions =============
+const getToken = () => document.getElementById('token').value;
+const getBaseUrl = () => document.getElementById('baseUrl').value;
+const $ = id => document.getElementById(id);
+
+async function apiCall(method, endpoint, body = null) {
+    const url = getBaseUrl() + endpoint;
+    const options = {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }
+    };
+    if (body) options.body = JSON.stringify(body);
+    try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        showResponse(data, response.ok);
+        if (!response.ok) {
+            const errorMsg = data.message || data.error || 'API Error';
+            showToast(errorMsg, 'error');
+            throw new Error(errorMsg);
+        }
+        return data;
+    } catch (error) {
+        showResponse({ error: error.message }, false);
+        if (!error.message.includes('API Error')) {
+            showToast(error.message || 'Request failed', 'error');
+        }
+        return null;
+    }
+}
+
+function extractData(response) {
+    if (!response) return { data: [], pagination: null };
+    if (response.data?.content) {
+        return {
+            data: response.data.content,
+            pagination: {
+                page: response.data.number || 0,
+                totalPages: response.data.totalPages || 1,
+                totalElements: response.data.totalElements || response.data.content.length,
+                size: response.data.size || PAGE_SIZE
+            }
+        };
+    }
+    if (Array.isArray(response.data)) return { data: response.data, pagination: null };
+    return { data: [], pagination: null };
+}
+
+function showResponse(data, success = true) {
+    const content = $('responseContent');
+    content.className = 'response-content ' + (success ? 'response-success' : 'response-error');
+    content.textContent = JSON.stringify(data, null, 2);
+}
+
+function clearResponse() { $('responseContent').textContent = ''; }
+
+function toggleResponsePanel() {
+    $('responsePanel').classList.toggle('collapsed');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function formatJson(elementId) {
+    const el = $(elementId);
+    try { el.value = JSON.stringify(JSON.parse(el.value), null, 2); }
+    catch (e) { showToast('Invalid JSON', 'error'); }
+}
+
+function renderPagination(elementId, pg, loadFn) {
+    const container = $(elementId);
+    if (!container || !pg || pg.totalPages <= 1) {
+        if (container) container.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    // Previous button
+    html += `<button class="btn btn-sm btn-outline" ${pg.page === 0 ? 'disabled' : ''} onclick="event.preventDefault(); (${loadFn.name})(${pg.page - 1})">← Prev</button>`;
+
+    // Page numbers
+    const maxVisible = 5;
+    let start = Math.max(0, pg.page - Math.floor(maxVisible / 2));
+    let end = Math.min(pg.totalPages, start + maxVisible);
+    if (end - start < maxVisible) start = Math.max(0, end - maxVisible);
+
+    if (start > 0) {
+        html += `<button class="btn btn-sm btn-outline" onclick="event.preventDefault(); (${loadFn.name})(0)">1</button>`;
+        if (start > 1) html += `<span style="padding: 0 5px;">...</span>`;
+    }
+
+    for (let i = start; i < end; i++) {
+        html += `<button class="btn btn-sm ${i === pg.page ? 'btn-primary' : 'btn-outline'}" onclick="event.preventDefault(); (${loadFn.name})(${i})">${i + 1}</button>`;
+    }
+
+    if (end < pg.totalPages) {
+        if (end < pg.totalPages - 1) html += `<span style="padding: 0 5px;">...</span>`;
+        html += `<button class="btn btn-sm btn-outline" onclick="event.preventDefault(); (${loadFn.name})(${pg.totalPages - 1})">${pg.totalPages}</button>`;
+    }
+
+    // Next button
+    html += `<button class="btn btn-sm btn-outline" ${pg.page >= pg.totalPages - 1 ? 'disabled' : ''} onclick="event.preventDefault(); (${loadFn.name})(${pg.page + 1})">Next →</button>`;
+
+    container.innerHTML = html;
+}
+
+// ============= Navigation =============
+document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        const page = link.dataset.page;
+        document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+        link.classList.add('active');
+        $('page-' + page).classList.add('active');
+        if (page === 'attribute-options') populateAttributeDropdowns();
+    });
+});
+
+// ============= Stats =============
+function updateStats() {
+    const totalFamilies = state.pagination.families.totalElements || state.families.length;
+    const totalLines = state.pagination.lines.totalElements || state.lines.length;
+    const totalProducts = state.pagination.products.totalElements || state.products.length;
+    const totalAttrs = state.pagination.attributes.totalElements || state.attributes.length;
+
+    $('statFamilies').textContent = totalFamilies;
+    $('statLines').textContent = totalLines;
+    $('statProducts').textContent = totalProducts;
+    $('statBundles').textContent = state.bundles.length;
+    $('statAttributes').textContent = totalAttrs;
+    $('statConstraints').textContent = state.constraints.length;
+    // Update badges
+    $('badgeFamilies').textContent = totalFamilies;
+    $('badgeLines').textContent = totalLines;
+    $('badgeProducts').textContent = totalProducts;
+    $('badgeBundles').textContent = state.bundles.length;
+    $('badgeAttrs').textContent = totalAttrs;
+    $('badgeConstraints').textContent = state.constraints.length;
+}
+
+// ============= Load All Data =============
+async function loadAllData() {
+    showToast('Loading data...');
+    await Promise.all([loadProductFamilies(), loadProductLines(), loadProducts(), loadGlobalAttributes()]);
+    await loadBundles();
+    updateStats();
+    showToast('Data loaded!');
+}
+
+// ============= Product Families =============
+async function loadProductFamilies(page = 0) {
+    const data = await apiCall('GET', `${API.productFamilies}?page=${page}&size=${PAGE_SIZE}`);
+    if (data) {
+        const result = extractData(data);
+        state.families = result.data;
+        if (result.pagination) state.pagination.families = result.pagination;
+        renderFamilyTable();
+        populateFamilyDropdowns();
+    }
+}
+
+function renderFamilyTable() {
+    const search = ($('familySearch')?.value || '').toLowerCase();
+    const filtered = state.families.filter(f => f.name?.toLowerCase().includes(search) || f.description?.toLowerCase().includes(search));
+    $('productFamilyTable').innerHTML = filtered.length ? filtered.map(f => `
+        <tr><td><strong>${f.name || ''}</strong></td><td>${f.description || '-'}</td>
+        <td><span class="badge ${f.status__r === 'Active' ? 'badge-success' : 'badge-secondary'}">${f.status__r || '-'}</span></td>
+        <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editFamily('${f.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteFamily('${f.id}')">Delete</button></td></tr>
+    `).join('') : '<tr><td colspan="4" class="empty-state">No families found</td></tr>';
+
+    const pg = state.pagination.families;
+    if ($('familyPageInfo')) {
+        $('familyPageInfo').textContent = pg.totalElements > 0
+            ? `Showing ${filtered.length} of ${pg.totalElements} (Page ${pg.page + 1} of ${pg.totalPages})`
+            : `${filtered.length} families`;
+    }
+    if ($('familyPagination')) renderPagination('familyPagination', pg, loadProductFamilies);
+}
+
+function filterFamilies() { renderFamilyTable(); }
+function populateFamilyDropdowns() {
+    const opts = state.families.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+    if ($('lineFilterFamily')) $('lineFilterFamily').innerHTML = '<option value="">All Families</option>' + opts;
+}
+
+function showFamilyModal(family = null) {
+    state.currentModal = { type: 'family', data: family };
+    $('modalTitle').textContent = family ? 'Edit Product Family' : 'New Product Family';
+    $('modalBody').innerHTML = `
+        <div class="form-group"><label>Name *</label><input type="text" id="modalFamilyName" value="${family?.name || ''}"></div>
+        <div class="form-group"><label>Description</label><input type="text" id="modalFamilyDescription" value="${family?.description || ''}"></div>
+        <div class="form-group"><label>Status</label><select id="modalFamilyStatus">
+            ${Object.entries(STATUS_IDS).map(([lbl, uuid]) => `<option value="${uuid}" ${(family?.status === uuid) ? 'selected' : ''}>${lbl}</option>`).join('')}
+        </select></div>`;
+    openModal();
+}
+
+function editFamily(id) { const f = state.families.find(x => x.id === id); if (f) showFamilyModal(f); }
+async function saveFamily() {
+    const body = { name: $('modalFamilyName').value, description: $('modalFamilyDescription').value || null, status: $('modalFamilyStatus').value || null };
+    if (!body.name) return showToast('Name required', 'error');
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.productFamilies}/${data.id}` : API.productFamilies, body);
+    if (result) {
+        showToast(data?.id ? 'Product family updated' : 'Product family created', 'success');
+        closeModal(); loadProductFamilies();
+    }
+}
+async function deleteFamily(id) { if (confirm('Delete this product family?')) { const r = await apiCall('DELETE', `${API.productFamilies}/${id}`); if (r) { showToast('Product family deleted', 'success'); loadProductFamilies(); } } }
+
+// ============= Product Lines =============
+async function loadProductLines(page = 0) {
+    const data = await apiCall('GET', `${API.productLines}?page=${page}&size=${PAGE_SIZE}`);
+    if (data) {
+        const result = extractData(data);
+        state.lines = result.data;
+        if (result.pagination) state.pagination.lines = result.pagination;
+        renderLineTable();
+        populateLineDropdowns();
+    }
+}
+
+function renderLineTable() {
+    const search = ($('lineSearch')?.value || '').toLowerCase();
+    const familyFilter = $('lineFilterFamily')?.value || '';
+    const filtered = state.lines.filter(l => {
+        const fId = l.prodFamilyId || l.prod_family_id;
+        return l.name?.toLowerCase().includes(search) && (!familyFilter || fId === familyFilter);
+    });
+    $('productLineTable').innerHTML = filtered.length ? filtered.map(l => {
+        const fId = l.prodFamilyId || l.prod_family_id;
+        const family = state.families.find(f => f.id === fId);
+        return `<tr><td><strong>${l.name || ''}</strong></td><td>${family?.name || '-'}</td><td>${l.description || '-'}</td>
+        <td><span class="badge ${l.status__r === 'Active' ? 'badge-success' : 'badge-secondary'}">${l.status__r || '-'}</span></td>
+        <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editLine('${l.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteLine('${l.id}')">Delete</button></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-state">No lines found</td></tr>';
+
+    const pg = state.pagination.lines;
+    if ($('linePageInfo')) {
+        $('linePageInfo').textContent = pg.totalElements > 0
+            ? `Showing ${filtered.length} of ${pg.totalElements} (Page ${pg.page + 1} of ${pg.totalPages})`
+            : `${filtered.length} lines`;
+    }
+    if ($('linePagination')) renderPagination('linePagination', pg, loadProductLines);
+}
+
+function filterLines() { renderLineTable(); }
+function populateLineDropdowns() {
+    const opts = state.lines.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+    if ($('productFilterLine')) $('productFilterLine').innerHTML = '<option value="">All Product Lines</option>' + opts;
+}
+
+function showLineModal(line = null) {
+    state.currentModal = { type: 'line', data: line };
+    $('modalTitle').textContent = line ? 'Edit Product Line' : 'New Product Line';
+    const fId = line?.prodFamilyId || line?.prod_family_id;
+    const familyOpts = state.families.map(f => `<option value="${f.id}" ${fId === f.id ? 'selected' : ''}>${f.name}</option>`).join('');
+    $('modalBody').innerHTML = `
+        <div class="form-group"><label>Name *</label><input type="text" id="modalLineName" value="${line?.name || ''}"></div>
+        <div class="form-group"><label>Description</label><input type="text" id="modalLineDescription" value="${line?.description || ''}"></div>
+        <div class="form-group"><label>Product Family *</label><select id="modalLineFamily">${familyOpts}</select></div>
+        <div class="form-group"><label>Status</label><select id="modalLineStatus">
+            ${Object.entries(STATUS_IDS).map(([lbl, uuid]) => `<option value="${uuid}" ${(line?.status === uuid) ? 'selected' : ''}>${lbl}</option>`).join('')}
+        </select></div>`;
+    openModal();
+}
+
+function editLine(id) { const l = state.lines.find(x => x.id === id); if (l) showLineModal(l); }
+async function saveLine() {
+    const body = { name: $('modalLineName').value, description: $('modalLineDescription').value || null, prod_family_id: $('modalLineFamily').value, status: $('modalLineStatus').value || null };
+    if (!body.name || !body.prod_family_id) return showToast('Name and Family required', 'error');
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.productLines}/${data.id}` : API.productLines, body);
+    if (result) {
+        showToast(data?.id ? 'Product line updated' : 'Product line created', 'success');
+        closeModal(); loadProductLines();
+    }
+}
+async function deleteLine(id) { if (confirm('Delete this product line?')) { const r = await apiCall('DELETE', `${API.productLines}/${id}`); if (r) { showToast('Product line deleted', 'success'); loadProductLines(); } } }
+
+// ============= Products =============
+async function loadProducts(page = 0) {
+    const data = await apiCall('GET', `${API.products}?page=${page}&size=${PAGE_SIZE}`);
+    if (data) {
+        const result = extractData(data);
+        state.products = result.data;
+        if (result.pagination) state.pagination.products = result.pagination;
+        state.bundles = state.products.filter(p => (p.product_type__r || p.productType || p.product_type) === 'Bundle');
+        renderProductTable();
+        populateProductDropdowns();
+    }
+}
+
+function renderProductTable() {
+    const search = ($('productSearch')?.value || '').toLowerCase();
+    const lineFilter = $('productFilterLine')?.value || '';
+    const typeFilter = $('productFilterType')?.value || '';
+    const filtered = state.products.filter(p => {
+        const lId = p.prodLineId || p.prod_line_id;
+        const pTypeLabel = p.product_type__r || p.productType || p.product_type;
+        return (p.label?.toLowerCase().includes(search) || p.sku?.toLowerCase().includes(search)) && (!lineFilter || lId === lineFilter) && (!typeFilter || pTypeLabel === typeFilter);
+    });
+    const BUNDLE_UUID = 'e5f6a7b8-c3d4-6012-def0-345678901234';
+    const DYNAMIC_UUID = 'd4e5f6a7-b2c3-5901-cdef-234567890123';
+    const resolveType = p => {
+        if (p.product_type__r) return p.product_type__r;
+        const raw = String(p.product_type || '').toLowerCase();
+        if (raw === BUNDLE_UUID) return 'Bundle';
+        if (raw === DYNAMIC_UUID) return 'Dynamic';
+        return 'Simple';
+    };
+    $('productTable').innerHTML = filtered.length ? filtered.map(p => {
+        const lId = p.prodLineId || p.prod_line_id;
+        const line = state.lines.find(l => l.id === lId);
+        const family = line ? state.families.find(f => f.id === (line.prod_family_id || line.prodFamilyId)) : null;
+        const pTypeLabel = resolveType(p);
+        const typeBadgeStyle = pTypeLabel === 'Bundle'
+            ? 'background:#1a1a2e;color:white;'
+            : pTypeLabel === 'Dynamic'
+            ? 'background:#1a1a2e;color:white;'
+            : 'background:#f0f0f0;color:#444;';
+        return `<tr style="cursor:pointer;" onclick="viewProduct('${p.id}')">
+        <td style="font-size:13px;font-weight:600;color:#1a1a2e;">${p.label || ''}</td>
+        <td style="font-size:13px;color:#999;">${p.sku || ''}</td>
+        <td><span style="padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;${typeBadgeStyle}">${pTypeLabel || '-'}</span></td>
+        <td><span style="padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f0f0;color:#444;">${line?.name || '-'}</span></td>
+        <td style="font-size:13px;color:#555;">${family?.name || '-'}</td>
+        <td class="actions-cell" style="white-space:nowrap;" onclick="event.stopPropagation()">
+            <button style="padding:4px 8px;border:none;background:none;color:#555;" onclick="editProduct('${p.id}')" title="Edit">&#9998;</button>
+            <button style="padding:4px 8px;border:none;background:none;color:#e53935;" onclick="deleteProduct('${p.id}')" title="Delete">&#128465;</button>
+        </td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">No products found</td></tr>';
+
+    // Update page info and pagination
+    const pg = state.pagination.products;
+    if ($('productPageInfo')) {
+        $('productPageInfo').textContent = pg.totalElements > 0
+            ? `Showing ${filtered.length} of ${pg.totalElements} products (Page ${pg.page + 1} of ${pg.totalPages})`
+            : `${filtered.length} products`;
+    }
+    if ($('productPagination')) {
+        renderPagination('productPagination', pg, loadProducts);
+    }
+}
+
+function filterProducts() { renderProductTable(); }
+
+async function loadAllProducts() {
+    showToast('Loading all products...');
+    const data = await apiCall('GET', `${API.products}?page=0&size=1000`);
+    if (data) {
+        const result = extractData(data);
+        state.products = result.data;
+        if (result.pagination) {
+            state.pagination.products = result.pagination;
+            state.pagination.products.totalPages = 1; // Treat as single page
+        }
+        state.bundles = state.products.filter(p => (p.product_type__r || p.productType || p.product_type) === 'Bundle');
+        renderProductTable();
+        populateProductDropdowns();
+        updateStats();
+        showToast(`Loaded ${state.products.length} products`);
+    }
+}
+function populateProductDropdowns() {
+    const prodOpts = state.products.map(p => `<option value="${p.id}">${p.label} (${p.sku})</option>`).join('');
+    const bundleOpts = state.bundles.map(b => `<option value="${b.id}">${b.label}</option>`).join('');
+    if ($('prodAttrFilterProduct')) $('prodAttrFilterProduct').innerHTML = '<option value="">Select Product...</option>' + prodOpts;
+    ['constraintBundleId', 'evalBundleId', 'featureBundleSelect', 'fpBundleSelect', 'overrideBundleSelect'].forEach(id => {
+        if ($(id)) $(id).innerHTML = '<option value="">Select Bundle...</option>' + bundleOpts;
+    });
+}
+
+const PRODUCT_TYPE_IDS = { Simple: 'c3d4e5f6-a1b2-4890-bcde-f12345678901', Dynamic: 'd4e5f6a7-b2c3-5901-cdef-234567890123', Bundle: 'e5f6a7b8-c3d4-6012-def0-345678901234' };
+const STATUS_IDS = { Active: 'b89bf75a-acec-4fbf-a416-62458747248d', Inactive: 'aa292841-4c9e-4ef6-8fb2-542e3cd7737a' };
+
+function showProductModal(product = null) {
+    state.currentModal = { type: 'product', data: product };
+    $('modalTitle').textContent = product ? 'Edit Product' : 'New Product';
+    const lId = product?.prodLineId || product?.prod_line_id;
+    const pTypeId = product?.productType || product?.product_type;
+    const statusId = product?.status;
+    const lineOpts = state.lines.map(l => `<option value="${l.id}" ${lId === l.id ? 'selected' : ''}>${l.name}</option>`).join('');
+    const isAsset = product?.isAsset || product?.is_asset;
+    const isOrd = product?.isOrderable !== false && product?.is_orderable !== false;
+    const typeOpts = Object.entries(PRODUCT_TYPE_IDS).map(([label, uuid]) => `<option value="${uuid}" ${pTypeId === uuid ? 'selected' : ''}>${label}</option>`).join('');
+    const statusOpts = Object.entries(STATUS_IDS).map(([label, uuid]) => `<option value="${uuid}" ${statusId === uuid ? 'selected' : ''}>${label}</option>`).join('');
+    $('modalBody').innerHTML = `
+        <div class="form-row"><div class="form-group"><label>Label *</label><input type="text" id="modalProductLabel" value="${product?.label || ''}"></div>
+        <div class="form-group"><label>SKU *</label><input type="text" id="modalProductSku" value="${product?.sku || ''}"></div></div>
+        <div class="form-group"><label>Description</label><input type="text" id="modalProductDescription" value="${product?.description || ''}"></div>
+        <div class="form-row"><div class="form-group"><label>Product Line *</label><select id="modalProductLine">${lineOpts}</select></div>
+        <div class="form-group"><label>Type</label><select id="modalProductType">${typeOpts}</select></div></div>
+        <div class="form-row"><div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalProductIsAsset" ${isAsset ? 'checked' : ''}> Is Asset</label></div>
+        <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalProductIsOrderable" ${isOrd ? 'checked' : ''}> Is Orderable</label></div>
+        <div class="form-group"><label>Status</label><select id="modalProductStatus">${statusOpts}</select></div></div>`;
+    openModal();
+}
+
+function editProduct(id) { const p = state.products.find(x => x.id === id); if (p) showProductModal(p); }
+async function saveProduct() {
+    const body = { label: $('modalProductLabel').value, sku: $('modalProductSku').value, description: $('modalProductDescription').value,
+        prod_line_id: $('modalProductLine').value, product_type: $('modalProductType').value,
+        is_asset: $('modalProductIsAsset').checked, is_orderable: $('modalProductIsOrderable').checked, status: $('modalProductStatus').value };
+    if (!body.label || !body.sku || !body.prod_line_id) return showToast('Label, SKU, Line required', 'error');
+    if (!body.product_type || !body.status) return showToast('Product Type and Status required', 'error');
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.products}/${data.id}` : API.products, body);
+    if (result) {
+        showToast(data?.id ? 'Product updated' : 'Product created', 'success');
+        closeModal(); loadProducts();
+    }
+}
+async function deleteProduct(id) { if (confirm('Delete this product?')) { const r = await apiCall('DELETE', `${API.products}/${id}`); if (r) { showToast('Product deleted', 'success'); loadProducts(); } } }
+
+// ============= Product Detail View =============
+let detailState = { product: null, productAttributes: [], features: [], featureProducts: {}, attrOverrides: [], layoutCols: 1 };
+
+async function viewProduct(id) {
+    const product = state.products.find(p => p.id === id);
+    if (!product) return showToast('Product not found', 'error');
+    detailState.product = product;
+    detailState.layoutCols = 1;
+
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+    $('page-product-detail').classList.add('active');
+
+    // Detect bundle by label OR by raw UUID (e5f6a7b8-c3d4-6012-def0-345678901234)
+    const BUNDLE_TYPE_UUID = 'e5f6a7b8-c3d4-6012-def0-345678901234';
+    const rawType = String(product.product_type || '');
+    const isBundle = (product.product_type__r || '').toLowerCase() === 'bundle'
+        || rawType.toLowerCase() === BUNDLE_TYPE_UUID;
+
+    $('detailProductLabel').textContent = product.label || product.name || '–';
+    const typeLabel = product.product_type__r
+        || (isBundle ? 'Bundle' : null)
+        || '–';
+    const typeBadge = $('detailProductTypeBadge');
+    typeBadge.textContent = typeLabel;
+    typeBadge.className = 'detail-type-badge'
+        + (isBundle ? ' is-bundle' : '')
+        + (typeLabel === 'Dynamic' ? ' is-dynamic' : '');
+
+    const line = state.lines.find(l => l.id === (product.prod_line_id || product.prodLineId));
+    const family = line ? state.families.find(f => f.id === (line.prod_family_id || line.prodFamilyId)) : null;
+    $('detailBreadcrumb').textContent = [family?.name, line?.name, product.sku ? 'SKU: ' + product.sku : ''].filter(Boolean).join(' › ');
+
+    const tabs = isBundle
+        ? [{ id: 'Features', label: 'Bundle Features' }, { id: 'Constraints', label: 'Constraints' }, { id: 'Attrs', label: 'Attributes & Layout' }]
+        : [{ id: 'Attrs', label: 'Attributes & Layout' }];
+    $('detailTabs').innerHTML = tabs.map((t, i) =>
+        `<div class="detail-tab ${i === 0 ? 'active' : ''}" onclick="switchDetailTab('${t.id}', this)">${t.label}</div>`
+    ).join('');
+    document.querySelectorAll('.detail-tab-pane').forEach(p => p.classList.remove('active'));
+    $('detailTab' + tabs[0].id).classList.add('active');
+
+    // Always reload the full attributes list when entering a product detail.
+    // state.attributes may only have page-0 (50 items) from the Attributes section,
+    // which would cause missing type__r lookups for attributes beyond the first page.
+    const attrsData = await apiCall('GET', `${API.attributes}?page=0&size=1000`);
+    if (attrsData) {
+        const r = extractData(attrsData);
+        state.attributes = r.data || [];
+    }
+
+    const paData = await apiCall('GET', `${API.attributes}/products/${product.id}`);
+    detailState.productAttributes = paData ? extractData(paData).data : [];
+
+    if (isBundle) await loadDetailBundleFeatures(product.id);
+    if (isBundle) await loadDetailConstraints();
+    // attrOverrides are loaded inside loadDetailBundleFeatures once sub-product IDs are known
+    if (!isBundle) detailState.attrOverrides = [];
+
+    renderDetailAttrSelection();
+    renderDetailLayout();
+}
+
+function switchDetailTab(tabId, el) {
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.detail-tab-pane').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    $('detailTab' + tabId).classList.add('active');
+}
+
+async function loadDetailBundleFeatures(bundleId) {
+    const data = await apiCall('GET', `${API.bundles}/${bundleId}/features`);
+    detailState.features = data ? extractData(data).data : [];
+
+    // Features embed their products directly (f.products[]).
+    detailState.featureProducts = {};
+    detailState.features.forEach(f => {
+        detailState.featureProducts[f.id] = Array.isArray(f.products) ? f.products : [];
+    });
+
+    // Collect unique sub-product IDs, then load their attribute overrides in parallel.
+    // product_id on the override IS the sub-product id (bundle_id was renamed to product_id).
+    const subProductIds = new Set();
+    Object.values(detailState.featureProducts).forEach(fps =>
+        fps.forEach(fp => { const pid = fp.product_id || fp.productId; if (pid) subProductIds.add(pid); })
+    );
+    if (subProductIds.size) {
+        const overrideResults = await Promise.all(
+            [...subProductIds].map(pid =>
+                apiCall('GET', `${API.bundles}/${bundleId}/products/${pid}/attribute-overrides`)
+                    .then(r => r ? extractData(r).data : [])
+            )
+        );
+        detailState.attrOverrides = overrideResults.flat();
+    } else {
+        detailState.attrOverrides = [];
+    }
+
+    renderDetailFeatures();
+}
+
+function renderDetailAttrSelection() {
+    const linkedIds = new Set(detailState.productAttributes.map(pa => pa.attribute_id || pa.attributeId));
+    if (!state.attributes.length) {
+        $('detailAttrGrid').innerHTML = '<div style="color:#999;font-size:13px;">No global attributes found.</div>';
+        return;
+    }
+    $('detailAttrGrid').innerHTML = state.attributes.map(a => {
+        const checked = linkedIds.has(a.id);
+        return `<div class="attr-card ${checked ? 'selected' : ''}" onclick="toggleDetailAttr('${a.id}', this)">
+            <input type="checkbox" ${checked ? 'checked' : ''} onclick="event.stopPropagation();toggleDetailAttr('${a.id}', this.closest('.attr-card'))">
+            <span class="attr-card-name">${a.name}</span>
+            <span class="attr-card-type">${attrTypeDisplay(a.type__r)}</span>
+        </div>`;
+    }).join('');
+    renderDetailLayout();
+}
+
+async function toggleDetailAttr(attrId, cardEl) {
+    const linkedIds = new Set(detailState.productAttributes.map(pa => pa.attribute_id || pa.attributeId));
+    const productId = detailState.product.id;
+    if (linkedIds.has(attrId)) {
+        const pa = detailState.productAttributes.find(pa => (pa.attribute_id || pa.attributeId) === attrId);
+        if (pa) {
+            await apiCall('DELETE', `${API.attributes}/products/${productId}/attributes/${pa.id}`);
+            detailState.productAttributes = detailState.productAttributes.filter(p => p.id !== pa.id);
+        }
+    } else {
+        const result = await apiCall('POST', `${API.attributes}/products/${productId}`, { attribute_id: attrId, sort_order: 0 });
+        if (result?.data?.id) detailState.productAttributes.push(result.data);
+    }
+    renderDetailAttrSelection();
+}
+
+function renderDetailLayout() {
+    const linkedIds = new Set(detailState.productAttributes.map(pa => pa.attribute_id || pa.attributeId));
+    const linked = state.attributes.filter(a => linkedIds.has(a.id));
+    const list = $('detailLayoutList');
+    if (!linked.length) {
+        list.innerHTML = '<div style="color:#bbb;font-size:13px;padding:12px;">No attributes selected.</div>';
+        list.style.cssText = '';
+        return;
+    }
+    if (detailState.layoutCols === 2) { list.style.display = 'grid'; list.style.gridTemplateColumns = '1fr 1fr'; list.style.gap = '8px'; }
+    else { list.style.display = 'flex'; list.style.flexDirection = 'column'; list.style.gap = '8px'; }
+    list.innerHTML = linked.map(a => `
+        <div class="layout-drop-item">
+            <span class="drag-handle">&#8942;&#8942;</span>
+            <span style="flex:1">${a.name}</span>
+            <span class="attr-card-type">${attrTypeDisplay(a.type__r)}</span>
+        </div>`).join('');
+}
+
+function setLayout(cols) {
+    detailState.layoutCols = cols;
+    $('btn1Col').className = 'layout-btn' + (cols === 1 ? ' active' : '');
+    $('btn2Col').className = 'layout-btn' + (cols === 2 ? ' active' : '');
+    renderDetailLayout();
+}
+
+function renderDetailFeatures() {
+    const container = $('detailFeatureList');
+    if (!detailState.features.length) {
+        container.innerHTML = '<div style="color:#bbb;font-size:13px;padding:20px 0;">No features yet. Click + Add Feature to get started.</div>';
+        return;
+    }
+    container.innerHTML = detailState.features
+        .slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(f => {
+            const fps = detailState.featureProducts[f.id] || [];
+            const isReq = f.is_required || f.isRequired || f.required;
+
+            // Build chips: default product gets dark chip with star, others get light chip
+            const chips = fps.filter(fp => fp.product_id || fp.productId).map(fp => {
+                const pid = fp.product_id || fp.productId;
+                const prod = state.products.find(p => p.id === pid);
+                const name = fp.product_label || prod?.label || pid || 'Unknown';
+                const isDef = fp.is_default || fp.isDefault || fp.default;
+                // Count saved attribute overrides for this product
+                const overrideCount = detailState.attrOverrides.filter(o =>
+                    (o.product_id || o.productId) === pid).length;
+                // Only show badge when there are overrides; otherwise show a subtle edit hint
+                const countBadge = overrideCount > 0
+                    ? `<span class="chip-override-count">${overrideCount}</span>`
+                    : `<span class="chip-override-hint">&#8963;</span>`;
+                const safeName = name.replace(/'/g, "\\'");
+                if (isDef) {
+                    return `<span class="feature-chip-default" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">&#9733; ${name} ${countBadge}</span>`;
+                } else {
+                    return `<span class="feature-chip-alt" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">${name} ${countBadge}</span>`;
+                }
+            }).join('');
+
+            return `<div class="feature-row">
+                <div class="feature-row-header">
+                    <div class="feature-row-title">
+                        ${f.label}
+                        ${isReq ? '<span class="req-badge">Required</span>' : ''}
+                    </div>
+                    <div class="feature-row-actions">
+                        <button onclick="editFeatureFromDetail('${f.id}')" title="Edit">&#9998;</button>
+                        <button class="del" onclick="deleteFeatureFromDetail('${f.id}')" title="Delete">&#128465;</button>
+                    </div>
+                </div>
+                <div class="feature-products-row">${chips || '<span style="color:#bbb;font-size:12px;">No products linked</span>'}</div>
+            </div>`;
+        }).join('');
+}
+
+// ============= Attribute Restrictions Modal =============
+
+async function openAttrRestrictionsModal(productId, productName) {
+    const bundleId = detailState.product?.id;
+    if (!bundleId) return;
+
+    // Load the product's linked attributes and existing overrides in parallel
+    const [attrsResp, overridesResp] = await Promise.all([
+        apiCall('GET', `${API.attributes}/products/${productId}`),
+        apiCall('GET', `${API.bundles}/${bundleId}/products/${productId}/attribute-overrides`)
+    ]);
+
+    const productAttrs = attrsResp ? extractData(attrsResp).data : [];
+    const overrides    = overridesResp ? extractData(overridesResp).data : [];
+
+    // Fetch full attribute details for each linked attribute.
+    // Uses state.attributes cache first, falls back to individual API calls.
+    // This handles pagination gaps where state.attributes only has the first page of results.
+    const attrDetails = await Promise.all(
+        productAttrs.map(pa => {
+            const attrId = pa.attribute_id || pa.attributeId;
+            if (!attrId) return Promise.resolve(null);
+            const cached = state.attributes.find(a => a.id === attrId);
+            if (cached) return Promise.resolve(cached);
+            return apiCall('GET', `${API.attributes}/${attrId}`).then(r => {
+                const attr = r?.data || null;
+                if (attr) state.attributes.push(attr); // warm the cache
+                return attr;
+            });
+        })
+    );
+
+    // Include both Number and Dropdown attributes
+    const restrictableAttrs = attrDetails.filter(a => a && (
+        a.type__r === 'Number' || a.type__r === 'Numerical' ||
+        a.type__r === 'Dropdown' || a.type__r === 'Picklist'
+    ));
+
+    if (!restrictableAttrs.length) {
+        showToast('No restrictable attributes linked to this product', 'info');
+        return;
+    }
+
+    // Pre-load options for any Dropdown attributes not yet in cache
+    if (!state.attrOptionsCache) state.attrOptionsCache = {};
+    await Promise.all(restrictableAttrs
+        .filter(a => a.type__r === 'Dropdown' || a.type__r === 'Picklist')
+        .filter(a => !state.attrOptionsCache[a.id])
+        .map(async a => {
+            try {
+                const optData = await apiCall('GET', `${API.attributes}/${a.id}/options`);
+                state.attrOptionsCache[a.id] = optData ? extractData(optData).data : [];
+            } catch (e) {
+                state.attrOptionsCache[a.id] = [];
+            }
+        })
+    );
+
+    // Build modal body blocks — one per restrictable attribute
+    const blocks = restrictableAttrs.map(a => {
+        const ov = overrides.find(o => (o.attribute_id || o.attributeId) === a.id);
+        const isNumber   = a.type__r === 'Number' || a.type__r === 'Numerical';
+        const isDropdown = a.type__r === 'Dropdown' || a.type__r === 'Picklist';
+
+        if (isNumber) {
+            const globalMin  = a.min_value !== undefined && a.min_value !== 0 ? a.min_value : '';
+            const globalMax  = a.max_value !== undefined && a.max_value !== 0 ? a.max_value : '';
+            const globalStep = a.step      !== undefined && a.step      !== 0 ? a.step      : '';
+            const curMin   = ov?.override_min  || ov?.overrideMin  || '';
+            const curMax   = ov?.override_max  || ov?.overrideMax  || '';
+            const curStep  = ov?.override_step || ov?.overrideStep || '';
+            const curVals  = ov?.allowed_values?.values
+                ? (Array.isArray(ov.allowed_values.values) ? ov.allowed_values.values.join(', ') : ov.allowed_values.values)
+                : '';
+            return `<div class="attr-restrict-block" data-attr-id="${a.id}" data-override-id="${ov?.id || ''}" data-type="Number">
+                <div class="attr-restrict-block-title">${a.name} <span style="color:#888;font-weight:400;font-size:12px;">(Number)</span></div>
+                <div class="attr-restrict-row">
+                    <div class="form-group">
+                        <label>Range Min</label>
+                        <input type="number" class="ar-min" placeholder="${globalMin ? 'Global: ' + globalMin : 'No min'}" value="${curMin}">
+                    </div>
+                    <div class="form-group">
+                        <label>Range Max</label>
+                        <input type="number" class="ar-max" placeholder="${globalMax ? 'Global: ' + globalMax : 'No max'}" value="${curMax}">
+                    </div>
+                    <div class="form-group">
+                        <label>Step</label>
+                        <input type="number" class="ar-step" placeholder="${globalStep ? globalStep : 'e.g. 5'}" value="${curStep}">
+                    </div>
+                </div>
+                <div class="attr-restrict-discrete">
+                    <label>Discrete Values (comma-separated)</label>
+                    <input type="text" class="ar-discrete" placeholder="e.g. 0, 1, 2, 3, 4, 5" value="${curVals}">
+                </div>
+            </div>`;
+        }
+
+        if (isDropdown) {
+            const allowedVals = ov?.allowed_values?.values
+                ? (Array.isArray(ov.allowed_values.values) ? ov.allowed_values.values : [ov.allowed_values.values])
+                : [];
+            const options = (state.attrOptionsCache || {})[a.id] || [];
+            const optHtml = options.length
+                ? options.map(opt => {
+                    const val = opt.value || '';
+                    const lbl = opt.label || opt.value || '';
+                    const checked = allowedVals.includes(val) ? 'checked' : '';
+                    return `<label class="ar-option-check"><input type="checkbox" class="ar-option" value="${val}" ${checked}> ${lbl}</label>`;
+                }).join('')
+                : '<span style="color:#aaa;font-size:12px;">No options defined for this attribute</span>';
+            return `<div class="attr-restrict-block" data-attr-id="${a.id}" data-override-id="${ov?.id || ''}" data-type="Dropdown">
+                <div class="attr-restrict-block-title">${a.name} <span style="color:#888;font-weight:400;font-size:12px;">(Dropdown)</span></div>
+                <div class="attr-restrict-options">
+                    <label>Allowed Options <span style="color:#aaa;font-size:11px;font-weight:400;">(leave all checked = no restriction)</span></label>
+                    <div class="ar-options-grid">${optHtml}</div>
+                </div>
+            </div>`;
+        }
+
+        return '';
+    }).join('');
+
+    // Show in the generic modal with a special class
+    $('modalTitle').textContent = `Attribute Restrictions \u2014 ${productName}`;
+    $('modalBox').className = 'modal attr-restrict-modal';
+    $('modalBody').innerHTML = `
+        <p class="modal-subtitle">Define valid values for each attribute within this bundle context.</p>
+        <div id="attrRestrictBlocks">${blocks}</div>`;
+    $('modalSaveBtn').textContent = 'Save Restrictions';
+
+    // Store context for save
+    window._attrRestrictContext = { bundleId, productId, restrictableAttrs, overrides };
+    state.currentModal = { type: 'attrRestrictions', data: null };
+    openModal();
+}
+
+async function saveAttrRestrictions() {
+    const ctx = window._attrRestrictContext;
+    if (!ctx) return;
+    const { bundleId, productId } = ctx;
+
+    const blocks = document.querySelectorAll('#attrRestrictBlocks .attr-restrict-block');
+    for (const block of blocks) {
+        const attrId     = block.dataset.attrId;
+        const overrideId = block.dataset.overrideId;
+        const blockType  = block.dataset.type;
+
+        let hasValues = false;
+        let payload   = null;
+
+        if (blockType === 'Dropdown') {
+            const checkedOpts = [...block.querySelectorAll('.ar-option:checked')].map(cb => cb.value);
+            const totalOpts   = block.querySelectorAll('.ar-option').length;
+            // Only save restriction if fewer than all options are selected (partial restriction)
+            hasValues = checkedOpts.length > 0 && checkedOpts.length < totalOpts;
+            if (hasValues) {
+                payload = {
+                    attribute_id:   attrId,
+                    override_min:   0,
+                    override_max:   0,
+                    override_step:  0,
+                    allowed_values: { values: checkedOpts }
+                };
+            }
+        } else {
+            // Number block
+            const minRaw      = block.querySelector('.ar-min').value.trim();
+            const maxRaw      = block.querySelector('.ar-max').value.trim();
+            const stepRaw     = block.querySelector('.ar-step').value.trim();
+            const discreteRaw = block.querySelector('.ar-discrete').value.trim();
+            hasValues = !!(minRaw || maxRaw || stepRaw || discreteRaw);
+            if (hasValues) {
+                const discreteArr = discreteRaw
+                    ? discreteRaw.split(',').map(v => v.trim()).filter(Boolean)
+                    : [];
+                payload = {
+                    attribute_id:   attrId,
+                    override_min:   parseFloat(minRaw)  || 0,
+                    override_max:   parseFloat(maxRaw)  || 0,
+                    override_step:  parseFloat(stepRaw) || 0,
+                    allowed_values: discreteArr.length ? { values: discreteArr } : null
+                };
+            }
+        }
+
+        if (!hasValues) {
+            // All fields empty / all options selected — delete existing override if any
+            if (overrideId) {
+                await apiCall('DELETE', `${API.bundles}/${bundleId}/products/${productId}/attribute-overrides/${overrideId}`);
+            }
+            continue;
+        }
+
+        await apiCall('POST', `${API.bundles}/${bundleId}/products/${productId}/attribute-overrides`, payload);
+    }
+
+    // Refresh overrides for this product in the chips
+    const freshOvData = await apiCall('GET', `${API.bundles}/${bundleId}/products/${productId}/attribute-overrides`);
+    const freshOvs = freshOvData ? extractData(freshOvData).data : [];
+    // Merge: replace overrides for this productId, keep others
+    detailState.attrOverrides = [
+        ...detailState.attrOverrides.filter(o => (o.product_id || o.productId) !== productId),
+        ...freshOvs
+    ];
+    renderDetailFeatures();
+
+    showToast('Attribute restrictions saved', 'success');
+    closeModal();
+    $('modalBox').className = 'modal';
+}
+
+function showFeatureModalFromDetail() {
+    state.selectedBundleId = detailState.product.id;
+    state.features = detailState.features;
+    window._detailFeatureSaveOverride = true;
+    showFeatureModal();
+}
+
+function editFeatureFromDetail(id) {
+    state.selectedBundleId = detailState.product.id;
+    state.features = detailState.features;
+    window._detailFeatureSaveOverride = true;
+    editFeature(id);
+}
+
+async function deleteFeatureFromDetail(id) {
+    if (!confirm('Delete this feature?')) return;
+    await apiCall('DELETE', `${API.bundles}/${detailState.product.id}/features/${id}`);
+    await loadDetailBundleFeatures(detailState.product.id);
+}
+
+// ============= Detail Constraints =============
+let detailConstraints = [];
+
+async function loadDetailConstraints() {
+    const bundleId = detailState.product?.id;
+    if (!bundleId) return;
+    const data = await apiCall('GET', `${API.bundles}/${bundleId}/constraints`);
+    detailConstraints = data ? (extractData(data).data || []) : [];
+    renderDetailConstraints();
+}
+
+function resolveFeatureName(id) {
+    if (!id) return null;
+    const f = detailState.features.find(x => x.id === id);
+    return f?.label || id;
+}
+function resolveProductName(id) {
+    if (!id) return null;
+    const p = state.products.find(x => x.id === id);
+    return p?.label || id;
+}
+function resolveAttrName(id) {
+    if (!id) return null;
+    const a = state.attributes.find(x => x.id === id);
+    return a?.name || id;
+}
+function dash(val) { return val ? val : '<span style="color:#bbb;">—</span>'; }
+
+function renderDetailConstraints() {
+    const container = $('detailConstraintList');
+    if (!detailConstraints.length) {
+        container.innerHTML = '<div style="color:#bbb;font-size:13px;padding:20px 0;">No constraints defined. Click + Add Constraint to create one.</div>';
+        return;
+    }
+    container.innerHTML = detailConstraints
+        .slice().sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+        .map(c => {
+            const conditions = Array.isArray(c.conditions) ? c.conditions : [];
+            const actions    = Array.isArray(c.actions)    ? c.actions    : [];
+
+            // Determine IF logic (OR / AND) from first condition or rule-level field
+            const logic = c.logic || (conditions[0]?.logic) || 'OR';
+
+            // Build conditions table rows
+            const condRows = conditions.map(cond => {
+                const feat  = resolveFeatureName(cond.feature_id  || cond.featureId  || cond.feature);
+                const prod  = resolveProductName(cond.product_id  || cond.productId  || cond.product);
+                const attr  = resolveAttrName  (cond.attribute_id || cond.attributeId || cond.attribute);
+                const op    = cond.operator || cond.op || null;
+                const val   = cond.value != null ? cond.value : null;
+                return `<tr>
+                    <td>${dash(feat)}</td>
+                    <td>${dash(prod)}</td>
+                    <td>${dash(attr)}</td>
+                    <td>${dash(op)}</td>
+                    <td>${dash(val)}</td>
+                </tr>`;
+            }).join('');
+
+            // Build actions sections — group by type
+            const actionSections = actions.map(act => {
+                const actionType = (act.type || act.action_type || 'SUPPRESS_PRODUCT').toUpperCase();
+                const badgeLabel = actionType.startsWith('SUPPRESS') ? 'THEN SUPPRESS' : ('THEN ' + actionType);
+                const badgeClass = actionType.startsWith('SUPPRESS') ? 'suppress' : 'require';
+                const feat = resolveFeatureName(act.targetFeatureId || act.target_feature_id || act.featureId || act.feature_id);
+                const prod = resolveProductName(act.targetProductId || act.target_product_id || act.productId || act.product_id);
+                const attr = resolveAttrName   (act.targetAttributeId || act.target_attribute_id || act.attributeId || act.attribute_id);
+                const val  = (act.targetValues && act.targetValues[0]) || act.value || null;
+                return `<div class="constraint-action-row">
+                    <span class="action-badge ${badgeClass}">${badgeLabel}</span>
+                </div>
+                <table class="constraint-section-table">
+                    <thead><tr><th>Feature</th><th>Product</th><th>Attribute</th><th>Value</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>${dash(feat)}</td>
+                            <td>${dash(prod)}</td>
+                            <td>${dash(attr)}</td>
+                            <td>${dash(val)}</td>
+                        </tr>
+                    </tbody>
+                </table>`;
+            }).join('');
+
+            return `<div class="constraint-card">
+                <div class="constraint-card-header">
+                    <span class="logic-badge if-badge">IF</span>
+                    <span class="logic-badge ${logic.toLowerCase()}-badge">${logic}</span>
+                    <span class="spacer"></span>
+                    <div class="constraint-card-actions">
+                        <button onclick="editDetailConstraint('${c.id}')" title="Edit">&#9998;</button>
+                        <button class="del" onclick="deleteDetailConstraint('${c.id}')" title="Delete">&#128465;</button>
+                    </div>
+                </div>
+                ${conditions.length ? `
+                <table class="constraint-section-table">
+                    <thead><tr><th>Feature</th><th>Product</th><th>Attribute</th><th>Operator</th><th>Value</th></tr></thead>
+                    <tbody>${condRows}</tbody>
+                </table>` : '<div style="color:#bbb;font-size:12px;padding:4px 0;">No conditions</div>'}
+                ${actionSections}
+            </div>`;
+        }).join('');
+}
+
+// ---- Constraint Builder helpers ----
+function _cbFeatureOpts(selected) {
+    const features = detailState.features || [];
+    return `<option value="">—</option>` +
+        features.map(f => `<option value="${f.id}" ${f.id === selected ? 'selected' : ''}>${f.label || f.name || f.id}</option>`).join('');
+}
+function _cbProductOpts(selected) {
+    // Collect unique sub-products from all feature products in this bundle
+    const seen = new Set();
+    const products = [];
+    Object.values(detailState.featureProducts || {}).forEach(fps =>
+        fps.forEach(fp => {
+            const pid = fp.product_id || fp.productId;
+            const lbl = fp.product_label || fp.productLabel;
+            if (pid && !seen.has(pid)) { seen.add(pid); products.push({ id: pid, label: lbl }); }
+        })
+    );
+    if (!products.length) {
+        (state.products || []).forEach(p => {
+            if (!seen.has(p.id)) { seen.add(p.id); products.push({ id: p.id, label: p.label }); }
+        });
+    }
+    return `<option value="">—</option>` +
+        products.map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${p.label || p.id}</option>`).join('');
+}
+function _cbAttrOpts(selected) {
+    return `<option value="">—</option>` +
+        (state.attributes || []).map(a => `<option value="${a.id}" ${a.id === selected ? 'selected' : ''}>${a.name || a.id}</option>`).join('');
+}
+function _cbOpOpts(selected) {
+    return ['=','!=','>','<','>=','<='].map(op =>
+        `<option value="${op}" ${op === selected ? 'selected' : ''}>${op}</option>`
+    ).join('');
+}
+function _cbCondRow(cond) {
+    const featId = cond.feature_id || cond.featureId || '';
+    const prodId = cond.product_id || cond.productId || '';
+    const attrId = cond.attribute_id || cond.attributeId || '';
+    const op     = cond.operator || cond.op || '';
+    const val    = cond.value != null ? cond.value : '';
+    return `<tr class="cond-row">
+        <td><select class="cond-feature">${_cbFeatureOpts(featId)}</select></td>
+        <td><select class="cond-product">${_cbProductOpts(prodId)}</select></td>
+        <td><select class="cond-attr">${_cbAttrOpts(attrId)}</select></td>
+        <td style="width:90px"><select class="cond-op"><option value="">—</option>${_cbOpOpts(op)}</select></td>
+        <td style="width:100px"><input type="text" class="cond-value" placeholder="Value" value="${val}"></td>
+        <td style="width:28px"><button type="button" class="constraint-row-del" onclick="this.closest('tr').remove()" title="Remove">×</button></td>
+    </tr>`;
+}
+function _cbActionRow(act) {
+    const featId = act.targetFeatureId || act.target_feature_id || act.feature_id || act.featureId || '';
+    const prodId = act.targetProductId || act.target_product_id || act.product_id || act.productId || '';
+    const attrId = act.targetAttributeId || act.target_attribute_id || act.attribute_id || act.attributeId || '';
+    const val    = (act.targetValues && act.targetValues[0]) || act.value || '';
+    return `<tr class="action-row">
+        <td><select class="action-feature">${_cbFeatureOpts(featId)}</select></td>
+        <td><select class="action-product">${_cbProductOpts(prodId)}</select></td>
+        <td><select class="action-attr">${_cbAttrOpts(attrId)}</select></td>
+        <td style="width:100px"><input type="number" class="action-value" placeholder="Value" value="${val}"></td>
+        <td style="width:28px"><button type="button" class="constraint-row-del" onclick="this.closest('tr').remove()" title="Remove">×</button></td>
+    </tr>`;
+}
+function addConstraintConditionRow() {
+    $('condTableBody').insertAdjacentHTML('beforeend', _cbCondRow({}));
+}
+function addConstraintActionRow() {
+    $('actionTableBody').insertAdjacentHTML('beforeend', _cbActionRow({}));
+}
+
+function _openConstraintBuilderModal(existing) {
+    state.currentModal = { type: 'detailConstraint', data: existing || null };
+    $('modalTitle').textContent = existing ? 'Edit Constraint' : 'Add Constraint';
+    $('modalBox').className = 'modal constraint-builder-modal';
+
+    const conditions = (existing?.conditions?.length ? existing.conditions : [{}]);
+    const actions    = (existing?.actions?.length    ? existing.actions    : [{ type: 'SUPPRESS' }]);
+    const logic      = existing?.logic || 'OR';
+    const priority   = existing?.priority || 1;
+    const name       = existing?.name || '';
+
+    $('modalBody').innerHTML = `
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+            <div class="form-group" style="flex:1;margin:0;"><label>Name *</label><input type="text" id="modalConstraintName" value="${name}" placeholder="Constraint name"></div>
+            <div class="form-group" style="width:80px;margin:0;"><label>Priority</label><input type="number" id="modalConstraintPriority" value="${priority}" min="1"></div>
+        </div>
+
+        <div class="constraint-builder-section">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <span class="logic-badge if-badge">IF</span>
+                <select id="modalConstraintLogic" style="padding:5px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#555;background:white;">
+                    <option value="OR"  ${logic === 'OR'  ? 'selected' : ''}>OR — any condition must match</option>
+                    <option value="AND" ${logic === 'AND' ? 'selected' : ''}>AND — all conditions must match</option>
+                </select>
+            </div>
+            <table class="constraint-section-table">
+                <thead><tr><th>Feature</th><th>Product</th><th>Attribute</th><th>Operator</th><th>Value</th><th></th></tr></thead>
+                <tbody id="condTableBody">${conditions.map(_cbCondRow).join('')}</tbody>
+            </table>
+            <button type="button" class="btn btn-outline" style="margin-top:12px;font-size:12px;" onclick="addConstraintConditionRow()">+ Add Condition</button>
+        </div>
+
+        <div class="constraint-builder-section">
+            <div style="margin-bottom:14px;">
+                <span class="action-badge suppress">THEN SUPPRESS</span>
+            </div>
+            <table class="constraint-section-table">
+                <thead><tr><th>Feature</th><th>Product</th><th>Attribute</th><th>Value</th><th></th></tr></thead>
+                <tbody id="actionTableBody">${actions.map(_cbActionRow).join('')}</tbody>
+            </table>
+            <button type="button" class="btn btn-outline" style="margin-top:12px;font-size:12px;" onclick="addConstraintActionRow()">+ Add Row</button>
+        </div>`;
+
+    $('modalSaveBtn').textContent = existing ? 'Save Changes' : 'Add Constraint';
+    openModal();
+}
+
+function editDetailConstraint(id) {
+    const c = detailConstraints.find(x => x.id === id);
+    if (!c) return;
+    _openConstraintBuilderModal(c);
+}
+
+function showDetailConstraintModal() {
+    _openConstraintBuilderModal(null);
+}
+
+async function saveDetailConstraint() {
+    const name = $('modalConstraintName')?.value?.trim();
+    if (!name) return showToast('Name is required', 'error');
+
+    // Map the UI logic selector → per-condition logicalOp field (what the DTO expects)
+    const logicalOp = $('modalConstraintLogic')?.value || 'OR';
+
+    const conditions = [...document.querySelectorAll('#condTableBody .cond-row')]
+        .map(row => {
+            const featureId   = row.querySelector('.cond-feature').value || null;
+            const productId   = row.querySelector('.cond-product').value || null;
+            const attributeId = row.querySelector('.cond-attr').value    || null;
+            const operator    = row.querySelector('.cond-op').value      || null;
+            const value       = row.querySelector('.cond-value').value   || null;
+            if (!featureId && !productId) return null;
+            // ConditionType: FEATURE_PRODUCT when no attribute; PRODUCT_ATTRIBUTE when attribute is set
+            const type = attributeId ? 'PRODUCT_ATTRIBUTE' : 'FEATURE_PRODUCT';
+            return { type, featureId, productId, attributeId, operator, value, logicalOp };
+        })
+        .filter(Boolean);
+
+    const actions = [...document.querySelectorAll('#actionTableBody .action-row')]
+        .map(row => {
+            const targetFeatureId   = row.querySelector('.action-feature').value || null;
+            const targetProductId   = row.querySelector('.action-product').value || null;
+            const targetAttributeId = row.querySelector('.action-attr').value    || null;
+            const rawVal            = row.querySelector('.action-value').value   || null;
+            if (!targetFeatureId && !targetProductId) return null;
+            // ActionType: SUPPRESS_ATTRIBUTE_VALUE when attribute set; otherwise SUPPRESS_PRODUCT
+            const type         = targetAttributeId ? 'SUPPRESS_ATTRIBUTE_VALUE' : 'SUPPRESS_PRODUCT';
+            const targetValues = rawVal ? [rawVal] : undefined;
+            return { type, targetFeatureId, targetProductId, targetAttributeId, targetValues };
+        })
+        .filter(Boolean);
+
+    if (!conditions.length) return showToast('At least one condition is required', 'error');
+    if (!actions.length)    return showToast('At least one action is required', 'error');
+
+    const bundleId = detailState.product.id;
+    const body = {
+        name,
+        priority:   parseInt($('modalConstraintPriority')?.value) || 1,
+        conditions,
+        actions
+    };
+    const { data: existing } = state.currentModal;
+    // Both create and update use the bundle-scoped URL: /bundles/{bundleId}/constraints[/{ruleId}]
+    const url = existing?.id
+        ? `${API.bundles}/${bundleId}/constraints/${existing.id}`
+        : `${API.bundles}/${bundleId}/constraints`;
+    const result = await apiCall(existing?.id ? 'PUT' : 'POST', url, body);
+    if (result) {
+        showToast(existing?.id ? 'Constraint updated' : 'Constraint created', 'success');
+        closeModal();
+        await loadDetailConstraints();
+    }
+}
+
+async function deleteDetailConstraint(id) {
+    if (!confirm('Delete this constraint?')) return;
+    const bundleId = detailState.product?.id;
+    const r = await apiCall('DELETE', `${API.bundles}/${bundleId}/constraints/${id}`);
+    if (r) { showToast('Constraint deleted', 'success'); await loadDetailConstraints(); }
+}
+
+function backToProducts() {
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+    $('page-products').classList.add('active');
+    document.querySelector('[data-page="products"]')?.classList.add('active');
+}
+
+// ============= Global Attributes =============
+async function loadGlobalAttributes(page = 0) {
+    const data = await apiCall('GET', `${API.attributes}?page=${page}&size=${PAGE_SIZE}`);
+    if (data) {
+        const result = extractData(data);
+        state.attributes = result.data;
+        if (result.pagination) state.pagination.attributes = result.pagination;
+        renderAttributeTable();
+        populateAttributeDropdowns();
+        // Pre-fetch options for all Dropdown attributes
+        loadAllAttributeOptions();
+    }
+}
+
+async function loadAllAttributeOptions() {
+    if (!state.attrOptionsCache) state.attrOptionsCache = {};
+    // Load for any attribute that could be a dropdown — match by type__r OR type UUID
+    const dropdownAttrs = state.attributes.filter(a =>
+        a.type__r === 'Picklist' ||
+        a.type === ATTRIBUTE_TYPE_IDS.Dropdown ||
+        String(a.type) === ATTRIBUTE_TYPE_IDS.Dropdown
+    );
+    if (!dropdownAttrs.length) return;
+    await Promise.all(dropdownAttrs.map(async a => {
+        try {
+            const optData = await apiCall('GET', `${API.attributes}/${a.id}/options`);
+            state.attrOptionsCache[a.id] = optData ? extractData(optData).data : [];
+        } catch (e) {
+            state.attrOptionsCache[a.id] = [];
+        }
+    }));
+    renderAttributeTable();
+}
+
+// Dropdown = Picklist UUID, Number = Numerical UUID
+const ATTRIBUTE_TYPE_IDS = {
+    Dropdown: 'a1b2c3d4-e5f6-4789-abcd-111111111111',
+    Number:   'b2c3d4e5-f6a7-4890-bcde-222222222222'
+};
+// Map backend label → display label
+function attrTypeDisplay(type__r) {
+    if (!type__r) return '–';
+    if (type__r === 'Picklist') return 'Dropdown';
+    if (type__r === 'Numerical') return 'Number';
+    return type__r;
+}
+
+function renderAttributeTable() {
+    const search = ($('attrSearch')?.value || '').toLowerCase();
+    const typeFilter = $('attrFilterType')?.value || '';
+    const filtered = state.attributes.filter(a => {
+        const displayType = attrTypeDisplay(a.type__r);
+        return (a.name?.toLowerCase().includes(search) || a.description?.toLowerCase().includes(search))
+            && (!typeFilter || displayType === typeFilter);
+    });
+    $('globalAttributeTable').innerHTML = filtered.length ? filtered.map(a => {
+        const displayType = attrTypeDisplay(a.type__r);
+        const isDropdown = displayType === 'Dropdown';
+        const isNumber   = displayType === 'Number';
+
+        // Type badge — Dropdown is dark filled, Number is plain gray
+        const typeBadge = displayType === 'Dropdown'
+            ? `<span style="background:#1a1a2e;color:white;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">Dropdown</span>`
+            : displayType === 'Number'
+            ? `<span style="background:#f0f0f0;color:#444;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">Number</span>`
+            : displayType
+            ? `<span style="background:#f0f0f0;color:#444;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">${displayType}</span>`
+            : '';
+
+        // Details
+        let detail = '–';
+        if (isDropdown) {
+            const opts = (state.attrOptionsCache || {})[a.id];
+            const optCount = opts?.length;
+            const countLabel = optCount != null ? `${optCount} option${optCount !== 1 ? 's' : ''}` : '– options';
+            detail = `<span class="options-pill" onmouseenter="ensureOptionsLoaded('${a.id}', this)">
+                <span class="pill-count">${countLabel}</span>
+                <div class="options-popup" id="optpop_${a.id}">
+                    <div class="options-popup-title">Options</div>
+                    ${buildOptionsPopupRows(opts)}
+                </div>
+            </span>`;
+        } else if (isNumber) {
+            const minV = (a.min_value != null && a.min_value !== 0) ? a.min_value : null;
+            const maxV = (a.max_value != null && a.max_value !== 0) ? a.max_value : null;
+            const minStr = minV != null ? minV : '0';
+            const maxStr = maxV != null ? maxV : '∞';
+            detail = `${minStr} to ${maxStr}`;
+        }
+
+        // Assigned products count from cached product attributes
+        const assignedCount = (state.productAttributes || [])
+            .filter(pa => (pa.attribute_id || pa.attributeId) === a.id).length;
+
+        // Label comes from description field
+        const label = a.description || a.name || '–';
+
+        return `<tr>
+        <td style="font-size:13px;font-weight:500;color:#1a1a2e;">${a.name || ''}</td>
+        <td style="font-size:13px;color:#1a1a2e;">${label}</td>
+        <td>${typeBadge}</td>
+        <td style="font-size:13px;color:#444;">${detail}</td>
+        <td><span style="font-size:13px;font-weight:600;color:#1a1a2e;">${assignedCount} product${assignedCount !== 1 ? 's' : ''}</span></td>
+        <td class="actions-cell" style="white-space:nowrap;">
+            <button class="btn btn-sm btn-outline" style="padding:4px 8px;border:none;background:none;color:#555;" onclick="editAttribute('${a.id}')" title="Edit">&#9998;</button>
+            <button class="btn btn-sm btn-danger" style="padding:4px 8px;border:none;background:none;color:#e53935;" onclick="deleteAttribute('${a.id}')" title="Delete">&#128465;</button>
+        </td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">No attributes found</td></tr>';
+
+    const pg = state.pagination.attributes;
+    if ($('attrPageInfo')) {
+        $('attrPageInfo').textContent = pg.totalElements > 0
+            ? `Showing ${filtered.length} of ${pg.totalElements} (Page ${pg.page + 1} of ${pg.totalPages})`
+            : `${filtered.length} attributes`;
+    }
+    if ($('attrPagination')) renderPagination('attrPagination', pg, loadGlobalAttributes);
+}
+
+function filterAttributes() { renderAttributeTable(); }
+
+function buildOptionsPopupRows(opts) {
+    if (!opts) return '<div class="options-popup-empty" style="display:flex;align-items:center;gap:6px;"><span style="animation:spin 1s linear infinite;display:inline-block;">&#8635;</span> Loading…</div>';
+    if (opts.length === 0) return '<div class="options-popup-empty">No options defined</div>';
+    return opts.map(o =>
+        `<div class="options-popup-row">
+            <span class="options-popup-key">${o.value || ''}</span>
+            <span class="options-popup-label">${o.label && o.label !== o.value ? o.label : ''}</span>
+        </div>`
+    ).join('');
+}
+
+async function ensureOptionsLoaded(attrId, pillEl) {
+    if (!state.attrOptionsCache) state.attrOptionsCache = {};
+    if (state.attrOptionsCache[attrId] !== undefined) return; // already loaded
+    // Mark as loading
+    state.attrOptionsCache[attrId] = undefined;
+    const optData = await apiCall('GET', `${API.attributes}/${attrId}/options`);
+    state.attrOptionsCache[attrId] = optData ? extractData(optData).data : [];
+    // Update popup content in-place without full re-render
+    const popup = $('optpop_' + attrId);
+    if (popup) {
+        popup.innerHTML = `<div class="options-popup-title">Options</div>` + buildOptionsPopupRows(state.attrOptionsCache[attrId]);
+    }
+    // Update pill count label
+    const pill = popup?.closest('.options-pill');
+    const countEl = pill?.querySelector('.pill-count');
+    if (countEl) {
+        const n = state.attrOptionsCache[attrId].length;
+        countEl.textContent = `${n} option${n !== 1 ? 's' : ''}`;
+    }
+}
+
+function populateAttributeDropdowns() {
+    const attrOpts = state.attributes
+        .map(a => {
+            const typeLabel = a.type__r ? ` (${attrTypeDisplay(a.type__r)})` : '';
+            return `<option value="${a.id}">${a.name}${typeLabel}</option>`;
+        }).join('');
+    if ($('optionFilterAttr')) $('optionFilterAttr').innerHTML = '<option value="">Select Attribute...</option>' + attrOpts;
+    if (state.selectedAttributeId && $('optionFilterAttr')) {
+        $('optionFilterAttr').value = state.selectedAttributeId;
+    }
+}
+
+// Attribute type dropdown change handler – show/hide type-specific sections
+function onAttrTypeChange() {
+    const typeId = $('modalAttrType')?.value;
+    const isDropdown = typeId === ATTRIBUTE_TYPE_IDS.Dropdown;
+    const isNumber   = typeId === ATTRIBUTE_TYPE_IDS.Number;
+    const optSection = $('attrOptionsSection');
+    const numSection = $('attrNumberSection');
+    if (optSection) optSection.style.display = isDropdown ? 'block' : 'none';
+    if (numSection) numSection.style.display = isNumber   ? 'block' : 'none';
+    const lbl = $('modalAttrDefaultLabel');
+    const inp = $('modalAttrDefault');
+    if (lbl) lbl.textContent = isDropdown ? 'Default Value (key)' : 'Default Value';
+    if (inp) inp.placeholder = isDropdown ? 'Optional default key' : 'Optional';
+}
+
+function addOptionPairRow(key = '', label = '') {
+    const row = document.createElement('div');
+    row.className = 'option-pair-row';
+    row.innerHTML = `
+        <input type="text" placeholder="Key (stored value)" value="${key}" class="attr-opt-key">
+        <input type="text" placeholder="Label (display)" value="${label}" class="attr-opt-label">
+        <button type="button" class="option-remove-btn" onclick="this.closest('.option-pair-row').remove()">&times;</button>`;
+    $('attrOptionPairs').appendChild(row);
+}
+
+async function showAttributeModal(attr = null) {
+    state.currentModal = { type: 'attribute', data: attr };
+    $('modalTitle').textContent = attr ? 'Edit Attribute' : 'New Attribute';
+    $('modalSaveBtn').textContent = attr ? 'Update' : 'Create';
+    $('modalBox').className = 'modal modal-feature';
+
+    const currentTypeId = attr?.type || '';
+    const isDropdown = currentTypeId === ATTRIBUTE_TYPE_IDS.Dropdown;
+    const isNumber   = currentTypeId === ATTRIBUTE_TYPE_IDS.Number;
+
+    const typeOpts = [
+        `<option value="">Select type…</option>`,
+        ...Object.entries(ATTRIBUTE_TYPE_IDS).map(([lbl, uuid]) =>
+            `<option value="${uuid}" ${currentTypeId === uuid ? 'selected' : ''}>${lbl}</option>`)
+    ].join('');
+
+    $('modalBody').innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <label style="font-size:13px;font-weight:500;color:#555;">Name (code) *</label>
+                <input type="text" id="modalAttrName" placeholder="e.g. ram_size" value="${attr?.name || ''}">
+            </div>
+            <div class="form-group">
+                <label style="font-size:13px;font-weight:500;color:#555;">Label (display)</label>
+                <input type="text" id="modalAttrLabel" placeholder="e.g. RAM Size" value="${attr?.description || ''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label style="font-size:13px;font-weight:500;color:#555;">Type</label>
+            <select id="modalAttrType" onchange="onAttrTypeChange()">${typeOpts}</select>
+        </div>
+        <div id="attrOptionsSection" style="display:${isDropdown ? 'block' : 'none'}">
+            <div class="attr-section-label">Options (Key-Value Pairs)</div>
+            <div id="attrOptionPairs"></div>
+            <button type="button" class="add-option-btn" onclick="addOptionPairRow()">&#43; Add Option</button>
+        </div>
+        <div id="attrNumberSection" style="display:${isNumber ? 'block' : 'none'}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:500;color:#555;">Min</label>
+                    <input type="number" step="any" id="modalAttrMin" placeholder="Optional" value="${attr?.min_value != null && attr.min_value !== 0 ? attr.min_value : ''}">
+                </div>
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:500;color:#555;">Max</label>
+                    <input type="number" step="any" id="modalAttrMax" placeholder="Optional" value="${attr?.max_value != null && attr.max_value !== 0 ? attr.max_value : ''}">
+                </div>
+            </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+            <label style="font-size:13px;font-weight:500;color:#555;" id="modalAttrDefaultLabel">${isDropdown ? 'Default Value (key)' : 'Default Value'}</label>
+            <input type="text" id="modalAttrDefault" placeholder="${isDropdown ? 'Optional default key' : 'Optional'}" value="${attr?.default_value || ''}">
+        </div>`;
+
+    // Pre-load existing options for edit mode
+    if (attr?.id) {
+        const optData = await apiCall('GET', `${API.attributes}/${attr.id}/options`);
+        const opts = optData ? extractData(optData).data : [];
+        // Cache for table display
+        if (!state.attrOptionsCache) state.attrOptionsCache = {};
+        state.attrOptionsCache[attr.id] = opts;
+        opts.forEach(o => addOptionPairRow(o.value || '', o.label || ''));
+    }
+
+    openModal();
+}
+
+function editAttribute(id) { const a = state.attributes.find(x => x.id === id); if (a) showAttributeModal(a); }
+
+async function saveAttribute() {
+    const name = $('modalAttrName').value.trim();
+    const description = $('modalAttrLabel').value.trim() || null;
+    const typeId = $('modalAttrType').value || null;
+    const defaultValue = $('modalAttrDefault').value.trim() || null;
+
+    if (!name) return showToast('Name required', 'error');
+
+    const body = { name, description, type: typeId, default_value: defaultValue };
+
+    if (typeId === ATTRIBUTE_TYPE_IDS.Number) {
+        const minVal = $('modalAttrMin')?.value;
+        const maxVal = $('modalAttrMax')?.value;
+        if (minVal !== '' && minVal != null) body.min_value = parseFloat(minVal);
+        if (maxVal !== '' && maxVal != null) body.max_value = parseFloat(maxVal);
+    }
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.attributes}/${data.id}` : API.attributes, body);
+    if (!result) return;
+
+    const attrId = data?.id || result?.data?.id;
+
+    // Save options if Dropdown type
+    if (typeId === ATTRIBUTE_TYPE_IDS.Dropdown && attrId) {
+        const pairRows = document.querySelectorAll('#attrOptionPairs .option-pair-row');
+
+        // Delete existing options first (for edit mode)
+        if (data?.id) {
+            const existing = (state.attrOptionsCache || {})[data.id] || [];
+            await Promise.all(existing.map(o => apiCall('DELETE', `${API.attributes}/${attrId}/options/${o.id}`)));
+        }
+
+        // Create new options
+        let sortOrder = 1;
+        for (const row of pairRows) {
+            const key = row.querySelector('.attr-opt-key').value.trim();
+            const label = row.querySelector('.attr-opt-label').value.trim();
+            if (key) {
+                await apiCall('POST', `${API.attributes}/${attrId}/options`, { value: key, label: label || key, sort_order: sortOrder++ });
+            }
+        }
+    }
+
+    showToast(data?.id ? 'Attribute updated' : 'Attribute created', 'success');
+    closeModal();
+    loadGlobalAttributes();
+}
+
+async function deleteAttribute(id) {
+    if (confirm('Delete this attribute?')) {
+        const r = await apiCall('DELETE', `${API.attributes}/${id}`);
+        if (r) { showToast('Attribute deleted', 'success'); loadGlobalAttributes(); }
+    }
+}
+
+// ============= Attribute Options =============
+async function loadAttributeOptions() {
+    const attrId = $('optionFilterAttr')?.value;
+    if (!attrId) { $('attributeOptionTable').innerHTML = '<tr><td colspan="4" class="empty-state">Select attribute</td></tr>'; return; }
+    state.selectedAttributeId = attrId;
+    const data = await apiCall('GET', `${API.attributes}/${attrId}/options`);
+    if (data) { state.options = extractData(data).data; renderOptionTable(); }
+}
+
+function renderOptionTable() {
+    $('attributeOptionTable').innerHTML = state.options.length ? state.options.map(o => `
+        <tr><td><strong>${o.label || ''}</strong></td><td><code>${o.value || ''}</code></td><td>${o.sortOrder || o.sort_order || 1}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-danger" onclick="deleteOption('${o.id}')">Delete</button></td></tr>
+    `).join('') : '<tr><td colspan="4" class="empty-state">No options</td></tr>';
+}
+
+function showOptionModal() {
+    if (!state.selectedAttributeId) return showToast('Select attribute first', 'error');
+    state.currentModal = { type: 'option', data: null };
+    $('modalTitle').textContent = 'New Option';
+    $('modalBody').innerHTML = `
+        <div class="form-row"><div class="form-group"><label>Value *</label><input type="text" id="modalOptionValue"></div>
+        <div class="form-group"><label>Label *</label><input type="text" id="modalOptionLabel"></div></div>
+        <div class="form-group"><label>Sort Order</label><input type="number" id="modalOptionOrder" value="1"></div>`;
+    openModal();
+}
+
+async function saveOption() {
+    const body = { value: $('modalOptionValue').value, label: $('modalOptionLabel').value, sortOrder: parseInt($('modalOptionOrder').value) || 1, isActive: true };
+    if (!body.value || !body.label) return showToast('Value and Label required', 'error');
+    const result = await apiCall('POST', `${API.attributes}/${state.selectedAttributeId}/options`, body);
+    if (result) {
+        showToast('Option created', 'success');
+        closeModal(); loadAttributeOptions();
+    }
+}
+async function deleteOption(id) { if (confirm('Delete this option?')) { const r = await apiCall('DELETE', `${API.attributes}/${state.selectedAttributeId}/options/${id}`); if (r) { showToast('Option deleted', 'success'); loadAttributeOptions(); } } }
+
+// ============= Product Attributes =============
+async function loadProductAttributes() {
+    const productId = $('prodAttrFilterProduct')?.value;
+    if (!productId) { $('productAttributeTable').innerHTML = '<tr><td colspan="5" class="empty-state">Select product</td></tr>'; return; }
+    state.selectedProductId = productId;
+    const data = await apiCall('GET', `${API.attributes}/products/${productId}`);
+    if (data) { state.productAttributes = extractData(data).data; renderProductAttributeTable(); }
+}
+
+function renderProductAttributeTable() {
+    $('productAttributeTable').innerHTML = state.productAttributes.length ? state.productAttributes.map(pa => {
+        const aId = pa.attributeId || pa.attribute_id;
+        const attr = state.attributes.find(a => a.id === aId);
+        const aType = attr?.attributeType || attr?.attribute_type || '-';
+        const isReq = pa.isRequired || pa.is_required;
+        const def = pa.defaultValue || pa.default_value || '-';
+        return `<tr><td><strong>${attr?.name || aId}</strong></td><td>${aType}</td><td>${isReq ? 'Yes' : '-'}</td><td>${def}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-danger" onclick="deleteProductAttribute('${pa.id}')">Delete</button></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-state">No attributes</td></tr>';
+}
+
+function showProductAttributeModal() {
+    if (!state.selectedProductId) return showToast('Select product first', 'error');
+    state.currentModal = { type: 'productAttribute', data: null };
+    $('modalTitle').textContent = 'Add Attribute to Product';
+    const attrOpts = state.attributes.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+    $('modalBody').innerHTML = `
+        <div class="form-group"><label>Attribute *</label><select id="modalProdAttrAttr">${attrOpts}</select></div>
+        <div class="form-row"><div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalProdAttrRequired"> Required</label></div>
+        <div class="form-group"><label>Default</label><input type="text" id="modalProdAttrDefault"></div></div>`;
+    openModal();
+}
+
+async function saveProductAttribute() {
+    const body = { attributeId: $('modalProdAttrAttr').value, isRequired: $('modalProdAttrRequired').checked, defaultValue: $('modalProdAttrDefault').value || null };
+    if (!body.attributeId) return showToast('Attribute required', 'error');
+    const result = await apiCall('POST', `${API.attributes}/products/${state.selectedProductId}`, body);
+    if (result) {
+        showToast('Product attribute added', 'success');
+        closeModal(); loadProductAttributes();
+    }
+}
+async function deleteProductAttribute(id) { if (confirm('Remove this attribute from product?')) { const r = await apiCall('DELETE', `${API.attributes}/products/${state.selectedProductId}/attributes/${id}`); if (r) { showToast('Product attribute removed', 'success'); loadProductAttributes(); } } }
+
+// ============= Bundles =============
+async function loadBundles() { if (!state.bundles.length) await loadProducts(); renderBundleTable(); }
+
+function renderBundleTable() {
+    $('bundleTable').innerHTML = state.bundles.length ? state.bundles.map(b => `
+        <tr><td><strong>${b.label || ''}</strong></td><td><code>${b.sku || ''}</code></td><td>${b.description || '-'}</td>
+        <td><span class="badge badge-success">${b.status || 'Active'}</span></td>
+        <td class="actions-cell"><button class="btn btn-sm btn-primary" onclick="manageBundleFeatures('${b.id}')">Features</button></td></tr>
+    `).join('') : '<tr><td colspan="5" class="empty-state">No bundles found</td></tr>';
+}
+
+function manageBundleFeatures(bundleId) {
+    state.selectedBundleId = bundleId;
+    document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-page="bundle-features"]').classList.add('active');
+    $('page-bundle-features').classList.add('active');
+    $('featureBundleSelect').value = bundleId;
+    selectBundleForFeatures();
+}
+
+// ============= Bundle Features =============
+function selectBundleForFeatures() {
+    const bundleId = $('featureBundleSelect').value;
+    if (!bundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="6" class="empty-state">Select bundle</td></tr>'; return; }
+    state.selectedBundleId = bundleId;
+    const bundle = state.bundles.find(b => b.id === bundleId);
+    $('selectedBundleLabel').textContent = bundle ? `Selected: ${bundle.label}` : '';
+    loadBundleFeatures();
+}
+
+async function loadBundleFeatures() {
+    if (!state.selectedBundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="6" class="empty-state">Select bundle</td></tr>'; return; }
+    const data = await apiCall('GET', `${API.bundles}/${state.selectedBundleId}/features`);
+    if (data) { state.features = extractData(data).data; renderFeatureTable(); populateFeatureDropdowns(); }
+}
+
+function renderFeatureTable() {
+    $('bundleFeatureTable').innerHTML = state.features.length ? state.features.map(f => {
+        const minO = f.min_qty ?? f.minOptions ?? f.min_options ?? 0;
+        const maxO = f.max_qty ?? f.maxOptions ?? f.max_options ?? 0;
+        const isReq = f.is_required || f.isRequired || f.required;
+        return `<tr><td><strong>${f.label || ''}</strong></td><td>${f.description || '-'}</td><td>${minO}</td><td>${maxO}</td><td>${isReq ? 'Yes' : '-'}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-info" onclick="manageFeatureProducts('${f.id}')">Products</button>
+        <button class="btn btn-sm btn-warning" onclick="editFeature('${f.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteFeature('${f.id}')">Delete</button></td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">No features</td></tr>';
+}
+
+function populateFeatureDropdowns() {
+    const opts = state.features.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
+    if ($('fpFeatureSelect')) $('fpFeatureSelect').innerHTML = '<option value="">Select Feature...</option>' + opts;
+}
+
+async function showFeatureModal(feature = null) {
+    if (!state.selectedBundleId) return showToast('Select bundle first', 'error');
+    state.currentModal = { type: 'feature', data: feature };
+    $('modalTitle').textContent = feature ? 'Edit Feature' : 'Add Bundle Feature';
+    $('modalSaveBtn').textContent = feature ? 'Save' : 'Add Feature';
+    $('modalBox').className = 'modal modal-feature';
+
+    const isReq = feature ? (feature.is_required || feature.isRequired || feature.required) : false;
+
+    // Ensure products are loaded
+    if (!state.products.length) {
+        const pd = await apiCall('GET', `${API.products}?page=0&size=1000`);
+        if (pd) state.products = extractData(pd).data || [];
+    }
+
+    // Pre-load existing feature products for edit mode
+    // Use embedded products from detailState if available (avoids extra API call)
+    let existingProductIds = new Set();
+    let existingDefaultId = null;
+    if (feature?.id) {
+        const embedded = detailState.featureProducts?.[feature.id];
+        const fps = Array.isArray(embedded) ? embedded
+            : (await apiCall('GET', `${API.bundles}/${state.selectedBundleId}/features/${feature.id}/products`)
+                .then(d => d ? extractData(d).data : []));
+        fps.filter(fp => fp.product_id || fp.productId).forEach(fp => {
+            const pid = fp.product_id || fp.productId;
+            if (pid) existingProductIds.add(pid);
+            if ((fp.is_default || fp.isDefault) && pid) existingDefaultId = pid;
+        });
+    }
+
+    // Build product list (exclude the bundle itself)
+    const productRows = state.products
+        .filter(p => p.id !== state.selectedBundleId)
+        .map(p => {
+            const checked = existingProductIds.has(p.id);
+            const isDefault = existingDefaultId === p.id;
+            const typeLabel = p.product_type__r || resolveType(p) || '–';
+            return `<div class="product-option-row">
+                <input type="checkbox" id="fpChk_${p.id}" ${checked ? 'checked' : ''}
+                    onchange="onFeatureProductCheck('${p.id}', this)">
+                <span class="product-option-name">${p.label || ''}</span>
+                <span class="product-option-sku">${p.sku || ''}</span>
+                <span class="badge badge-secondary" style="font-size:11px;">${typeLabel}</span>
+                <button type="button" class="star-btn ${isDefault ? 'default' : ''}" id="fpStar_${p.id}"
+                    onclick="setFeatureDefault('${p.id}')" title="Set as default">&#9733;</button>
+            </div>`;
+        }).join('');
+
+    $('modalBody').innerHTML = `
+        <div class="form-group">
+            <label style="font-size:13px;font-weight:500;color:#555;margin-bottom:4px;display:block;">Feature Name *</label>
+            <input type="text" id="modalFeatureLabel" placeholder="e.g. Processor, Storage" value="${feature?.label || ''}">
+        </div>
+        <div class="form-group">
+            <label style="font-size:13px;font-weight:500;color:#555;margin-bottom:4px;display:block;">Description</label>
+            <input type="text" id="modalFeatureDescription" placeholder="Optional description" value="${feature?.description || ''}">
+        </div>
+        <div class="toggle-row">
+            <label class="toggle">
+                <input type="checkbox" id="modalFeatureRequired" ${isReq ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Required feature</span>
+        </div>
+        <input type="hidden" id="modalFeatureMin" value="${feature?.min_qty ?? feature?.minOptions ?? 0}">
+        <input type="hidden" id="modalFeatureMax" value="${feature?.max_qty ?? feature?.maxOptions ?? 0}">
+        <input type="hidden" id="modalFeatureOrder" value="${feature?.sort_order ?? feature?.sortOrder ?? 0}">
+        <input type="hidden" id="featureDefaultProductId" value="${existingDefaultId || ''}">
+        <div class="product-options-label">Product Options</div>
+        <div class="product-options-hint">Select products as options. Click star to set default.</div>
+        <div class="product-option-list">${productRows || '<div style="padding:16px;color:#999;font-size:13px;">No products available.</div>'}</div>`;
+    openModal();
+}
+
+function onFeatureProductCheck(productId, el) {
+    // If unchecking, clear default if it was this product
+    if (!el.checked) {
+        const defId = $('featureDefaultProductId').value;
+        if (defId === productId) {
+            $('featureDefaultProductId').value = '';
+            $('fpStar_' + productId)?.classList.remove('default');
+        }
+    }
+}
+
+function setFeatureDefault(productId) {
+    // Clear previous default star
+    document.querySelectorAll('.star-btn.default').forEach(b => b.classList.remove('default'));
+    const starBtn = $('fpStar_' + productId);
+    const defInput = $('featureDefaultProductId');
+    const chk = $('fpChk_' + productId);
+    if (defInput.value === productId) {
+        // Toggle off
+        defInput.value = '';
+    } else {
+        defInput.value = productId;
+        starBtn?.classList.add('default');
+        if (chk) chk.checked = true; // auto-check when setting default
+    }
+}
+
+function editFeature(id) { const f = state.features.find(x => x.id === id); if (f) showFeatureModal(f); }
+async function saveFeature() {
+    const body = {
+        label: $('modalFeatureLabel').value,
+        description: $('modalFeatureDescription').value || null,
+        min_qty: parseInt($('modalFeatureMin').value) || 0,
+        max_qty: parseInt($('modalFeatureMax').value) || 0,
+        sort_order: parseInt($('modalFeatureOrder').value) || 0,
+        is_required: $('modalFeatureRequired').checked
+    };
+    if (!body.label) return showToast('Feature name required', 'error');
+
+    const { data } = state.currentModal;
+    const bundleId = state.selectedBundleId;
+    let featureId = data?.id;
+
+    const result = await apiCall(
+        featureId ? 'PUT' : 'POST',
+        featureId ? `${API.bundles}/${bundleId}/features/${featureId}` : `${API.bundles}/${bundleId}/features`,
+        body
+    );
+    if (!result) return;
+
+    // Determine saved feature id
+    if (!featureId) {
+        const saved = result.data || result;
+        featureId = saved?.id;
+    }
+
+    // Save selected product options
+    if (featureId) {
+        const defaultId = $('featureDefaultProductId')?.value || '';
+        const checked = Array.from(document.querySelectorAll('.product-option-list input[type=checkbox]:checked'))
+            .map(el => el.id.replace('fpChk_', ''));
+
+        // For edit: fetch existing, remove unchecked/null, add newly checked
+        if (data?.id) {
+            const fpData = await apiCall('GET', `${API.bundles}/${bundleId}/features/${featureId}/products`);
+            const existing = fpData ? extractData(fpData).data : [];
+            const checkedSet = new Set(checked);
+            // Build map of valid (non-null) existing entries
+            const existingMap = {};
+            for (const fp of existing) {
+                const pid = fp.product_id || fp.productId;
+                if (pid) existingMap[pid] = fp;
+                else await apiCall('DELETE', `${API.bundles}/${bundleId}/features/${featureId}/products/${fp.id}`);
+            }
+            // Delete unchecked entries
+            for (const [pid, fp] of Object.entries(existingMap)) {
+                if (!checkedSet.has(String(pid))) {
+                    await apiCall('DELETE', `${API.bundles}/${bundleId}/features/${featureId}/products/${fp.id}`);
+                }
+            }
+            // Add newly checked entries
+            for (const pid of checked) {
+                if (!existingMap[pid]) {
+                    await apiCall('POST', `${API.bundles}/${bundleId}/features/${featureId}/products`,
+                        { product_id: pid, sort_order: 1, is_default: pid === defaultId });
+                }
+            }
+        } else {
+            for (const pid of checked) {
+                await apiCall('POST', `${API.bundles}/${bundleId}/features/${featureId}/products`,
+                    { product_id: pid, sort_order: 1, is_default: pid === defaultId });
+            }
+        }
+    }
+
+    showToast(data?.id ? 'Feature updated' : 'Feature created', 'success');
+    closeModal();
+    $('modalBox').className = 'modal';
+    if (window._detailFeatureSaveOverride) {
+        window._detailFeatureSaveOverride = false;
+        await loadDetailBundleFeatures(detailState.product.id);
+    } else {
+        loadBundleFeatures();
+    }
+}
+async function deleteFeature(id) { if (confirm('Delete this feature?')) { const r = await apiCall('DELETE', `${API.bundles}/${state.selectedBundleId}/features/${id}`); if (r) { showToast('Feature deleted', 'success'); loadBundleFeatures(); } } }
+
+function manageFeatureProducts(featureId) {
+    state.selectedFeatureId = featureId;
+    document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-page="feature-products"]').classList.add('active');
+    $('page-feature-products').classList.add('active');
+    $('fpBundleSelect').value = state.selectedBundleId;
+    onFPBundleChange();
+    $('fpFeatureSelect').value = featureId;
+    loadFeatureProducts();
+}
+
+// ============= Feature Products =============
+function onFPBundleChange() {
+    const bundleId = $('fpBundleSelect').value;
+    state.selectedBundleId = bundleId;
+    if (!bundleId) { $('fpFeatureSelect').innerHTML = '<option value="">Select Feature...</option>'; return; }
+    apiCall('GET', `${API.bundles}/${bundleId}/features`).then(data => {
+        if (data) {
+            state.features = extractData(data).data;
+            const opts = state.features.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
+            $('fpFeatureSelect').innerHTML = '<option value="">Select Feature...</option>' + opts;
+        }
+    });
+}
+
+async function loadFeatureProducts() {
+    const bundleId = $('fpBundleSelect').value;
+    const featureId = $('fpFeatureSelect').value;
+    if (!bundleId || !featureId) { $('featureProductTable').innerHTML = '<tr><td colspan="5" class="empty-state">Select bundle and feature</td></tr>'; return; }
+    state.selectedBundleId = bundleId;
+    state.selectedFeatureId = featureId;
+    const data = await apiCall('GET', `${API.bundles}/${bundleId}/features/${featureId}/products`);
+    if (data) { state.featureProducts = extractData(data).data; renderFeatureProductTable(); }
+}
+
+function renderFeatureProductTable() {
+    $('featureProductTable').innerHTML = state.featureProducts.length ? state.featureProducts.map(fp => {
+        const pId = fp.productId || fp.product_id;
+        const product = state.products.find(p => p.id === pId);
+        const isDef = fp.isDefault || fp.is_default;
+        const sortO = fp.sortOrder || fp.sort_order || 1;
+        return `<tr><td><strong>${product?.label || pId}</strong></td><td><code>${product?.sku || ''}</code></td><td>${isDef ? 'Yes' : '-'}</td><td>${sortO}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-danger" onclick="removeFeatureProduct('${fp.id}')">Remove</button></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-state">No products</td></tr>';
+}
+
+function showFeatureProductModal() {
+    if (!state.selectedFeatureId) return showToast('Select feature first', 'error');
+    state.currentModal = { type: 'featureProduct', data: null };
+    $('modalTitle').textContent = 'Add Product to Feature';
+    const prodOpts = state.products.filter(p => (p.productType || p.product_type) !== 'Bundle')
+        .map(p => `<option value="${p.id}">${p.label} (${p.sku})</option>`).join('');
+    $('modalBody').innerHTML = `
+        <div class="form-group"><label>Product *</label><select id="modalFPProduct">${prodOpts}</select></div>
+        <div class="form-row"><div class="form-group"><label>Sort Order</label><input type="number" id="modalFPOrder" value="1"></div>
+        <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalFPDefault"> Default</label></div></div>`;
+    openModal();
+}
+
+async function saveFeatureProduct() {
+    const body = { product_id: $('modalFPProduct').value, sort_order: parseInt($('modalFPOrder').value) || 1, is_default: $('modalFPDefault').checked };
+    if (!body.product_id) return showToast('Product required', 'error');
+    const result = await apiCall('POST', `${API.bundles}/${state.selectedBundleId}/features/${state.selectedFeatureId}/products`, body);
+    if (result) {
+        showToast('Product added to feature', 'success');
+        closeModal(); loadFeatureProducts();
+    }
+}
+async function removeFeatureProduct(id) { if (confirm('Remove this product from feature?')) { const r = await apiCall('DELETE', `${API.bundles}/${state.selectedBundleId}/features/${state.selectedFeatureId}/products/${id}`); if (r) { showToast('Product removed from feature', 'success'); loadFeatureProducts(); } } }
+
+// ============= Attribute Overrides =============
+function selectBundleForOverrides() {
+    const bundleId = $('overrideBundleSelect').value;
+    state.selectedBundleId = bundleId;
+    loadAttributeOverrides();
+}
+
+async function loadAttributeOverrides() {
+    if (!state.selectedBundleId) { $('attributeOverrideTable').innerHTML = '<tr><td colspan="5" class="empty-state">Select bundle</td></tr>'; return; }
+    const data = await apiCall('GET', `${API.bundles}/${state.selectedBundleId}/attribute-overrides`);
+    if (data) { state.overrides = extractData(data).data; renderOverrideTable(); }
+}
+
+function renderOverrideTable() {
+    $('attributeOverrideTable').innerHTML = state.overrides.length ? state.overrides.map(o => {
+        const aId = o.attributeId || o.attribute_id;
+        const attr = state.attributes.find(a => a.id === aId);
+        const oType = o.overrideType || o.override_type || 'RESTRICT_VALUES';
+        const allowed = o.allowedValues || o.allowed_values;
+        const def = o.defaultValue || o.default_value || '-';
+        return `<tr><td><strong>${attr?.name || aId}</strong></td><td><span class="badge badge-info">${oType}</span></td>
+        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${allowed ? JSON.stringify(allowed) : '-'}</td><td>${def}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editOverride('${o.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteOverride('${o.id}')">Delete</button></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty-state">No overrides</td></tr>';
+}
+
+function showOverrideModal(override = null) {
+    if (!state.selectedBundleId) return showToast('Select bundle first', 'error');
+    state.currentModal = { type: 'override', data: override };
+    $('modalTitle').textContent = override ? 'Edit Override' : 'New Override';
+    const aId = override?.attributeId || override?.attribute_id;
+    const attrOpts = state.attributes.map(a => `<option value="${a.id}" ${aId === a.id ? 'selected' : ''}>${a.name}</option>`).join('');
+    const oType = override?.overrideType || override?.override_type;
+    const allowed = override?.allowedValues || override?.allowed_values;
+    const def = override?.defaultValue || override?.default_value || '';
+    $('modalBody').innerHTML = `
+        <div class="form-group"><label>Attribute *</label><select id="modalOverrideAttr">${attrOpts}</select></div>
+        <div class="form-group"><label>Override Type</label><select id="modalOverrideType">
+            <option value="RESTRICT_VALUES" ${oType !== 'SET_DEFAULT' ? 'selected' : ''}>Restrict Values</option>
+            <option value="SET_DEFAULT" ${oType === 'SET_DEFAULT' ? 'selected' : ''}>Set Default</option></select></div>
+        <div class="form-group"><label>Allowed Values (JSON)</label><textarea id="modalOverrideAllowed" style="min-height: 100px;">${allowed ? JSON.stringify(allowed, null, 2) : '{"options": []}'}</textarea></div>
+        <div class="form-group"><label>Default Value</label><input type="text" id="modalOverrideDefault" value="${def}"></div>`;
+    openModal();
+}
+
+function editOverride(id) { const o = state.overrides.find(x => x.id === id); if (o) showOverrideModal(o); }
+async function saveOverride() {
+    let allowed = null;
+    try { const v = $('modalOverrideAllowed').value; if (v) allowed = JSON.parse(v); } catch (e) { return showToast('Invalid JSON', 'error'); }
+    const body = { attributeId: $('modalOverrideAttr').value, overrideType: $('modalOverrideType').value, allowedValues: allowed, defaultValue: $('modalOverrideDefault').value || null };
+    if (!body.attributeId) return showToast('Attribute required', 'error');
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.bundles}/${state.selectedBundleId}/attribute-overrides/${data.id}` : `${API.bundles}/${state.selectedBundleId}/attribute-overrides`, body);
+    if (result) {
+        showToast(data?.id ? 'Override updated' : 'Override created', 'success');
+        closeModal(); loadAttributeOverrides();
+    }
+}
+async function deleteOverride(id) { if (confirm('Delete this override?')) { const r = await apiCall('DELETE', `${API.bundles}/${state.selectedBundleId}/attribute-overrides/${id}`); if (r) { showToast('Override deleted', 'success'); loadAttributeOverrides(); } } }
+
+// ============= Constraint Rules =============
+async function loadConstraintRules() {
+    const bundleId = $('constraintBundleId').value;
+    if (!bundleId) { $('constraintRuleTable').innerHTML = '<tr><td colspan="6" class="empty-state">Select bundle</td></tr>'; state.constraints = []; return; }
+    const data = await apiCall('GET', `${API.bundles}/${bundleId}/constraints`);
+    if (data) { state.constraints = extractData(data).data; renderConstraintTable(); updateStats(); }
+}
+
+function renderConstraintTable() {
+    $('constraintRuleTable').innerHTML = state.constraints.length ? state.constraints.map(r => {
+        const isAct = r.isActive !== false && r.is_active !== false;
+        return `<tr><td><strong>${r.name || ''}</strong></td><td>${r.priority || 1}</td>
+        <td>${isAct ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-secondary">Inactive</span>'}</td>
+        <td>${Array.isArray(r.conditions) ? r.conditions.length : 0}</td><td>${Array.isArray(r.actions) ? r.actions.length : 0}</td>
+        <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editConstraint('${r.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteConstraint('${r.id}')">Delete</button></td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">No constraints</td></tr>';
+}
+
+function showConstraintModal(constraint = null) {
+    const bundleId = $('constraintBundleId').value;
+    if (!bundleId) return showToast('Select bundle first', 'error');
+    state.currentModal = { type: 'constraint', data: constraint };
+    $('modalTitle').textContent = constraint ? 'Edit Constraint' : 'New Constraint';
+    const isAct = constraint?.isActive !== false && constraint?.is_active !== false;
+    $('modalBody').innerHTML = `
+        <div class="form-row"><div class="form-group"><label>Name *</label><input type="text" id="modalConstraintName" value="${constraint?.name || ''}"></div>
+        <div class="form-group"><label>Priority</label><input type="number" id="modalConstraintPriority" value="${constraint?.priority || 1}"></div></div>
+        <div class="form-group"><label>Description</label><input type="text" id="modalConstraintDescription" value="${constraint?.description || ''}"></div>
+        <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalConstraintActive" ${isAct ? 'checked' : ''}> Active</label></div>
+        <div class="form-group"><label>Conditions (JSON)</label><textarea id="modalConstraintConditions" style="min-height: 100px;">${constraint?.conditions ? JSON.stringify(constraint.conditions, null, 2) : '[]'}</textarea></div>
+        <div class="form-group"><label>Actions (JSON)</label><textarea id="modalConstraintActions" style="min-height: 100px;">${constraint?.actions ? JSON.stringify(constraint.actions, null, 2) : '[]'}</textarea></div>`;
+    openModal();
+}
+
+function editConstraint(id) { const c = state.constraints.find(x => x.id === id); if (c) showConstraintModal(c); }
+async function saveConstraint() {
+    let conditions, actions;
+    try { conditions = JSON.parse($('modalConstraintConditions').value || '[]'); actions = JSON.parse($('modalConstraintActions').value || '[]'); }
+    catch (e) { return showToast('Invalid JSON', 'error'); }
+    const body = { name: $('modalConstraintName').value, description: $('modalConstraintDescription').value,
+        priority: parseInt($('modalConstraintPriority').value) || 1, isActive: $('modalConstraintActive').checked, conditions, actions };
+    if (!body.name) return showToast('Name required', 'error');
+    const bundleId = $('constraintBundleId').value;
+    const { data } = state.currentModal;
+    const result = await apiCall(data?.id ? 'PUT' : 'POST', data?.id ? `${API.constraints}/${data.id}` : `${API.bundles}/${bundleId}/constraints`, body);
+    if (result) {
+        showToast(data?.id ? 'Constraint updated' : 'Constraint created', 'success');
+        closeModal(); loadConstraintRules();
+    }
+}
+async function deleteConstraint(id) { if (confirm('Delete this constraint?')) { const r = await apiCall('DELETE', `${API.constraints}/${id}`); if (r) { showToast('Constraint deleted', 'success'); loadConstraintRules(); } } }
+
+// ============= Evaluate =============
+async function evaluateConstraints() {
+    const bundleId = $('evalBundleId').value;
+    if (!bundleId) return showToast('Select bundle', 'error');
+    let request;
+    try { request = JSON.parse($('evalSelections').value || '{"selections": []}'); } catch (e) { return showToast('Invalid JSON', 'error'); }
+    const data = await apiCall('POST', `${API.bundles}/${bundleId}/evaluate`, request);
+    const result = $('evalResult');
+    if (data?.data) {
+        let html = `<strong>Valid:</strong> ${data.data.valid ? '<span style="color:#28a745">YES</span>' : '<span style="color:#dc3545">NO</span>'}\n\n`;
+        if (data.data.violations?.length) { html += `<strong style="color:#dc3545;">Violations:</strong>\n`; data.data.violations.forEach(v => { html += `  - ${v.ruleName}: ${v.message}\n`; }); html += '\n'; }
+        if (data.data.actions?.length) { html += `<strong style="color:#17a2b8;">Actions:</strong>\n`; data.data.actions.forEach(a => { html += `  - ${a.ruleName}: ${a.actionType}\n`; }); }
+        if (!data.data.violations?.length && !data.data.actions?.length) html += '<span style="color:#28a745">No violations.</span>';
+        result.innerHTML = html;
+    } else { result.textContent = JSON.stringify(data, null, 2); }
+}
+
+async function generateSampleSelection() {
+    const bundleId = $('evalBundleId').value;
+    if (!bundleId) return showToast('Select bundle', 'error');
+    const featuresData = await apiCall('GET', `${API.bundles}/${bundleId}/features`);
+    if (!featuresData) return;
+    const features = extractData(featuresData).data;
+    const selections = [];
+    for (const f of features) {
+        const productsData = await apiCall('GET', `${API.bundles}/${bundleId}/features/${f.id}/products`);
+        const products = extractData(productsData).data;
+        if (products.length) {
+            const defaultProd = products.find(p => p.isDefault || p.is_default) || products[0];
+            selections.push({ featureId: f.id, productId: defaultProd.productId || defaultProd.product_id, quantity: 1, attributes: {} });
+        }
+    }
+    $('evalSelections').value = JSON.stringify({ selections }, null, 2);
+    showToast('Sample generated');
+}
+
+// ============= Modal =============
+function openModal() { $('modalOverlay').classList.add('active'); }
+function closeModal() { $('modalOverlay').classList.remove('active'); $('modalBox').className = 'modal'; state.currentModal = null; }
+function saveModal() {
+    if (!state.currentModal) return;
+    switch (state.currentModal.type) {
+        case 'family': saveFamily(); break;
+        case 'line': saveLine(); break;
+        case 'product': saveProduct(); break;
+        case 'attribute': saveAttribute(); break;
+        case 'option': saveOption(); break;
+        case 'productAttribute': saveProductAttribute(); break;
+        case 'feature': saveFeature(); break;
+        case 'featureProduct': saveFeatureProduct(); break;
+        case 'override': saveOverride(); break;
+        case 'constraint': saveConstraint(); break;
+        case 'detailConstraint': saveDetailConstraint(); break;
+        case 'attrRestrictions': saveAttrRestrictions(); break;
+    }
+}
+
+$('modalOverlay').addEventListener('click', e => { if (e.target === $('modalOverlay')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+console.log('CPQ Console ready. Enter JWT token and click Load All Data.');
+</script>
+</body>
+</html>
