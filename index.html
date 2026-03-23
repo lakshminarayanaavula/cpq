@@ -133,12 +133,28 @@
         /* Modal */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; }
-        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-weight: 600; font-size: 16px; }
-        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
-        .modal-body { padding: 20px; }
-        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        .modal { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+        .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-weight: 700; font-size: 18px; color: #1a1a2e; }
+        .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #bbb; line-height: 1; }
+        .modal-close:hover { color: #555; }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; background: #fafafa; border-radius: 0 0 12px 12px; }
+        /* Product modal specific */
+        .product-modal { max-width: 580px; }
+        .product-modal .form-group label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; letter-spacing: 0.2px; }
+        .product-modal .form-group input,
+        .product-modal .form-group select,
+        .product-modal .form-group textarea { padding: 10px 13px; border: 1.5px solid #e8e8e8; border-radius: 8px; font-size: 14px; transition: border-color 0.15s; }
+        .product-modal .form-group input:focus,
+        .product-modal .form-group select:focus,
+        .product-modal .form-group textarea:focus { border-color: #1a1a2e; outline: none; box-shadow: 0 0 0 3px rgba(26,26,46,0.06); }
+        .product-modal .form-group textarea { resize: vertical; min-height: 76px; font-family: inherit; }
+        .required-star { color: #e53935; margin-left: 1px; }
+        .product-modal-bottom-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 4px; }
+        .product-modal-checks { display: flex; gap: 24px; align-items: center; padding-bottom: 2px; }
+        .product-modal-checks .checkbox-label { font-size: 13px; color: #444; display: flex; align-items: center; gap: 7px; cursor: pointer; font-weight: 500; }
+        .product-modal-checks input[type="checkbox"] { width: 16px; height: 16px; accent-color: #1a1a2e; cursor: pointer; }
 
         /* Toast */
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; color: white; font-size: 14px; z-index: 2000; animation: slideUp 0.3s ease; }
@@ -190,7 +206,14 @@
         .layout-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: white; }
         .layout-drop-list { display: flex; flex-direction: column; gap: 8px; }
         .layout-drop-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; }
-        .layout-drop-item .drag-handle { color: #bbb; font-size: 16px; cursor: grab; }
+        .layout-drop-item .drag-handle { color: #bbb; font-size: 16px; cursor: grab; user-select: none; }
+        .layout-drop-item .attr-sort-input { width: 52px; padding: 5px 7px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; text-align: center; }
+        .layout-drop-item .attr-sort-input:focus { border-color: #1a1a2e; outline: none; }
+        .layout-drop-item .attr-name { font-weight: 500; font-size: 13px; color: #555; min-width: 90px; }
+        .layout-drop-item .attr-label-input { flex: 1; padding: 5px 9px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .layout-drop-item .attr-label-input:focus { border-color: #1a1a2e; outline: none; }
+        .layout-drop-item .attr-save-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: #bbb; padding: 2px 4px; border-radius: 4px; }
+        .layout-drop-item .attr-save-btn:hover { color: #1a1a2e; background: #eef3ff; }
         /* Feature rows matching screenshot */
         .feature-row { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; }
         .feature-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -209,21 +232,89 @@
         .feature-chip-alt .chip-override-count { background: rgba(0,0,0,0.1); }
         .chip-override-hint { opacity: 0.45; font-size: 12px; margin-left: 1px; }
         /* Attribute Restrictions Modal */
-        .attr-restrict-modal { max-width: 660px; }
-        .attr-restrict-modal .modal-subtitle { font-size: 13px; color: #888; margin-top: 4px; margin-bottom: 20px; }
-        .attr-restrict-block { margin-bottom: 24px; }
-        .attr-restrict-block-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
-        .attr-restrict-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .attr-restrict-modal { max-width: 700px; }
+        .attr-restrict-modal .modal-subtitle { font-size: 13px; color: #888; margin-top: 4px; margin-bottom: 24px; }
+        .attr-restrict-block { padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+        .attr-restrict-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .attr-restrict-block-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; }
+        .attr-restrict-block-title span { font-size: 12px; font-weight: 400; color: #999; margin-left: 4px; }
+        .attr-restrict-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .attr-restrict-row .form-group { margin: 0; }
-        .attr-restrict-row label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 4px; }
-        .attr-restrict-row input, .attr-restrict-row select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
-        .attr-restrict-discrete label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 4px; margin-top: 8px; }
-        .attr-restrict-discrete input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
-        .attr-restrict-options label { font-size: 11px; font-weight: 500; color: #888; display: block; margin-bottom: 8px; }
-        .ar-options-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .ar-option-check { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; color: #444; cursor: pointer; user-select: none; }
-        .ar-option-check:hover { background: #f0f0f0; }
-        .ar-option-check input[type="checkbox"] { cursor: pointer; accent-color: #1a1a2e; }
+        .attr-restrict-row label { font-size: 11px; font-weight: 500; color: #999; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .attr-restrict-row input { width: 100%; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .attr-restrict-row input:focus { border-color: #1a1a2e; outline: none; }
+        .attr-restrict-discrete label { font-size: 11px; font-weight: 500; color: #999; display: block; margin-bottom: 5px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .attr-restrict-discrete input { width: 100%; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .attr-restrict-discrete input:focus { border-color: #1a1a2e; outline: none; }
+        .attr-restrict-options label { font-size: 11px; font-weight: 500; color: #999; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .ar-option-select { width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; padding: 9px 12px; font-size: 14px; color: #333; outline: none; background: white; cursor: pointer; }
+        .ar-option-select:focus { border-color: #1a1a2e; }
+
+        /* Product Attributes section inside Attr Restrictions modal */
+        .pa-section { margin-top: 24px; border-top: 2px solid #f0f0f0; padding-top: 20px; }
+        .pa-section-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; }
+        .pa-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; min-height: 32px; }
+        .pa-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .pa-chip.type-number   { background: #f0f0f0; color: #444; }
+        .pa-chip.type-dropdown { background: #1a1a2e; color: white; }
+        .pa-chip.type-other    { background: #eef2ff; color: #3b4fd4; }
+        .pa-chip-del { background: none; border: none; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 3px; opacity: 0.5; color: inherit; }
+        .pa-chip-del:hover { opacity: 1; }
+        .pa-empty-hint { color: #bbb; font-size: 13px; }
+        .pa-add-row { display: flex; gap: 8px; align-items: center; }
+        .pa-add-row select { flex: 1; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; }
+        .pa-add-row select:focus { border-color: #1a1a2e; outline: none; }
+        /* ===== Cost Matrix modal ===== */
+        .cost-matrix-modal { max-width: 560px; }
+        .cost-matrix-modal .form-group label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; letter-spacing: 0.2px; display: block; }
+        .cost-matrix-modal .form-group input,
+        .cost-matrix-modal .form-group select,
+        .cost-matrix-modal .form-group textarea { padding: 10px 13px; border: 1.5px solid #e8e8e8; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; transition: border-color 0.15s; }
+        .cost-matrix-modal .form-group input:focus,
+        .cost-matrix-modal .form-group select:focus,
+        .cost-matrix-modal .form-group textarea:focus { border-color: #1a1a2e; outline: none; box-shadow: 0 0 0 3px rgba(26,26,46,0.06); }
+
+        /* ===== Cost Matrices ===== */
+        .cm-tag { display:inline-flex; align-items:center; padding:4px 12px; border-radius:16px; font-size:12px; font-weight:600; background:#f0f0f0; color:#555; margin-right:6px; }
+        .cm-tag.primary { background:#1a1a2e; color:#fff; }
+        .cm-detail-header { margin-bottom:24px; }
+        .cm-detail-title { font-size:22px; font-weight:700; color:#1a1a2e; margin-bottom:4px; }
+        .cm-detail-sub { font-size:13px; color:#888; margin-bottom:14px; }
+        .cm-back-btn { background:none; border:none; cursor:pointer; font-size:18px; color:#888; margin-right:8px; vertical-align:middle; }
+        .cm-back-btn:hover { color:#1a1a2e; }
+        .cm-info-bar { display:flex; align-items:center; gap:6px; background:#f8f9ff; border:1px solid #e8eaf6; border-radius:8px; padding:10px 14px; margin-bottom:20px; font-size:12px; color:#555; }
+        .cm-info-bar svg { flex-shrink:0; color:#7c8db5; }
+        .cm-entries-section { background:white; border:1px solid #e8e8e8; border-radius:10px; padding:20px 24px; }
+        .cm-entries-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .cm-entries-title { font-size:15px; font-weight:700; color:#1a1a2e; }
+        .cm-entry-row { display:grid; grid-template-columns: 2fr 1.4fr 1fr 120px 36px; gap:8px; align-items:center; margin-bottom:8px; }
+        .cm-entry-row select, .cm-entry-row input[type=number] { padding:8px 10px; border:1px solid #e0e0e0; border-radius:8px; font-size:13px; width:100%; box-sizing:border-box; background:white; }
+        .cm-entry-row select:focus, .cm-entry-row input[type=number]:focus { border-color:#1a1a2e; outline:none; }
+        .cm-entry-del { background:none; border:none; cursor:pointer; color:#e57373; font-size:18px; display:flex; align-items:center; justify-content:center; border-radius:6px; padding:4px; }
+        .cm-entry-del:hover { background:#fdecea; }
+        .cm-attr-cond-toggle { font-size:11px; color:#7c8db5; cursor:pointer; user-select:none; padding:2px 0 8px 2px; display:block; }
+        .cm-attr-cond-toggle:hover { color:#1a1a2e; }
+        .cm-entry-group { margin-bottom:4px; }
+        .cm-col-header { font-size:11px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:0.4px; padding-bottom:4px; }
+        .cm-dynamic-star { color:#f59e0b; font-size:14px; margin-left:4px; }
+        .cm-cond-toggle-row { display:flex; align-items:center; gap:12px; padding:2px 0 6px 2px; }
+        .cm-attr-cond-toggle { font-size:11px; color:#7c8db5; cursor:pointer; user-select:none; }
+        .cm-attr-cond-toggle:hover { color:#1a1a2e; }
+        .cm-cond-add-btn { font-size:11px; color:#7c8db5; background:none; border:none; cursor:pointer; padding:0; }
+        .cm-cond-add-btn:hover { color:#1a1a2e; }
+        .cm-cond-panel { background:#f8f9ff; border:1px solid #e8eaf6; border-radius:8px; padding:12px 14px; margin-bottom:10px; margin-left:2px; }
+        .cm-cond-rows { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+        .cm-cond-row { display:grid; grid-template-columns:1fr 1fr 32px; gap:6px; align-items:center; }
+        .cm-cond-row select, .cm-cond-row input { padding:7px 10px; border:1px solid #dde1f0; border-radius:6px; font-size:13px; background:white; width:100%; box-sizing:border-box; }
+        .cm-cond-row select:focus, .cm-cond-row input:focus { border-color:#1a1a2e; outline:none; }
+        .cm-cond-new-row { display:grid; grid-template-columns:1fr 140px auto auto; gap:6px; align-items:center; border-top:1px solid #e8eaf6; padding-top:10px; }
+        .cm-cond-new-row select, .cm-cond-new-row input { padding:7px 10px; border:1px solid #dde1f0; border-radius:6px; font-size:13px; background:white; width:100%; box-sizing:border-box; }
+        .cm-cond-new-row select:focus, .cm-cond-new-row input:focus { border-color:#1a1a2e; outline:none; }
+        /* Price Matrix (LIST) — 3 price columns */
+        .pm-entry-row { display:grid; grid-template-columns: 2fr 1.2fr 0.9fr 100px 100px 100px 36px; gap:8px; align-items:center; margin-bottom:8px; }
+        .pm-entry-row select, .pm-entry-row input[type=number] { padding:8px 10px; border:1px solid #e0e0e0; border-radius:8px; font-size:13px; width:100%; box-sizing:border-box; background:white; }
+        .pm-entry-row select:focus, .pm-entry-row input[type=number]:focus { border-color:#1a1a2e; outline:none; }
+        .pm-col-header { font-size:11px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:0.4px; padding-bottom:4px; }
 
         /* Constraint Cards */
         .constraint-card { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; }
@@ -372,12 +463,12 @@
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Pricing</div>
                 <ul class="sidebar-menu">
-                    <li><a data-page="constraint-rules">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <li><a data-page="cost-matrices">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                         Cost Matrices
                     </a></li>
-                    <li><a data-page="evaluate">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10M7 12h10M7 17h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    <li><a data-page="price-matrices">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                         Price Matrices
                     </a></li>
                 </ul>
@@ -622,9 +713,12 @@
                             <div style="font-size:16px;font-weight:600;color:#1a1a2e;">Layout Definition</div>
                             <div style="font-size:13px;color:#888;margin-top:3px;">Add selected attributes to the layout and reorder them by dragging.</div>
                         </div>
-                        <div class="layout-toggle">
-                            <button class="layout-btn active" id="btn1Col" onclick="setLayout(1)">&#9646; 1 Col</button>
-                            <button class="layout-btn" id="btn2Col" onclick="setLayout(2)">&#9646;&#9646; 2 Col</button>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;" onclick="saveAllLayoutItems()">Save All</button>
+                            <div class="layout-toggle">
+                                <button class="layout-btn active" id="btn1Col" onclick="setLayout(1)">&#9646; 1 Col</button>
+                                <button class="layout-btn" id="btn2Col" onclick="setLayout(2)">&#9646;&#9646; 2 Col</button>
+                            </div>
                         </div>
                     </div>
                     <div class="layout-drop-list" id="detailLayoutList"></div>
@@ -912,6 +1006,75 @@ VALIDATION_INFO
             </div>
         </div>
 
+        <!-- ============= Cost Matrices ============= -->
+        <div class="page-section" id="page-cost-matrices">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Cost Matrices</div>
+                    <div class="page-subtitle">Define cost structures for products</div>
+                </div>
+                <button class="btn btn-primary" onclick="showCostMatrixModal(null)">+ Add Cost Matrix</button>
+            </div>
+
+            <!-- List view -->
+            <div id="cmListView">
+                <table class="data-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Currency</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Entries</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cmTableBody">
+                        <tr><td colspan="7" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detail view (hidden until user clicks a matrix row) -->
+            <div id="cmDetailView" style="display:none;"></div>
+        </div>
+
+        <!-- ============= Price Matrices (placeholder) ============= -->
+        <!-- ============= Price Matrices ============= -->
+        <div class="page-section" id="page-price-matrices">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Price Matrices</div>
+                    <div class="page-subtitle">Define pricing structures for products</div>
+                </div>
+                <button class="btn btn-primary" onclick="showPriceMatrixModal(null)">+ Add Price Matrix</button>
+            </div>
+
+            <!-- List view -->
+            <div id="pmListView">
+                <table class="data-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Currency</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Entries</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pmTableBody">
+                        <tr><td colspan="7" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Detail view -->
+            <div id="pmDetailView" style="display:none;"></div>
+        </div>
+
     </div>
 
     <!-- Response Panel -->
@@ -946,7 +1109,12 @@ const API = {
     products: '/api/v1/cpq/products',
     attributes: '/api/v1/cpq/attributes',
     bundles: '/api/v1/cpq/bundles',
-    constraints: '/api/v1/cpq/constraints'
+    constraints: '/api/v1/cpq/constraints',
+    costMatrices: '/api/v1/cpq/cost-matrices',
+    listMatrices: '/api/v1/cpq/list-matrices',
+    pricingMatrices: '/api/v1/cpq/pricing-matrices',
+    pricingEntries: '/api/v1/cpq/pricing-entries',
+    currencies: '/api/v1/mdata/mobject/4daa3a2d-b398-44da-9b4a-2219a0877186/with-related'
 };
 
 // Default page size for pagination
@@ -1087,6 +1255,8 @@ document.querySelectorAll('.sidebar-menu a').forEach(link => {
         link.classList.add('active');
         $('page-' + page).classList.add('active');
         if (page === 'attribute-options') populateAttributeDropdowns();
+        if (page === 'cost-matrices') loadCostMatrices();
+        if (page === 'price-matrices') loadPriceMatrices();
     });
 });
 
@@ -1358,18 +1528,45 @@ function showProductModal(product = null) {
     const statusId = product?.status;
     const lineOpts = state.lines.map(l => `<option value="${l.id}" ${lId === l.id ? 'selected' : ''}>${l.name}</option>`).join('');
     const isAsset = product?.isAsset || product?.is_asset;
-    const isOrd = product?.isOrderable !== false && product?.is_orderable !== false;
+    const isOrd = product ? (product.isOrderable !== false && product.is_orderable !== false) : false;
     const typeOpts = Object.entries(PRODUCT_TYPE_IDS).map(([label, uuid]) => `<option value="${uuid}" ${pTypeId === uuid ? 'selected' : ''}>${label}</option>`).join('');
     const statusOpts = Object.entries(STATUS_IDS).map(([label, uuid]) => `<option value="${uuid}" ${statusId === uuid ? 'selected' : ''}>${label}</option>`).join('');
+    $('modalBox').className = 'modal product-modal';
     $('modalBody').innerHTML = `
-        <div class="form-row"><div class="form-group"><label>Label *</label><input type="text" id="modalProductLabel" value="${product?.label || ''}"></div>
-        <div class="form-group"><label>SKU *</label><input type="text" id="modalProductSku" value="${product?.sku || ''}"></div></div>
-        <div class="form-group"><label>Description</label><input type="text" id="modalProductDescription" value="${product?.description || ''}"></div>
-        <div class="form-row"><div class="form-group"><label>Product Line *</label><select id="modalProductLine">${lineOpts}</select></div>
-        <div class="form-group"><label>Type</label><select id="modalProductType">${typeOpts}</select></div></div>
-        <div class="form-row"><div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalProductIsAsset" ${isAsset ? 'checked' : ''}> Is Asset</label></div>
-        <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="modalProductIsOrderable" ${isOrd ? 'checked' : ''}> Is Orderable</label></div>
-        <div class="form-group"><label>Status</label><select id="modalProductStatus">${statusOpts}</select></div></div>`;
+        <div class="form-row">
+            <div class="form-group">
+                <label>Label <span class="required-star">*</span></label>
+                <input type="text" id="modalProductLabel" placeholder="e.g. VM Small" value="${product?.label || ''}">
+            </div>
+            <div class="form-group">
+                <label>SKU <span class="required-star">*</span></label>
+                <input type="text" id="modalProductSku" placeholder="e.g. VM-SMALL-001" value="${product?.sku || ''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="modalProductDescription" rows="3" placeholder="Brief product description...">${product?.description || ''}</textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Product Line <span class="required-star">*</span></label>
+                <select id="modalProductLine">${lineOpts}</select>
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="modalProductType">${typeOpts}</select>
+            </div>
+        </div>
+        <div class="product-modal-bottom-row">
+            <div class="product-modal-checks">
+                <label class="checkbox-label"><input type="checkbox" id="modalProductIsAsset" ${isAsset ? 'checked' : ''}> Is Asset</label>
+                <label class="checkbox-label"><input type="checkbox" id="modalProductIsOrderable" ${isOrd ? 'checked' : ''}> Is Orderable</label>
+            </div>
+            <div class="form-group" style="margin:0;min-width:160px;">
+                <label>Status</label>
+                <select id="modalProductStatus">${statusOpts}</select>
+            </div>
+        </div>`;
     openModal();
 }
 
@@ -1524,8 +1721,16 @@ async function toggleDetailAttr(attrId, cardEl) {
 }
 
 function renderDetailLayout() {
-    const linkedIds = new Set(detailState.productAttributes.map(pa => pa.attribute_id || pa.attributeId));
-    const linked = state.attributes.filter(a => linkedIds.has(a.id));
+    const productId = detailState.product?.id;
+    const paMap = {};
+    detailState.productAttributes.forEach(pa => {
+        paMap[pa.attribute_id || pa.attributeId] = pa;
+    });
+    const linked = state.attributes
+        .filter(a => paMap[a.id])
+        .slice()
+        .sort((a, b) => (paMap[a.id]?.sort_order ?? paMap[a.id]?.sortOrder ?? 0) - (paMap[b.id]?.sort_order ?? paMap[b.id]?.sortOrder ?? 0));
+
     const list = $('detailLayoutList');
     if (!linked.length) {
         list.innerHTML = '<div style="color:#bbb;font-size:13px;padding:12px;">No attributes selected.</div>';
@@ -1534,12 +1739,70 @@ function renderDetailLayout() {
     }
     if (detailState.layoutCols === 2) { list.style.display = 'grid'; list.style.gridTemplateColumns = '1fr 1fr'; list.style.gap = '8px'; }
     else { list.style.display = 'flex'; list.style.flexDirection = 'column'; list.style.gap = '8px'; }
-    list.innerHTML = linked.map(a => `
-        <div class="layout-drop-item">
+
+    list.innerHTML = linked.map(a => {
+        const pa = paMap[a.id];
+        const paId = pa?.id || '';
+        const sortOrder = pa?.sort_order ?? pa?.sortOrder ?? 0;
+        const customLabel = pa?.custom_label || pa?.customLabel || '';
+        return `<div class="layout-drop-item" data-pa-id="${paId}" data-attr-id="${a.id}">
             <span class="drag-handle">&#8942;&#8942;</span>
-            <span style="flex:1">${a.name}</span>
+            <input type="number" class="attr-sort-input" value="${sortOrder}" min="0" placeholder="#" title="Sort order">
+            <span class="attr-name">${a.name}</span>
+            <input type="text" class="attr-label-input" value="${customLabel}" placeholder="Custom label (optional)">
             <span class="attr-card-type">${attrTypeDisplay(a.type__r)}</span>
-        </div>`).join('');
+            <button class="attr-save-btn" onclick="saveLayoutItem(this)" title="Save changes">&#10003;</button>
+        </div>`;
+    }).join('');
+}
+
+async function saveLayoutItem(btn) {
+    const row      = btn.closest('.layout-drop-item');
+    const paId     = row.dataset.paId;
+    const attrId   = row.dataset.attrId;
+    const productId = detailState.product?.id;
+    if (!paId || !productId) return showToast('Cannot save — missing record ID', 'error');
+
+    const sortOrder   = parseInt(row.querySelector('.attr-sort-input').value) || 0;
+    const customLabel = row.querySelector('.attr-label-input').value.trim();
+
+    const result = await apiCall('PUT', `${API.attributes}/products/${productId}/attributes/${paId}`, {
+        attribute_id:  attrId,
+        sort_order:    sortOrder,
+        custom_label:  customLabel || null
+    });
+    if (result) {
+        // Update local state
+        const pa = detailState.productAttributes.find(p => p.id === paId);
+        if (pa) { pa.sort_order = sortOrder; pa.sortOrder = sortOrder; pa.custom_label = customLabel; pa.customLabel = customLabel; }
+        showToast('Attribute updated', 'success');
+        renderDetailLayout();
+    }
+}
+
+async function saveAllLayoutItems() {
+    const rows = document.querySelectorAll('#detailLayoutList .layout-drop-item');
+    if (!rows.length) return;
+    const productId = detailState.product?.id;
+    let saved = 0;
+    for (const row of rows) {
+        const paId     = row.dataset.paId;
+        const attrId   = row.dataset.attrId;
+        if (!paId) continue;
+        const sortOrder   = parseInt(row.querySelector('.attr-sort-input').value) || 0;
+        const customLabel = row.querySelector('.attr-label-input').value.trim();
+        const result = await apiCall('PUT', `${API.attributes}/products/${productId}/attributes/${paId}`, {
+            attribute_id:  attrId,
+            sort_order:    sortOrder,
+            custom_label:  customLabel || null
+        });
+        if (result) {
+            const pa = detailState.productAttributes.find(p => p.id === paId);
+            if (pa) { pa.sort_order = sortOrder; pa.sortOrder = sortOrder; pa.custom_label = customLabel; pa.customLabel = customLabel; }
+            saved++;
+        }
+    }
+    if (saved) { showToast(`${saved} attribute(s) saved`, 'success'); renderDetailLayout(); }
 }
 
 function setLayout(cols) {
@@ -1630,16 +1893,17 @@ async function openAttrRestrictionsModal(productId, productName) {
         })
     );
 
-    // Include both Number and Dropdown attributes
-    const restrictableAttrs = attrDetails.filter(a => a && (
+    // All linked attributes (for the manage-attributes section)
+    const allLinkedAttrs = attrDetails.filter(Boolean);
+
+    // Subset that supports restrictions (Number / Dropdown)
+    const restrictableAttrs = allLinkedAttrs.filter(a =>
         a.type__r === 'Number' || a.type__r === 'Numerical' ||
         a.type__r === 'Dropdown' || a.type__r === 'Picklist'
-    ));
+    );
 
-    if (!restrictableAttrs.length) {
-        showToast('No restrictable attributes linked to this product', 'info');
-        return;
-    }
+    // Keep the PA records for unlink (need their internal id)
+    const paRecords = productAttrs; // raw ProductAttribute records
 
     // Pre-load options for any Dropdown attributes not yet in cache
     if (!state.attrOptionsCache) state.attrOptionsCache = {};
@@ -1700,19 +1964,23 @@ async function openAttrRestrictionsModal(productId, productName) {
                 ? (Array.isArray(ov.allowed_values.values) ? ov.allowed_values.values : [ov.allowed_values.values])
                 : [];
             const options = (state.attrOptionsCache || {})[a.id] || [];
+            // Pre-select the first saved allowed value (single-select)
+            const currentVal = allowedVals[0] || '';
             const optHtml = options.length
-                ? options.map(opt => {
+                ? `<option value="">— No restriction —</option>` + options.map(opt => {
                     const val = opt.value || '';
                     const lbl = opt.label || opt.value || '';
-                    const checked = allowedVals.includes(val) ? 'checked' : '';
-                    return `<label class="ar-option-check"><input type="checkbox" class="ar-option" value="${val}" ${checked}> ${lbl}</label>`;
+                    return `<option value="${val}" ${val === currentVal ? 'selected' : ''}>${lbl}</option>`;
                 }).join('')
+                : '';
+            const selectEl = options.length
+                ? `<select class="ar-option-select">${optHtml}</select>`
                 : '<span style="color:#aaa;font-size:12px;">No options defined for this attribute</span>';
             return `<div class="attr-restrict-block" data-attr-id="${a.id}" data-override-id="${ov?.id || ''}" data-type="Dropdown">
                 <div class="attr-restrict-block-title">${a.name} <span style="color:#888;font-weight:400;font-size:12px;">(Dropdown)</span></div>
                 <div class="attr-restrict-options">
-                    <label>Allowed Options <span style="color:#aaa;font-size:11px;font-weight:400;">(leave all checked = no restriction)</span></label>
-                    <div class="ar-options-grid">${optHtml}</div>
+                    <label>Restrict to Option <span style="color:#aaa;font-size:11px;font-weight:400;">(leave "No restriction" to allow all)</span></label>
+                    ${selectEl}
                 </div>
             </div>`;
         }
@@ -1720,18 +1988,87 @@ async function openAttrRestrictionsModal(productId, productName) {
         return '';
     }).join('');
 
+    // ---- Product Attributes management section ----
+    const linkedAttrIds = new Set(allLinkedAttrs.map(a => a.id));
+
+    // Build chips for currently linked attributes
+    const paChips = allLinkedAttrs.length ? allLinkedAttrs.map(a => {
+        const pa    = paRecords.find(r => (r.attribute_id || r.attributeId) === a.id);
+        const paId  = pa?.id || '';
+        const typeR = a.type__r || '';
+        const chipClass = (typeR === 'Number' || typeR === 'Numerical') ? 'type-number'
+                        : (typeR === 'Dropdown' || typeR === 'Picklist') ? 'type-dropdown'
+                        : 'type-other';
+        const typeBadge = (typeR === 'Number' || typeR === 'Numerical') ? 'Number'
+                        : (typeR === 'Dropdown' || typeR === 'Picklist') ? 'Dropdown'
+                        : (typeR || 'Text');
+        return `<span class="pa-chip ${chipClass}" data-attr-id="${a.id}" data-pa-id="${paId}">
+            ${a.name} <span style="opacity:.55;font-size:10px;font-weight:500;">(${typeBadge})</span>
+            <button class="pa-chip-del" onclick="removeProductAttrFromModal('${paId}','${a.id}')" title="Remove">×</button>
+        </span>`;
+    }).join('') : '<span class="pa-empty-hint">No attributes linked yet.</span>';
+
+    // Unlinked global attributes available to add
+    const unlinkedOpts = (state.attributes || [])
+        .filter(a => !linkedAttrIds.has(a.id))
+        .map(a => `<option value="${a.id}">${a.name} (${attrTypeDisplay(a.type__r)})</option>`)
+        .join('');
+
+    const addRow = unlinkedOpts
+        ? `<div class="pa-add-row">
+               <select id="paAddSelect"><option value="">— select attribute to add —</option>${unlinkedOpts}</select>
+               <button class="btn btn-outline" style="white-space:nowrap;padding:9px 16px;" onclick="addProductAttrFromModal()">+ Add</button>
+           </div>`
+        : '<span class="pa-empty-hint">All global attributes are already linked.</span>';
+
+    const restrictionsHtml = blocks
+        ? `<p class="modal-subtitle">Define valid values for each attribute within this bundle context.</p>
+           <div id="attrRestrictBlocks">${blocks}</div>`
+        : `<p class="modal-subtitle" style="color:#bbb;">No Number or Dropdown attributes linked — add some below.</p>
+           <div id="attrRestrictBlocks"></div>`;
+
     // Show in the generic modal with a special class
     $('modalTitle').textContent = `Attribute Restrictions \u2014 ${productName}`;
     $('modalBox').className = 'modal attr-restrict-modal';
     $('modalBody').innerHTML = `
-        <p class="modal-subtitle">Define valid values for each attribute within this bundle context.</p>
-        <div id="attrRestrictBlocks">${blocks}</div>`;
+        ${restrictionsHtml}
+        <div class="pa-section">
+            <div class="pa-section-title">Product Attributes</div>
+            <div class="pa-chips" id="paChipsContainer">${paChips}</div>
+            ${addRow}
+        </div>`;
     $('modalSaveBtn').textContent = 'Save Restrictions';
 
-    // Store context for save
-    window._attrRestrictContext = { bundleId, productId, restrictableAttrs, overrides };
+    // Store context for save and inline attribute actions
+    window._attrRestrictContext = { bundleId, productId, productName, restrictableAttrs, overrides };
     state.currentModal = { type: 'attrRestrictions', data: null };
     openModal();
+}
+
+async function addProductAttrFromModal() {
+    const ctx = window._attrRestrictContext;
+    if (!ctx) return;
+    const attrId = $('paAddSelect')?.value;
+    if (!attrId) return showToast('Select an attribute to add', 'info');
+    const result = await apiCall('POST', `${API.attributes}/products/${ctx.productId}`, { attribute_id: attrId, sort_order: 0 });
+    if (result) {
+        showToast('Attribute linked', 'success');
+        closeModal();
+        await openAttrRestrictionsModal(ctx.productId, ctx.productName);
+    }
+}
+
+async function removeProductAttrFromModal(paId, attrId) {
+    const ctx = window._attrRestrictContext;
+    if (!ctx) return;
+    if (!paId) return showToast('Cannot remove — no product attribute record found', 'error');
+    if (!confirm('Remove this attribute from the product?')) return;
+    const result = await apiCall('DELETE', `${API.attributes}/products/${ctx.productId}/attributes/${paId}`);
+    if (result !== null) {
+        showToast('Attribute removed', 'success');
+        closeModal();
+        await openAttrRestrictionsModal(ctx.productId, ctx.productName);
+    }
 }
 
 async function saveAttrRestrictions() {
@@ -1749,17 +2086,17 @@ async function saveAttrRestrictions() {
         let payload   = null;
 
         if (blockType === 'Dropdown') {
-            const checkedOpts = [...block.querySelectorAll('.ar-option:checked')].map(cb => cb.value);
-            const totalOpts   = block.querySelectorAll('.ar-option').length;
-            // Only save restriction if fewer than all options are selected (partial restriction)
-            hasValues = checkedOpts.length > 0 && checkedOpts.length < totalOpts;
+            const selectEl   = block.querySelector('.ar-option-select');
+            const selectedVal = selectEl?.value || '';
+            // Empty value ("— No restriction —") means no override
+            hasValues = !!selectedVal;
             if (hasValues) {
                 payload = {
                     attribute_id:   attrId,
                     override_min:   0,
                     override_max:   0,
                     override_step:  0,
-                    allowed_values: { values: checkedOpts }
+                    allowed_values: { values: [selectedVal] }
                 };
             }
         } else {
@@ -1939,25 +2276,27 @@ function _cbFeatureOpts(selected) {
     return `<option value="">—</option>` +
         features.map(f => `<option value="${f.id}" ${f.id === selected ? 'selected' : ''}>${f.label || f.name || f.id}</option>`).join('');
 }
-function _cbProductOpts(selected) {
-    // Collect unique sub-products from all feature products in this bundle
-    const seen = new Set();
-    const products = [];
-    Object.values(detailState.featureProducts || {}).forEach(fps =>
-        fps.forEach(fp => {
-            const pid = fp.product_id || fp.productId;
-            const lbl = fp.product_label || fp.productLabel;
-            if (pid && !seen.has(pid)) { seen.add(pid); products.push({ id: pid, label: lbl }); }
-        })
-    );
-    if (!products.length) {
-        (state.products || []).forEach(p => {
-            if (!seen.has(p.id)) { seen.add(p.id); products.push({ id: p.id, label: p.label }); }
-        });
-    }
+
+/** Returns product <option> HTML filtered to the given featureId. */
+function _cbProductOptsForFeature(featureId, selected) {
+    if (!featureId) return `<option value="">— select feature first —</option>`;
+    const fps = (detailState.featureProducts || {})[featureId] || [];
+    const products = fps
+        .map(fp => ({ id: fp.product_id || fp.productId, label: fp.product_label || fp.productLabel }))
+        .filter(p => p.id);
+    if (!products.length) return `<option value="">— no products —</option>`;
     return `<option value="">—</option>` +
         products.map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${p.label || p.id}</option>`).join('');
 }
+
+/** Called when a feature select changes — repopulates the sibling product select in the same row. */
+function _cbOnFeatureChange(featureSel) {
+    const row     = featureSel.closest('tr');
+    const prodSel = row.querySelector('.cond-product, .action-product');
+    if (!prodSel) return;
+    prodSel.innerHTML = _cbProductOptsForFeature(featureSel.value, '');
+}
+
 function _cbAttrOpts(selected) {
     return `<option value="">—</option>` +
         (state.attributes || []).map(a => `<option value="${a.id}" ${a.id === selected ? 'selected' : ''}>${a.name || a.id}</option>`).join('');
@@ -1974,8 +2313,8 @@ function _cbCondRow(cond) {
     const op     = cond.operator || cond.op || '';
     const val    = cond.value != null ? cond.value : '';
     return `<tr class="cond-row">
-        <td><select class="cond-feature">${_cbFeatureOpts(featId)}</select></td>
-        <td><select class="cond-product">${_cbProductOpts(prodId)}</select></td>
+        <td><select class="cond-feature" onchange="_cbOnFeatureChange(this)">${_cbFeatureOpts(featId)}</select></td>
+        <td><select class="cond-product">${_cbProductOptsForFeature(featId, prodId)}</select></td>
         <td><select class="cond-attr">${_cbAttrOpts(attrId)}</select></td>
         <td style="width:90px"><select class="cond-op"><option value="">—</option>${_cbOpOpts(op)}</select></td>
         <td style="width:100px"><input type="text" class="cond-value" placeholder="Value" value="${val}"></td>
@@ -1988,8 +2327,8 @@ function _cbActionRow(act) {
     const attrId = act.targetAttributeId || act.target_attribute_id || act.attribute_id || act.attributeId || '';
     const val    = (act.targetValues && act.targetValues[0]) || act.value || '';
     return `<tr class="action-row">
-        <td><select class="action-feature">${_cbFeatureOpts(featId)}</select></td>
-        <td><select class="action-product">${_cbProductOpts(prodId)}</select></td>
+        <td><select class="action-feature" onchange="_cbOnFeatureChange(this)">${_cbFeatureOpts(featId)}</select></td>
+        <td><select class="action-product">${_cbProductOptsForFeature(featId, prodId)}</select></td>
         <td><select class="action-attr">${_cbAttrOpts(attrId)}</select></td>
         <td style="width:100px"><input type="number" class="action-value" placeholder="Value" value="${val}"></td>
         <td style="width:28px"><button type="button" class="constraint-row-del" onclick="this.closest('tr').remove()" title="Remove">×</button></td>
@@ -2982,6 +3321,911 @@ async function generateSampleSelection() {
     showToast('Sample generated');
 }
 
+// ============= Cost Matrices =============
+const cmState = {
+    matrices: [],           // all COST type matrices (PricingMatrixWrapper)
+    currencies: [],         // [{id, currency_code, currency_name}]
+    currentMatrix: null,    // the matrix being viewed in detail
+    entries: [],            // PricingEntryWrapper[] for current matrix
+    entryCounts: {},        // matrixId -> entry count
+    productAttributes: {}   // productId -> [attribute objects] for qty attr + conditions dropdowns
+};
+
+// UOM options (usageUom UUID -> label)
+const UOM_OPTIONS = [
+    { id: 'b5c6d7e8-f9a0-4123-7890-555555555555', label: 'MRC' },
+    { id: 'd1e2f3a4-b5c6-4789-3456-111111111111', label: 'Hourly' },
+    { id: 'a4b5c6d7-e8f9-4012-6789-444444444444', label: 'OTC' },
+    { id: 'e2f3a4b5-c6d7-4890-4567-222222222222', label: 'Daily' },
+    { id: 'f3a4b5c6-d7e8-4901-5678-333333333333', label: 'Monthly' }
+];
+
+function _cmCurrencyLabel(currencyId) {
+    if (!currencyId) return '—';
+    const c = cmState.currencies.find(x => String(x.id) === String(currencyId));
+    return c ? (c.data?.currency_code || c.data?.currency_name || String(currencyId).slice(0, 8)) : String(currencyId).slice(0, 8);
+}
+function _cmUomLabel(uomId) {
+    const u = UOM_OPTIONS.find(x => x.id === uomId || x.id === String(uomId));
+    return u ? u.label : (uomId ? String(uomId).slice(0, 6) : '—');
+}
+function _cmUomOpts(selected) {
+    return UOM_OPTIONS.map(u => `<option value="${u.id}" ${u.id === selected ? 'selected' : ''}>${u.label}</option>`).join('');
+}
+function _cmProductLabel(pid) {
+    const p = state.products.find(x => x.id === pid || x.id === String(pid));
+    return p ? (p.label || p.name || pid) : (pid ? String(pid).slice(0, 8) : '—');
+}
+function _cmProductOpts(selected) {
+    return `<option value="">— Select Product —</option>` +
+        (state.products || []).map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${p.label || p.name} (${p.sku || ''})</option>`).join('');
+}
+function _cmAttrOpts(selected, productId) {
+    // Show numeric attributes linked to this product
+    let attrs = productId ? (cmState.productAttributes[productId] || []) : [];
+    const numericAttrs = attrs.filter(a => {
+        const t = (a.type__r || '').toLowerCase();
+        return t.includes('number') || t.includes('numer') || t === '';
+    });
+    // Fall back to all global number attributes if none found
+    const display = numericAttrs.length ? numericAttrs : (state.attributes || []).filter(a => {
+        const t = (a.type__r || a.type || '').toLowerCase();
+        return t.includes('number') || t.includes('numer');
+    });
+    return `<option value="">— None —</option>` +
+        display.map(a => `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`).join('');
+}
+
+function _cmAllAttrOpts(productId) {
+    // All attributes for a product (for condition dropdown — no type filter)
+    const attrs = productId ? (cmState.productAttributes[productId] || []) : [];
+    return `<option value="">— Attribute —</option>` +
+        attrs.map(a => `<option value="${a.id}">${a.label || a.name}</option>`).join('');
+}
+
+async function loadCostMatrices() {
+    // Load currencies first (for display)
+    if (!cmState.currencies.length) {
+        try {
+            const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0');
+            if (cRes) {
+                // Response: { content: [{id, data: {currency_code, currency_name, currency_symbol}}] }
+                const content = cRes.content || cRes.data || cRes;
+                cmState.currencies = Array.isArray(content) ? content : [];
+            }
+        } catch(e) { /* ignore */ }
+    }
+    // Load all pricing matrices and filter COST type
+    const res = await apiCall('GET', API.pricingMatrices + '?size=500');
+    if (!res) return;
+    const raw = extractData(res);
+    const all = Array.isArray(raw) ? raw : (raw.data || []);
+    cmState.matrices = all.filter(m => m.matrixType === 'COST');
+    renderCostMatricesList();
+}
+
+function renderCostMatricesList() {
+    $('cmDetailView').style.display = 'none';
+    $('cmListView').style.display = '';
+    const tbody = $('cmTableBody');
+    if (!cmState.matrices.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:32px;">No cost matrices found. Click "+ Add Cost Matrix" to create one.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = cmState.matrices.map((m, i) => {
+        const seq = String(i + 1).padStart(5, '0');
+        const idLabel = `CM-${seq}`;
+        const cur = _cmCurrencyLabel(m.currency);
+        const start = m.startDate || '—';
+        const end = m.endDate || '—';
+        const entries = cmState.entryCounts[m.id] !== undefined ? cmState.entryCounts[m.id] : '—';
+        return `<tr style="cursor:pointer;" onclick="viewCostMatrix('${m.id}')">
+            <td><span style="font-weight:600;color:#1a1a2e;">${idLabel}</span></td>
+            <td>${m.name || '—'}</td>
+            <td>${cur}</td>
+            <td>${start}</td>
+            <td>${end}</td>
+            <td>${entries}</td>
+            <td onclick="event.stopPropagation()">
+                <button class="btn btn-sm btn-outline" onclick="showCostMatrixModal('${m.id}')" title="Edit" style="margin-right:4px;">✏️</button>
+                <button class="btn btn-sm" style="background:none;border:none;color:#e57373;cursor:pointer;font-size:16px;" onclick="deleteCostMatrix('${m.id}')" title="Delete">🗑️</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function viewCostMatrix(id) {
+    const matrix = cmState.matrices.find(m => m.id === id);
+    if (!matrix) return;
+    cmState.currentMatrix = matrix;
+    // Load entries
+    const res = await apiCall('GET', `${API.pricingMatrices}/${id}/entries`);
+    if (!res) return;
+    const raw = extractData(res);
+    cmState.entries = Array.isArray(raw) ? raw : (raw.data || []);
+    cmState.entryCounts[id] = cmState.entries.length;
+    // Load product attributes for all products in entries (for Qty Attr + Conditions dropdowns)
+    await _cmLoadProductAttrs(cmState.entries);
+    renderCostMatrixDetail();
+}
+
+async function _cmLoadProductAttrs(entries) {
+    const uniquePids = [...new Set(entries.map(e => e.productId).filter(Boolean))];
+    await Promise.all(uniquePids.map(async pid => {
+        if (cmState.productAttributes[pid]) return; // already cached
+        try {
+            const r = await apiCall('GET', `${API.attributes}/products/${pid}`);
+            if (r) {
+                const raw = extractData(r);
+                // Each item has {id, attribute_id, attribute: {id, label, type__r, ...}}
+                const list = Array.isArray(raw) ? raw : (raw.data || []);
+                cmState.productAttributes[pid] = list.map(pa => ({
+                    id: pa.attribute_id || pa.attributeId || pa.id,
+                    paId: pa.id,
+                    label: pa.attribute?.label || pa.label || pa.name || pa.id,
+                    type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType || ''
+                }));
+            }
+        } catch(e) { cmState.productAttributes[pid] = []; }
+    }));
+}
+
+function renderCostMatrixDetail() {
+    $('cmListView').style.display = 'none';
+    const m = cmState.currentMatrix;
+    const cur = _cmCurrencyLabel(m.currency);
+    const seq = String(cmState.matrices.findIndex(x => x.id === m.id) + 1).padStart(5, '0');
+    const idLabel = `CM-${seq}`;
+    const detailDiv = $('cmDetailView');
+    detailDiv.style.display = '';
+
+    const colHeaders = `<div class="cm-entry-row" style="margin-bottom:4px;">
+        <div class="cm-col-header">Product</div>
+        <div class="cm-col-header">Qty Attribute</div>
+        <div class="cm-col-header">UOM</div>
+        <div class="cm-col-header">Value</div>
+        <div></div>
+    </div>`;
+
+    const entryRows = cmState.entries.map(e => _renderCmEntryRow(e)).join('');
+
+    detailDiv.innerHTML = `
+        <div class="cm-detail-header">
+            <button class="cm-back-btn" onclick="renderCostMatricesList()" title="Back">←</button>
+            <span class="cm-detail-title" style="display:inline;">${idLabel} — ${m.name}</span>
+            <div class="cm-detail-sub">${cur} · ${m.startDate || ''} → ${m.endDate || ''}</div>
+            <div>
+                <span class="cm-tag primary">${cur}</span>
+                <span class="cm-tag">${cmState.entries.length} entries</span>
+            </div>
+        </div>
+        <div class="cm-info-bar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><b>MRC</b> = Monthly Recurring Cost · <b>Hourly</b> = Per Hour Usage Cost · <b>OTC</b> = One-Time Charge. Attribute conditions are available when a <b>Dynamic</b> product is selected.</span>
+        </div>
+        <div class="cm-entries-section">
+            <div class="cm-entries-header">
+                <div class="cm-entries-title">Cost Entries</div>
+                <button class="btn btn-primary" style="font-size:13px;padding:8px 16px;" onclick="addCmEntryRow()">+ Add Entry</button>
+            </div>
+            <div id="cmEntriesBody">
+                ${colHeaders}
+                ${entryRows || `<div style="text-align:center;color:#aaa;padding:32px;">No entries yet. Click "+ Add Entry" to add one.</div>`}
+            </div>
+        </div>`;
+}
+
+function _renderCmEntryRow(e) {
+    const isDynamic = _cmProductIsDynamic(e.productId);
+    const value = (e.listPrice != null && !isNaN(e.listPrice)) ? e.listPrice : 0;
+    const rowId = `cmrow-${e.id}`;
+    const condCount = _cmCondCount(e);
+
+    // Parse existing attribute conditions
+    let conditions = {};
+    if (e.attributeConditions) {
+        try {
+            conditions = typeof e.attributeConditions === 'string'
+                ? JSON.parse(e.attributeConditions)
+                : (typeof e.attributeConditions === 'object' ? e.attributeConditions : {});
+        } catch(err) { conditions = {}; }
+    }
+    const condEntries = Object.entries(conditions);
+
+    // Build condition rows (for dynamic products only)
+    const condRowsHtml = condEntries.map(([attrId, val]) => {
+        const a = (cmState.productAttributes[e.productId] || []).find(x => String(x.id) === String(attrId));
+        const attrLabel = a ? (a.label || a.name) : attrId;
+        const allAttrsOpts = (cmState.productAttributes[e.productId] || [])
+            .map(x => `<option value="${x.id}" ${String(x.id) === String(attrId) ? 'selected' : ''}>${x.label || x.name}</option>`).join('');
+        return `<div class="cm-cond-row">
+            <select class="cm-cond-attr-sel">${allAttrsOpts || `<option value="${attrId}">${attrLabel}</option>`}</select>
+            <input type="text" class="cm-cond-val-inp" value="${val}" placeholder="Value">
+            <button class="cm-entry-del" onclick="_cmDeleteCondRow(this,'${e.id}')" title="Remove condition">🗑️</button>
+        </div>`;
+    }).join('');
+
+    const condPanel = isDynamic ? `
+        <div class="cm-cond-toggle-row">
+            <span class="cm-attr-cond-toggle" id="cmcond-toggle-${e.id}" onclick="_cmToggleCond('${e.id}')">
+                › Attribute Conditions (${condCount})
+            </span>
+            <button class="cm-cond-add-btn" onclick="_cmToggleCond('${e.id}')">+ Add Condition</button>
+        </div>
+        <div class="cm-cond-panel" id="cm-cond-${e.id}" style="display:none;">
+            <div class="cm-cond-rows" id="cm-cond-rows-${e.id}">${condRowsHtml}</div>
+            <div class="cm-cond-new-row">
+                <select id="cm-new-attr-${e.id}">${_cmAllAttrOpts(e.productId)}</select>
+                <input type="text" id="cm-new-val-${e.id}" placeholder="Value">
+                <button class="btn btn-sm btn-outline" onclick="_cmAddCondRow('${e.id}')">+ Add</button>
+                <button class="btn btn-sm btn-primary" onclick="_cmSaveConditions('${e.id}')">Save</button>
+            </div>
+        </div>` : '';
+
+    return `<div class="cm-entry-group" id="${rowId}" data-matrix-id="${cmState.currentMatrix?.id || ''}">
+        <div class="cm-entry-row">
+            <select onchange="_cmOnProductChange(this,'${e.id}')">${_cmProductOpts(e.productId)}</select>
+            <select id="cmattr-${e.id}" onchange="_cmSaveEntry('${e.id}')">${_cmAttrOpts(e.unitAttributeId, e.productId)}</select>
+            <select id="cmuom-${e.id}" onchange="_cmSaveEntry('${e.id}')">${_cmUomOpts(e.usageUom)}</select>
+            <input type="number" id="cmval-${e.id}" value="${value}" step="0.01" min="0" onblur="_cmSaveEntry('${e.id}')">
+            <button class="cm-entry-del" onclick="deleteCmEntry('${e.id}')" title="Delete">🗑️</button>
+        </div>
+        ${condPanel}
+    </div>`;
+}
+
+function _cmProductIsDynamic(productId) {
+    const p = state.products.find(x => x.id === productId);
+    return p && (p.productType__r === 'Dynamic' || p.type__r === 'Dynamic' || p.type === 'Dynamic');
+}
+function _cmAttrLabel(attrId) {
+    // Check cmState.productAttributes across all products first
+    for (const attrs of Object.values(cmState.productAttributes)) {
+        const a = attrs.find(x => String(x.id) === String(attrId));
+        if (a) return a.label || a.name || attrId;
+    }
+    const a = (state.attributes || []).find(x => String(x.id) === String(attrId));
+    return a ? (a.label || a.name) : attrId;
+}
+function _cmCondCount(entry) {
+    try {
+        if (!entry.attributeConditions) return 0;
+        const c = typeof entry.attributeConditions === 'string' ? JSON.parse(entry.attributeConditions) : entry.attributeConditions;
+        return Array.isArray(c) ? c.length : Object.keys(c).length;
+    } catch(e) { return 0; }
+}
+function _cmOnProductChange(sel, entryId) {
+    const attrSel = document.getElementById(`cmattr-${entryId}`);
+    if (attrSel) attrSel.innerHTML = _cmAttrOpts(null, sel.value);
+    _cmSaveEntry(entryId);
+}
+async function _cmSaveEntry(entryId) {
+    if (!entryId || entryId === 'undefined') return;
+    const rowEl = document.getElementById(`cmrow-${entryId}`);
+    const matrixId = rowEl?.dataset?.matrixId || cmState.currentMatrix?.id || null;
+    const prodSel = rowEl ? rowEl.querySelector('select') : null;
+    const productId = prodSel ? prodSel.value : null;
+    const unitAttrId = document.getElementById(`cmattr-${entryId}`)?.value || null;
+    const usageUom = document.getElementById(`cmuom-${entryId}`)?.value || null;
+    const valEl = document.getElementById(`cmval-${entryId}`);
+    const listPrice = valEl ? (parseFloat(valEl.value) || 0) : 0;
+    if (!productId) return;
+    const payload = {
+        matrixId: matrixId || undefined,
+        productId,
+        unitAttributeId: unitAttrId || null,
+        usageUom: usageUom || null,
+        listPrice,
+        matrixType: 'COST'
+    };
+    const res = await apiCall('PUT', `${API.pricingEntries}/${entryId}`, payload);
+    if (res) {
+        // Sync local state so re-renders reflect the saved values
+        const idx = cmState.entries.findIndex(e => String(e.id) === String(entryId));
+        if (idx !== -1) {
+            cmState.entries[idx] = {
+                ...cmState.entries[idx],
+                productId,
+                unitAttributeId: unitAttrId || null,
+                usageUom: usageUom || null,
+                listPrice
+            };
+        }
+    }
+}
+function _cmToggleCond(entryId) {
+    const panel = document.getElementById(`cm-cond-${entryId}`);
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : '';
+    const toggle = document.getElementById(`cmcond-toggle-${entryId}`);
+    if (toggle) toggle.textContent = `${isOpen ? '›' : '▾'} Attribute Conditions (${_cmCondCountFromPanel(entryId)})`;
+}
+
+function _cmCondCountFromPanel(entryId) {
+    const rows = document.querySelectorAll(`#cm-cond-rows-${entryId} .cm-cond-row`);
+    return rows.length;
+}
+
+function _cmAddCondRow(entryId) {
+    const attrSel = document.getElementById(`cm-new-attr-${entryId}`);
+    const valInp = document.getElementById(`cm-new-val-${entryId}`);
+    const attrId = attrSel?.value;
+    const val = valInp?.value?.trim();
+    if (!attrId) { showToast('Select an attribute first', 'error'); return; }
+    if (val === '') { showToast('Enter a value', 'error'); return; }
+
+    const attrLabel = attrSel.options[attrSel.selectedIndex]?.text || attrId;
+    const allAttrsOpts = Array.from(attrSel.options).map(o =>
+        `<option value="${o.value}" ${o.value === attrId ? 'selected' : ''}>${o.text}</option>`
+    ).join('');
+
+    const rowsEl = document.getElementById(`cm-cond-rows-${entryId}`);
+    if (rowsEl) {
+        const div = document.createElement('div');
+        div.className = 'cm-cond-row';
+        div.innerHTML = `<select class="cm-cond-attr-sel">${allAttrsOpts}</select>
+            <input type="text" class="cm-cond-val-inp" value="${val}" placeholder="Value">
+            <button class="cm-entry-del" onclick="_cmDeleteCondRow(this,'${entryId}')" title="Remove">🗑️</button>`;
+        rowsEl.appendChild(div);
+    }
+    // Reset new-row inputs
+    attrSel.value = '';
+    if (valInp) valInp.value = '';
+}
+
+function _cmDeleteCondRow(btn, entryId) {
+    btn.closest('.cm-cond-row')?.remove();
+    // Update count in toggle
+    const toggle = document.getElementById(`cmcond-toggle-${entryId}`);
+    if (toggle) toggle.textContent = `▾ Attribute Conditions (${_cmCondCountFromPanel(entryId)})`;
+}
+
+async function _cmSaveConditions(entryId) {
+    const rowsEl = document.getElementById(`cm-cond-rows-${entryId}`);
+    const condRows = rowsEl ? rowsEl.querySelectorAll('.cm-cond-row') : [];
+    const conditions = {};
+    condRows.forEach(row => {
+        const attrId = row.querySelector('.cm-cond-attr-sel')?.value;
+        const val = row.querySelector('.cm-cond-val-inp')?.value?.trim();
+        if (attrId && val !== undefined && val !== '') {
+            conditions[attrId] = isNaN(val) ? val : Number(val);
+        }
+    });
+
+    const rowEl = document.getElementById(`cmrow-${entryId}`);
+    const matrixId = rowEl?.dataset?.matrixId || cmState.currentMatrix?.id;
+    const prodSel = rowEl?.querySelector('select');
+    const productId = prodSel?.value;
+    const unitAttrId = document.getElementById(`cmattr-${entryId}`)?.value || null;
+    const usageUom = document.getElementById(`cmuom-${entryId}`)?.value || null;
+    const listPrice = parseFloat(document.getElementById(`cmval-${entryId}`)?.value) || 0;
+
+    const payload = {
+        matrixId, productId,
+        unitAttributeId: unitAttrId || null,
+        usageUom: usageUom || null,
+        listPrice,
+        attributeConditions: Object.keys(conditions).length ? conditions : null,
+        matrixType: 'COST'
+    };
+    const res = await apiCall('PUT', `${API.pricingEntries}/${entryId}`, payload);
+    if (res) {
+        const idx = cmState.entries.findIndex(e => String(e.id) === String(entryId));
+        if (idx !== -1) cmState.entries[idx].attributeConditions = payload.attributeConditions;
+        const count = Object.keys(conditions).length;
+        const toggle = document.getElementById(`cmcond-toggle-${entryId}`);
+        if (toggle) toggle.textContent = `▾ Attribute Conditions (${count})`;
+        showToast('Conditions saved');
+    }
+}
+
+async function addCmEntryRow() {
+    if (!cmState.currentMatrix) return;
+    const payload = { productId: null, listPrice: 0, usageUom: UOM_OPTIONS[0].id, matrixType: 'COST' };
+    const res = await apiCall('POST', `${API.pricingMatrices}/${cmState.currentMatrix.id}/entries`, payload);
+    if (!res) return;
+    // POST returns ApiResponse<PricingEntryWrapper> — single object in res.data
+    const created = res?.data || res;
+    if (!created?.id) { showToast('Failed to get entry ID from server', 'error'); return; }
+    cmState.entries.push(created);
+    cmState.entryCounts[cmState.currentMatrix.id] = cmState.entries.length;
+    renderCostMatrixDetail();
+}
+
+async function deleteCmEntry(entryId) {
+    if (!entryId || entryId === 'undefined') return;
+    if (!confirm('Delete this cost entry?')) return;
+    await apiCall('DELETE', `${API.pricingEntries}/${entryId}?matrixType=COST`);
+    cmState.entries = cmState.entries.filter(e => String(e.id) !== String(entryId));
+    cmState.entryCounts[cmState.currentMatrix.id] = cmState.entries.length;
+    renderCostMatrixDetail();
+}
+
+function showCostMatrixModal(id) {
+    const matrix = id ? cmState.matrices.find(m => m.id === id) : null;
+    const isEdit = !!matrix;
+    const curOpts = cmState.currencies.map(c => {
+        const code = c.data?.currency_code || '';
+        const name = c.data?.currency_name || '';
+        const selId = String(c.id);
+        const sel = matrix && String(matrix.currency) === selId ? 'selected' : '';
+        return `<option value="${selId}" ${sel}>${code}${name ? ' – ' + name : ''}</option>`;
+    }).join('');
+
+    $('modalBox').className = 'modal cost-matrix-modal';
+    $('modalBody').innerHTML = `
+        <div class="form-group">
+            <label>Name <span class="required-star">*</span></label>
+            <input type="text" id="cmModalName" placeholder="e.g. Q1 2025 Costs" value="${matrix?.name || ''}">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Currency</label>
+                <select id="cmModalCurrency">
+                    <option value="">— Select Currency —</option>
+                    ${curOpts}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="cmModalStart" value="${matrix?.startDate || ''}">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="cmModalEnd" value="${matrix?.endDate || ''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="cmModalDesc" rows="3" placeholder="Optional description" style="resize:vertical;min-height:72px;font-family:inherit;width:100%;box-sizing:border-box;">${matrix?.description || ''}</textarea>
+        </div>`;
+
+    state.currentModal = { type: 'costMatrix', id };
+    $('modalTitle').textContent = isEdit ? 'Edit Cost Matrix' : 'New Cost Matrix';
+    $('modalSaveBtn').textContent = isEdit ? 'Save' : 'Create';
+    openModal();
+}
+
+async function saveCostMatrix() {
+    const name = $('cmModalName')?.value?.trim();
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const currency = $('cmModalCurrency')?.value || null;
+    const startDate = $('cmModalStart')?.value || null;
+    const endDate = $('cmModalEnd')?.value || null;
+    const description = $('cmModalDesc')?.value?.trim() || null;
+    const payload = { name, currency: currency || null, start_date: startDate, end_date: endDate, description };
+    const id = state.currentModal?.id;
+    let res;
+    if (id) {
+        res = await apiCall('PUT', `${API.costMatrices}/${id}`, payload);
+    } else {
+        res = await apiCall('POST', API.costMatrices, payload);
+    }
+    if (!res) return;
+    closeModal();
+    showToast(id ? 'Cost matrix updated' : 'Cost matrix created');
+    await loadCostMatrices();
+}
+
+async function deleteCostMatrix(id) {
+    if (!confirm('Delete this cost matrix?')) return;
+    // No DELETE endpoint in controller — show message
+    showToast('Delete is not supported by the API yet', 'error');
+}
+
+// ============= Price Matrices (LIST type) =============
+const pmState = {
+    matrices: [],
+    currencies: [],         // shared with cmState after first load
+    currentMatrix: null,
+    entries: [],
+    entryCounts: {},
+    productAttributes: {}
+};
+
+async function loadPriceMatrices() {
+    // Reuse currencies already loaded by cost matrices
+    if (!pmState.currencies.length) {
+        pmState.currencies = cmState.currencies.length ? cmState.currencies : [];
+        if (!pmState.currencies.length) {
+            try {
+                const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0');
+                if (cRes) {
+                    const content = cRes.content || cRes.data || cRes;
+                    pmState.currencies = Array.isArray(content) ? content : [];
+                    cmState.currencies = pmState.currencies; // share cache
+                }
+            } catch(e) { /* ignore */ }
+        }
+    }
+    const res = await apiCall('GET', API.pricingMatrices + '?size=500');
+    if (!res) return;
+    const raw = extractData(res);
+    const all = Array.isArray(raw) ? raw : (raw.data || []);
+    pmState.matrices = all.filter(m => m.matrixType === 'LIST');
+    renderPriceMatricesList();
+}
+
+function _pmCurrencyLabel(currencyId) {
+    if (!currencyId) return '—';
+    const currencies = pmState.currencies.length ? pmState.currencies : cmState.currencies;
+    const c = currencies.find(x => String(x.id) === String(currencyId));
+    return c ? (c.data?.currency_code || c.data?.currency_name || String(currencyId).slice(0, 8)) : String(currencyId).slice(0, 8);
+}
+
+function renderPriceMatricesList() {
+    $('pmDetailView').style.display = 'none';
+    $('pmListView').style.display = '';
+    const tbody = $('pmTableBody');
+    if (!pmState.matrices.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:32px;">No price matrices found. Click "+ Add Price Matrix" to create one.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = pmState.matrices.map((m, i) => {
+        const seq = String(i + 1).padStart(5, '0');
+        const idLabel = `PM-${seq}`;
+        const cur = _pmCurrencyLabel(m.currency);
+        const entries = pmState.entryCounts[m.id] !== undefined ? pmState.entryCounts[m.id] : '—';
+        return `<tr style="cursor:pointer;" onclick="viewPriceMatrix('${m.id}')">
+            <td><span style="font-weight:600;color:#1a1a2e;">${idLabel}</span></td>
+            <td>${m.name || '—'}</td>
+            <td>${cur}</td>
+            <td>${m.startDate || '—'}</td>
+            <td>${m.endDate || '—'}</td>
+            <td>${entries}</td>
+            <td onclick="event.stopPropagation()">
+                <button class="btn btn-sm btn-outline" onclick="showPriceMatrixModal('${m.id}')" title="Edit" style="margin-right:4px;">✏️</button>
+                <button class="btn btn-sm" style="background:none;border:none;color:#e57373;cursor:pointer;font-size:16px;" onclick="deletePriceMatrix('${m.id}')" title="Delete">🗑️</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function viewPriceMatrix(id) {
+    const matrix = pmState.matrices.find(m => m.id === id);
+    if (!matrix) return;
+    pmState.currentMatrix = matrix;
+    const res = await apiCall('GET', `${API.pricingMatrices}/${id}/entries`);
+    if (!res) return;
+    const raw = extractData(res);
+    pmState.entries = Array.isArray(raw) ? raw : (raw.data || []);
+    pmState.entryCounts[id] = pmState.entries.length;
+    await _pmLoadProductAttrs(pmState.entries);
+    renderPriceMatrixDetail();
+}
+
+async function _pmLoadProductAttrs(entries) {
+    const uniquePids = [...new Set(entries.map(e => e.productId).filter(Boolean))];
+    await Promise.all(uniquePids.map(async pid => {
+        if (pmState.productAttributes[pid]) return;
+        try {
+            const r = await apiCall('GET', `${API.attributes}/products/${pid}`);
+            if (r) {
+                const raw = extractData(r);
+                const list = Array.isArray(raw) ? raw : (raw.data || []);
+                pmState.productAttributes[pid] = list.map(pa => ({
+                    id: pa.attribute_id || pa.attributeId || pa.id,
+                    label: pa.attribute?.label || pa.label || pa.name || pa.id,
+                    type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType || ''
+                }));
+            }
+        } catch(e) { pmState.productAttributes[pid] = []; }
+    }));
+}
+
+function renderPriceMatrixDetail() {
+    $('pmListView').style.display = 'none';
+    const m = pmState.currentMatrix;
+    const cur = _pmCurrencyLabel(m.currency);
+    const seq = String(pmState.matrices.findIndex(x => x.id === m.id) + 1).padStart(5, '0');
+    const idLabel = `PM-${seq}`;
+    const detailDiv = $('pmDetailView');
+    detailDiv.style.display = '';
+
+    const colHeaders = `<div class="pm-entry-row" style="margin-bottom:4px;">
+        <div class="pm-col-header">Product</div>
+        <div class="pm-col-header">Qty Attribute</div>
+        <div class="pm-col-header">UOM</div>
+        <div class="pm-col-header">List Price</div>
+        <div class="pm-col-header">AM Price</div>
+        <div class="pm-col-header">MSP Price</div>
+        <div></div>
+    </div>`;
+
+    const entryRows = pmState.entries.map(e => _renderPmEntryRow(e)).join('');
+
+    detailDiv.innerHTML = `
+        <div class="cm-detail-header">
+            <button class="cm-back-btn" onclick="renderPriceMatricesList()" title="Back">←</button>
+            <span class="cm-detail-title" style="display:inline;">${idLabel} — ${m.name}</span>
+            <div class="cm-detail-sub">${cur} · ${m.startDate || ''} → ${m.endDate || ''}</div>
+            <div>
+                <span class="cm-tag primary">${cur}</span>
+                <span class="cm-tag">${pmState.entries.length} entries</span>
+            </div>
+        </div>
+        <div class="cm-info-bar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><b>MRC</b> = Monthly Recurring Price · <b>Hourly</b> = Per Hour Usage Price · <b>OTC</b> = One-Time Charge. Attribute conditions are available when a <b>Dynamic</b> product is selected.</span>
+        </div>
+        <div class="cm-entries-section">
+            <div class="cm-entries-header">
+                <div class="cm-entries-title">Price Entries</div>
+                <button class="btn btn-primary" style="font-size:13px;padding:8px 16px;" onclick="addPmEntryRow()">+ Add Entry</button>
+            </div>
+            <div id="pmEntriesBody">
+                ${colHeaders}
+                ${entryRows || `<div style="text-align:center;color:#aaa;padding:32px;">No entries yet. Click "+ Add Entry" to add one.</div>`}
+            </div>
+        </div>`;
+}
+
+function _pmProductOpts(selected) {
+    return `<option value="">Product</option>` +
+        (state.products || []).map(p => `<option value="${p.id}" ${String(p.id) === String(selected) ? 'selected' : ''}>${p.label || p.name} (${p.sku || ''})</option>`).join('');
+}
+function _pmAttrOpts(selected, productId) {
+    const attrs = productId ? (pmState.productAttributes[productId] || []) : [];
+    const numericAttrs = attrs.filter(a => {
+        const t = (a.type__r || '').toLowerCase();
+        return t.includes('number') || t.includes('numer') || t === '';
+    });
+    const display = numericAttrs.length ? numericAttrs : (state.attributes || []).filter(a => {
+        const t = (a.type__r || a.type || '').toLowerCase();
+        return t.includes('number') || t.includes('numer');
+    });
+    return `<option value="">— None —</option>` +
+        display.map(a => `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`).join('');
+}
+function _pmAllAttrOpts(productId) {
+    const attrs = productId ? (pmState.productAttributes[productId] || []) : [];
+    return `<option value="">— Attribute —</option>` +
+        attrs.map(a => `<option value="${a.id}">${a.label || a.name}</option>`).join('');
+}
+function _pmProductIsDynamic(productId) {
+    const p = state.products.find(x => x.id === productId);
+    return p && (p.productType__r === 'Dynamic' || p.type__r === 'Dynamic' || p.type === 'Dynamic');
+}
+function _pmCondCount(entry) {
+    try {
+        if (!entry.attributeConditions) return 0;
+        const c = typeof entry.attributeConditions === 'string' ? JSON.parse(entry.attributeConditions) : entry.attributeConditions;
+        return Array.isArray(c) ? c.length : Object.keys(c).length;
+    } catch(e) { return 0; }
+}
+
+function _renderPmEntryRow(e) {
+    const isDynamic = _pmProductIsDynamic(e.productId);
+    const lp = (e.listPrice != null && !isNaN(e.listPrice)) ? e.listPrice : 0;
+    const ap = (e.amPrice != null && !isNaN(e.amPrice)) ? e.amPrice : 0;
+    const mp = (e.mspPrice != null && !isNaN(e.mspPrice)) ? e.mspPrice : 0;
+    const rowId = `pmrow-${e.id}`;
+    const condCount = _pmCondCount(e);
+
+    // Parse attribute conditions
+    let conditions = {};
+    if (e.attributeConditions) {
+        try { conditions = typeof e.attributeConditions === 'string' ? JSON.parse(e.attributeConditions) : (e.attributeConditions || {}); } catch(err) {}
+    }
+    const condEntries = Object.entries(conditions);
+    const condRowsHtml = condEntries.map(([attrId, val]) => {
+        const a = (pmState.productAttributes[e.productId] || []).find(x => String(x.id) === String(attrId));
+        const allAttrsOpts = (pmState.productAttributes[e.productId] || [])
+            .map(x => `<option value="${x.id}" ${String(x.id) === String(attrId) ? 'selected' : ''}>${x.label || x.name}</option>`).join('');
+        return `<div class="cm-cond-row">
+            <select class="cm-cond-attr-sel">${allAttrsOpts || `<option value="${attrId}">${a?.label || attrId}</option>`}</select>
+            <input type="text" class="cm-cond-val-inp" value="${val}" placeholder="Value">
+            <button class="cm-entry-del" onclick="_pmDeleteCondRow(this,'${e.id}')" title="Remove">🗑️</button>
+        </div>`;
+    }).join('');
+
+    const condPanel = isDynamic ? `
+        <div class="cm-cond-toggle-row">
+            <span class="cm-attr-cond-toggle" id="pmcond-toggle-${e.id}" onclick="_pmToggleCond('${e.id}')">
+                › Attribute Conditions (${condCount})
+            </span>
+            <button class="cm-cond-add-btn" onclick="_pmToggleCond('${e.id}')">+ Add Condition</button>
+        </div>
+        <div class="cm-cond-panel" id="pm-cond-${e.id}" style="display:none;">
+            <div class="cm-cond-rows" id="pm-cond-rows-${e.id}">${condRowsHtml}</div>
+            <div class="cm-cond-new-row">
+                <select id="pm-new-attr-${e.id}">${_pmAllAttrOpts(e.productId)}</select>
+                <input type="text" id="pm-new-val-${e.id}" placeholder="Value">
+                <button class="btn btn-sm btn-outline" onclick="_pmAddCondRow('${e.id}')">+ Add</button>
+                <button class="btn btn-sm btn-primary" onclick="_pmSaveConditions('${e.id}')">Save</button>
+            </div>
+        </div>` : '';
+
+    return `<div class="cm-entry-group" id="${rowId}" data-matrix-id="${pmState.currentMatrix?.id || ''}">
+        <div class="pm-entry-row">
+            <select onchange="_pmOnProductChange(this,'${e.id}')">${_pmProductOpts(e.productId)}</select>
+            <select id="pmattr-${e.id}" onchange="_pmSaveEntry('${e.id}')">${_pmAttrOpts(e.unitAttributeId, e.productId)}</select>
+            <select id="pmuom-${e.id}" onchange="_pmSaveEntry('${e.id}')">${_cmUomOpts(e.usageUom)}</select>
+            <input type="number" id="pmlp-${e.id}" value="${lp}" step="0.01" min="0" placeholder="0.00" onblur="_pmSaveEntry('${e.id}')">
+            <input type="number" id="pmap-${e.id}" value="${ap}" step="0.01" min="0" placeholder="0.00" onblur="_pmSaveEntry('${e.id}')">
+            <input type="number" id="pmmp-${e.id}" value="${mp}" step="0.01" min="0" placeholder="0.00" onblur="_pmSaveEntry('${e.id}')">
+            <button class="cm-entry-del" onclick="deletePmEntry('${e.id}')" title="Delete">🗑️</button>
+        </div>
+        ${condPanel}
+    </div>`;
+}
+
+function _pmOnProductChange(sel, entryId) {
+    const attrSel = document.getElementById(`pmattr-${entryId}`);
+    if (attrSel) attrSel.innerHTML = _pmAttrOpts(null, sel.value);
+    _pmSaveEntry(entryId);
+}
+async function _pmSaveEntry(entryId) {
+    if (!entryId || entryId === 'undefined') return;
+    const rowEl = document.getElementById(`pmrow-${entryId}`);
+    const matrixId = rowEl?.dataset?.matrixId || pmState.currentMatrix?.id || null;
+    const prodSel = rowEl ? rowEl.querySelector('select') : null;
+    const productId = prodSel ? prodSel.value : null;
+    const unitAttrId = document.getElementById(`pmattr-${entryId}`)?.value || null;
+    const usageUom = document.getElementById(`pmuom-${entryId}`)?.value || null;
+    const listPrice = parseFloat(document.getElementById(`pmlp-${entryId}`)?.value) || 0;
+    const amPrice   = parseFloat(document.getElementById(`pmap-${entryId}`)?.value) || 0;
+    const mspPrice  = parseFloat(document.getElementById(`pmmp-${entryId}`)?.value) || 0;
+    if (!productId) return;
+    const payload = { matrixId: matrixId || undefined, productId, unitAttributeId: unitAttrId || null, usageUom: usageUom || null, listPrice, amPrice, mspPrice, matrixType: 'LIST' };
+    const res = await apiCall('PUT', `${API.pricingEntries}/${entryId}`, payload);
+    if (res) {
+        const idx = pmState.entries.findIndex(e => String(e.id) === String(entryId));
+        if (idx !== -1) Object.assign(pmState.entries[idx], { productId, unitAttributeId: unitAttrId || null, usageUom: usageUom || null, listPrice, amPrice, mspPrice });
+    }
+}
+
+function _pmToggleCond(entryId) {
+    const panel = document.getElementById(`pm-cond-${entryId}`);
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : '';
+    const toggle = document.getElementById(`pmcond-toggle-${entryId}`);
+    if (toggle) toggle.textContent = `${isOpen ? '›' : '▾'} Attribute Conditions (${document.querySelectorAll(`#pm-cond-rows-${entryId} .cm-cond-row`).length})`;
+}
+function _pmAddCondRow(entryId) {
+    const attrSel = document.getElementById(`pm-new-attr-${entryId}`);
+    const valInp  = document.getElementById(`pm-new-val-${entryId}`);
+    const attrId = attrSel?.value; const val = valInp?.value?.trim();
+    if (!attrId) { showToast('Select an attribute first', 'error'); return; }
+    if (val === '') { showToast('Enter a value', 'error'); return; }
+    const allAttrsOpts = Array.from(attrSel.options).map(o => `<option value="${o.value}" ${o.value === attrId ? 'selected' : ''}>${o.text}</option>`).join('');
+    const rowsEl = document.getElementById(`pm-cond-rows-${entryId}`);
+    if (rowsEl) {
+        const div = document.createElement('div');
+        div.className = 'cm-cond-row';
+        div.innerHTML = `<select class="cm-cond-attr-sel">${allAttrsOpts}</select>
+            <input type="text" class="cm-cond-val-inp" value="${val}" placeholder="Value">
+            <button class="cm-entry-del" onclick="_pmDeleteCondRow(this,'${entryId}')">🗑️</button>`;
+        rowsEl.appendChild(div);
+    }
+    attrSel.value = ''; if (valInp) valInp.value = '';
+}
+function _pmDeleteCondRow(btn, entryId) {
+    btn.closest('.cm-cond-row')?.remove();
+    const toggle = document.getElementById(`pmcond-toggle-${entryId}`);
+    if (toggle) toggle.textContent = `▾ Attribute Conditions (${document.querySelectorAll(`#pm-cond-rows-${entryId} .cm-cond-row`).length})`;
+}
+async function _pmSaveConditions(entryId) {
+    const rowsEl = document.getElementById(`pm-cond-rows-${entryId}`);
+    const conditions = {};
+    (rowsEl?.querySelectorAll('.cm-cond-row') || []).forEach(row => {
+        const attrId = row.querySelector('.cm-cond-attr-sel')?.value;
+        const val = row.querySelector('.cm-cond-val-inp')?.value?.trim();
+        if (attrId && val !== '') conditions[attrId] = isNaN(val) ? val : Number(val);
+    });
+    const rowEl = document.getElementById(`pmrow-${entryId}`);
+    const matrixId = rowEl?.dataset?.matrixId || pmState.currentMatrix?.id;
+    const prodSel  = rowEl?.querySelector('select');
+    const productId = prodSel?.value;
+    const unitAttrId = document.getElementById(`pmattr-${entryId}`)?.value || null;
+    const usageUom   = document.getElementById(`pmuom-${entryId}`)?.value || null;
+    const listPrice  = parseFloat(document.getElementById(`pmlp-${entryId}`)?.value) || 0;
+    const amPrice    = parseFloat(document.getElementById(`pmap-${entryId}`)?.value) || 0;
+    const mspPrice   = parseFloat(document.getElementById(`pmmp-${entryId}`)?.value) || 0;
+    const payload = { matrixId, productId, unitAttributeId: unitAttrId || null, usageUom: usageUom || null, listPrice, amPrice, mspPrice, attributeConditions: Object.keys(conditions).length ? conditions : null, matrixType: 'LIST' };
+    const res = await apiCall('PUT', `${API.pricingEntries}/${entryId}`, payload);
+    if (res) {
+        const idx = pmState.entries.findIndex(e => String(e.id) === String(entryId));
+        if (idx !== -1) pmState.entries[idx].attributeConditions = payload.attributeConditions;
+        const count = Object.keys(conditions).length;
+        const toggle = document.getElementById(`pmcond-toggle-${entryId}`);
+        if (toggle) toggle.textContent = `▾ Attribute Conditions (${count})`;
+        showToast('Conditions saved');
+    }
+}
+
+async function addPmEntryRow() {
+    if (!pmState.currentMatrix) return;
+    const payload = { productId: null, listPrice: 0, amPrice: 0, mspPrice: 0, usageUom: UOM_OPTIONS[0].id, matrixType: 'LIST' };
+    const res = await apiCall('POST', `${API.pricingMatrices}/${pmState.currentMatrix.id}/entries`, payload);
+    if (!res) return;
+    const created = res?.data || res;
+    if (!created?.id) { showToast('Failed to get entry ID from server', 'error'); return; }
+    pmState.entries.push(created);
+    pmState.entryCounts[pmState.currentMatrix.id] = pmState.entries.length;
+    renderPriceMatrixDetail();
+}
+
+async function deletePmEntry(entryId) {
+    if (!entryId || entryId === 'undefined') return;
+    if (!confirm('Delete this price entry?')) return;
+    await apiCall('DELETE', `${API.pricingEntries}/${entryId}?matrixType=LIST`);
+    pmState.entries = pmState.entries.filter(e => String(e.id) !== String(entryId));
+    pmState.entryCounts[pmState.currentMatrix.id] = pmState.entries.length;
+    renderPriceMatrixDetail();
+}
+
+function showPriceMatrixModal(id) {
+    const matrix = id ? pmState.matrices.find(m => m.id === id) : null;
+    const isEdit = !!matrix;
+    const currencies = pmState.currencies.length ? pmState.currencies : cmState.currencies;
+    const curOpts = currencies.map(c => {
+        const code = c.data?.currency_code || '';
+        const name = c.data?.currency_name || '';
+        const selId = String(c.id);
+        const sel = matrix && String(matrix.currency) === selId ? 'selected' : '';
+        return `<option value="${selId}" ${sel}>${code}${name ? ' – ' + name : ''}</option>`;
+    }).join('');
+
+    $('modalBox').className = 'modal cost-matrix-modal';
+    $('modalBody').innerHTML = `
+        <div class="form-group">
+            <label>Name <span class="required-star">*</span></label>
+            <input type="text" id="pmModalName" placeholder="e.g. Q1 2025 Pricing" value="${matrix?.name || ''}">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Currency</label>
+                <select id="pmModalCurrency">
+                    <option value="">— Select Currency —</option>
+                    ${curOpts}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="pmModalStart" value="${matrix?.startDate || ''}">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="pmModalEnd" value="${matrix?.endDate || ''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="pmModalDesc" rows="3" placeholder="Optional description" style="resize:vertical;min-height:72px;font-family:inherit;width:100%;box-sizing:border-box;">${matrix?.description || ''}</textarea>
+        </div>`;
+
+    state.currentModal = { type: 'priceMatrix', id };
+    $('modalTitle').textContent = isEdit ? 'Edit Price Matrix' : 'New Price Matrix';
+    $('modalSaveBtn').textContent = isEdit ? 'Save' : 'Create';
+    openModal();
+}
+
+async function savePriceMatrix() {
+    const name = $('pmModalName')?.value?.trim();
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const currency  = $('pmModalCurrency')?.value || null;
+    const startDate = $('pmModalStart')?.value || null;
+    const endDate   = $('pmModalEnd')?.value || null;
+    const description = $('pmModalDesc')?.value?.trim() || null;
+    const payload = { name, currency: currency || null, start_date: startDate, end_date: endDate, description };
+    const id = state.currentModal?.id;
+    const res = id
+        ? await apiCall('PUT',  `${API.listMatrices}/${id}`, payload)
+        : await apiCall('POST', API.listMatrices, payload);
+    if (!res) return;
+    closeModal();
+    showToast(id ? 'Price matrix updated' : 'Price matrix created');
+    await loadPriceMatrices();
+}
+
+async function deletePriceMatrix(id) {
+    if (!confirm('Delete this price matrix?')) return;
+    showToast('Delete is not supported by the API yet', 'error');
+}
+
 // ============= Modal =============
 function openModal() { $('modalOverlay').classList.add('active'); }
 function closeModal() { $('modalOverlay').classList.remove('active'); $('modalBox').className = 'modal'; state.currentModal = null; }
@@ -3000,6 +4244,8 @@ function saveModal() {
         case 'constraint': saveConstraint(); break;
         case 'detailConstraint': saveDetailConstraint(); break;
         case 'attrRestrictions': saveAttrRestrictions(); break;
+        case 'costMatrix': saveCostMatrix(); break;
+        case 'priceMatrix': savePriceMatrix(); break;
     }
 }
 
