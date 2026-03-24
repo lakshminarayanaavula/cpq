@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monetize360 Rating Engine - Implementation Tasks</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card .label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .component-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .component-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .component-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .component-header h2 {
+            font-size: 1.5rem;
+            color: var(--gray-800);
+        }
+
+        .component-header .task-count {
+            margin-left: auto;
+            background: var(--gray-100);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .task-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .task-group h3 {
+            font-size: 1.1rem;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--gray-300);
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            background: var(--gray-100);
+            transform: translateX(4px);
+        }
+
+        .task-item.priority-high { border-left-color: var(--danger); }
+        .task-item.priority-medium { border-left-color: var(--warning); }
+        .task-item.priority-low { border-left-color: var(--success); }
+
+        .task-id {
+            background: var(--gray-200);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            white-space: nowrap;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tag-api { background: #dbeafe; color: #1d4ed8; }
+        .tag-backend { background: #dcfce7; color: #166534; }
+        .tag-config { background: #fef3c7; color: #92400e; }
+        .tag-db { background: #f3e8ff; color: #7c3aed; }
+        .tag-integration { background: #ffe4e6; color: #be123c; }
+        .tag-new { background: #cffafe; color: #0891b2; }
+        .tag-enhance { background: #fce7f3; color: #be185d; }
+
+        .priority-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-badge.high { background: #fee2e2; color: var(--danger); }
+        .priority-badge.medium { background: #fef3c7; color: #d97706; }
+        .priority-badge.low { background: #dcfce7; color: var(--success); }
+
+        .dependency-list {
+            background: var(--gray-100);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .dependency-list h4 {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .dependency-list ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .dependency-list li {
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .phase-timeline {
+            display: flex;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+
+        .phase-item {
+            flex: 1;
+            min-width: 180px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid var(--gray-200);
+            position: relative;
+        }
+
+        .phase-item::after {
+            content: '→';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1.5rem;
+        }
+
+        .phase-item:last-child::after {
+            display: none;
+        }
+
+        .phase-item.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.05));
+        }
+
+        .phase-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+        }
+
+        .phase-name {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .phase-tasks {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .api-spec {
+            background: var(--gray-900);
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+
+        .api-method {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .api-method.post { background: #22c55e; color: white; }
+        .api-method.get { background: #3b82f6; color: white; }
+        .api-method.put { background: #f59e0b; color: white; }
+        .api-method.delete { background: #ef4444; color: white; }
+
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .mapping-table th,
+        .mapping-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .mapping-table th {
+            background: var(--gray-100);
+            font-weight: 600;
+        }
+
+        .mapping-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .icon-ingestion { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .icon-context { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
+        .icon-rating { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .icon-discount { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .icon-credit { background: linear-gradient(135deg, #ec4899, #be185d); color: white; }
+        .icon-tax { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; }
+        .icon-aggregation { background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; }
+        .icon-rerate { background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; }
+        .icon-api { background: linear-gradient(135deg, #64748b, #475569); color: white; }
+        .icon-explain { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; }
+
+        @media print {
+            body { background: white; }
+            .component-section { box-shadow: none; border: 1px solid #ddd; }
+            .task-item { break-inside: avoid; }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .phase-timeline { flex-direction: column; }
+            .phase-item::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Monetize360 Rating Engine</h1>
+            <p>Implementation Tasks based on PRD Requirements</p>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number">72</div>
+                <div class="label">Total Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">10</div>
+                <div class="label">Components</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">6</div>
+                <div class="label">Phases</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">15</div>
+                <div class="label">API Endpoints</div>
+            </div>
+        </div>
+
+        <!-- Phase Timeline -->
+        <div class="phase-timeline">
+            <div class="phase-item active">
+                <div class="phase-number">1</div>
+                <div class="phase-name">Foundation</div>
+                <div class="phase-tasks">12 tasks</div>
+            </div>
+            <div class="phase-item">
+                <div class="phase-number">2</div>
+                <div class="phase-name">Rating Core</div>
+                <div class="phase-tasks">18 tasks</div>
+            </div>
+            <div class="phase-item">
+                <div class="phase-number">3</div>
+                <div class="phase-name">Discounting</div>
+                <div class="phase-tasks">10 tasks</div>
+            </div>
+            <div class="phase-item">
+                <div class="phase-number">4</div>
+                <div class="phase-name">Credits & Tax</div>
+                <div class="phase-tasks">12 tasks</div>
+            </div>
+            <div class="phase-item">
+                <div class="phase-number">5</div>
+                <div class="phase-name">Aggregation</div>
+                <div class="phase-tasks">8 tasks</div>
+            </div>
+            <div class="phase-item">
+                <div class="phase-number">6</div>
+                <div class="phase-name">Re-rating</div>
+                <div class="phase-tasks">12 tasks</div>
+            </div>
+        </div>
+
+        <!-- Component 1: Event Ingestion -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-ingestion">📥</div>
+                <h2>1. Event Ingestion Service</h2>
+                <span class="task-count">8 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 API Development</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">ING-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Usage Event Ingestion API</div>
+                            <div class="task-description">Implement POST /v1/events endpoint for accepting usage events via API</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">ING-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Idempotent Event Processing</div>
+                            <div class="task-description">Ensure duplicate events with same event_id are handled gracefully without double-processing</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">ING-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Create UsageEvent Entity and Schema</div>
+                            <div class="task-description">Define usage_event__m table with event_id, account_id, service_id, quantity, unit, timestamp, metadata</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Validation & Processing</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">ING-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement JSON Schema Validation for Events</div>
+                            <div class="task-description">Validate incoming events against predefined schema before processing</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">ING-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Batch Event Ingestion Endpoint</div>
+                            <div class="task-description">POST /v1/events/batch for bulk event submission with async processing</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">ING-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Streaming Event Consumer</div>
+                            <div class="task-description">Kafka/RabbitMQ consumer for high-throughput event streaming</div>
+                            <div class="task-meta">
+                                <span class="tag tag-integration">Integration</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Event Status Management</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-low">
+                        <span class="task-id">ING-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Event Status Tracking</div>
+                            <div class="task-description">Track event lifecycle: RECEIVED → VALIDATED → RATED → CHARGED</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">ING-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Event Query API</div>
+                            <div class="task-description">GET /v1/events with filtering by account, service, date range, status</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="api-spec">
+                <span class="api-method post">POST</span>/v1/events
+                <br><br>
+                {<br>
+                &nbsp;&nbsp;"event_id": "evt_123",<br>
+                &nbsp;&nbsp;"account_id": "acc_001",<br>
+                &nbsp;&nbsp;"service_id": "gpu_hours",<br>
+                &nbsp;&nbsp;"quantity": 10,<br>
+                &nbsp;&nbsp;"unit": "hours",<br>
+                &nbsp;&nbsp;"timestamp": "2026-03-20T10:00:00Z",<br>
+                &nbsp;&nbsp;"metadata": { "region": "us-west" }<br>
+                }
+            </div>
+        </section>
+
+        <!-- Component 2: Context Resolution -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-context">🔍</div>
+                <h2>2. Context Resolution Service</h2>
+                <span class="task-count">10 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Account Resolution</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CTX-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Account Hierarchy Resolution</div>
+                            <div class="task-description">Resolve billing account from master account, support parent-child relationships</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">CTX-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Create AccountResolutionFunc Step</div>
+                            <div class="task-description">MFlow step function for resolving account context with caching</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Contract Resolution</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CTX-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Enhance ContractResolutionFunc with Date-Effectiveness</div>
+                            <div class="task-description">Support version-aware contract resolution with effective_from/effective_to dates</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CTX-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Contract Entitlements Resolution</div>
+                            <div class="task-description">Resolve customer-specific entitlements and limits from contract</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Product/Service Resolution</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CTX-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Create ServiceResolutionFunc Enhancement</div>
+                            <div class="task-description">Resolve service with product catalog, dimensions, and pricing model metadata</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CTX-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Service Instance Resolution</div>
+                            <div class="task-description">Support service instances for multi-subscription scenarios</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Rate Card Resolution</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CTX-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Enhance RateCardResolutionFunc with Versioning</div>
+                            <div class="task-description">Support rate card versioning with effective dates for time-travel queries</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CTX-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Rate Card Caching Layer</div>
+                            <div class="task-description">High-performance cache for rate cards to support 1B+ events/day</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CTX-009</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Rate Card Schema Entity</div>
+                            <div class="task-description">Define rate_card schema with pricing_model, tiers, effective dates as per PRD</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">CTX-010</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Context Resolution API</div>
+                            <div class="task-description">Debug API to preview context resolution without rating</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 3: Rating Engine -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-rating">💰</div>
+                <h2>3. Rating Engine</h2>
+                <span class="task-count">18 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Pricing Models Implementation</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Flat Pricing Model</div>
+                            <div class="task-description">Simple per-unit pricing with fixed rate</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Tiered Pricing (Graduated)</div>
+                            <div class="task-description">Different rates for different quantity tiers, each tier priced separately</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Volume Pricing</div>
+                            <div class="task-description">All units priced at the tier rate achieved by total volume</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Slab Pricing</div>
+                            <div class="task-description">Fixed price per slab/range of quantity</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Subscription + Overage Pricing</div>
+                            <div class="task-description">Base subscription fee + overage charges beyond included quantity</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Commit Drawdown Pricing</div>
+                            <div class="task-description">Pre-committed spend with usage drawdown tracking</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">RAT-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Dynamic Pricing Support</div>
+                            <div class="task-description">External price lookup or formula-based dynamic pricing</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Rating API</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Real-time Rating API</div>
+                            <div class="task-description">POST /v1/rate - Rate single event with &lt;200ms latency</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-009</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Bulk Rating API</div>
+                            <div class="task-description">POST /v1/rate/bulk - Async bulk rating with job tracking</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-010</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Charge Lines Query API</div>
+                            <div class="task-description">GET /v1/charges - Query rated charges with filters</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 MFlow Step Functions</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-011</span>
+                        <div class="task-content">
+                            <div class="task-title">Refactor RateComputationFunc</div>
+                            <div class="task-description">Update to support all pricing models from PRD</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-012</span>
+                        <div class="task-content">
+                            <div class="task-title">Create ChargeLineCreationFunc</div>
+                            <div class="task-description">Step function to create charge_line records with full breakdown</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-013</span>
+                        <div class="task-content">
+                            <div class="task-title">Create PricingModelStrategyFactory</div>
+                            <div class="task-description">Factory pattern for selecting pricing calculation strategy</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Data Entities</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-014</span>
+                        <div class="task-content">
+                            <div class="task-title">Create ChargeLine Entity</div>
+                            <div class="task-description">charge_line__m with base_amount, discount_amount, credit_amount, tax_amount, final_amount</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-015</span>
+                        <div class="task-content">
+                            <div class="task-title">Create ChargeLineBreakdown Entity</div>
+                            <div class="task-description">Detailed breakdown of each charge component for explainability</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Performance Optimization</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RAT-016</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Rating Engine Partitioning</div>
+                            <div class="task-description">Partition by account/time for distributed processing (Spark/Flink ready)</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-017</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Batch Rating Job Orchestration</div>
+                            <div class="task-description">Async job orchestration for bulk rating with progress tracking</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RAT-018</span>
+                        <div class="task-content">
+                            <div class="task-title">Add Rating Performance Metrics</div>
+                            <div class="task-description">Latency, throughput, error rate metrics for monitoring</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="api-spec">
+                <span class="api-method post">POST</span>/v1/rate
+                <br><br>
+                Request: { "event_id": "evt_123" }
+                <br><br>
+                Response:<br>
+                {<br>
+                &nbsp;&nbsp;"charge_lines": [{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"charge_id": "chg_001",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"amount": 25.00,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"breakdown": {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"base": 30.00,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"discount": -5.00,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"tax": 2.00<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                &nbsp;&nbsp;}]<br>
+                }
+            </div>
+        </section>
+
+        <!-- Component 4: Discounting Engine -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-discount">🏷️</div>
+                <h2>4. Discounting Engine</h2>
+                <span class="task-count">10 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Discount Rule Framework</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">DSC-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Discount Rule Entity</div>
+                            <div class="task-description">discount_rule__m with scope, condition, action, priority as per PRD schema</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">DSC-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Rule-Based Discount Engine</div>
+                            <div class="task-description">Evaluate discount rules with condition matching and action execution</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">DSC-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Create DiscountApplicationFunc Step</div>
+                            <div class="task-description">MFlow step function for applying discounts to charge lines</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Discount Types</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">DSC-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Percentage Discount</div>
+                            <div class="task-description">Percentage-based discount (e.g., 10% off)</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">DSC-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Fixed Amount Discount</div>
+                            <div class="task-description">Fixed monetary discount (e.g., $5 off)</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">DSC-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Tiered Discount</div>
+                            <div class="task-description">Discount based on quantity/spend tiers</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Multi-Level & Stacking</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">DSC-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Multi-Level Discount Application</div>
+                            <div class="task-description">Support account, contract, product, line-item level discounts</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">DSC-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Discount Stacking & Prioritization</div>
+                            <div class="task-description">Rules for combining/stacking multiple discounts with priority order</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">DSC-009</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Discount Exclusivity Rules</div>
+                            <div class="task-description">Handle mutually exclusive discounts</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">DSC-010</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Discount Preview API</div>
+                            <div class="task-description">Simulate discounts without persisting for quote generation</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 5: Credits Engine -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-credit">💳</div>
+                <h2>5. Credits Engine</h2>
+                <span class="task-count">8 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Credit Ledger</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CRD-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Credit Ledger Entity</div>
+                            <div class="task-description">credit_ledger__m with balance, expiry_date, type, restrictions</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">CRD-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Credit Transaction Entity</div>
+                            <div class="task-description">Track credit additions, deductions, expirations with audit trail</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">CRD-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Wallet-Based Credit Consumption</div>
+                            <div class="task-description">Apply credits to charges with FIFO/expiry-based consumption</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Credit Management</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CRD-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Create CreditApplicationFunc Step</div>
+                            <div class="task-description">MFlow step function for applying credits to charge lines</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CRD-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Credit Expiry Handling</div>
+                            <div class="task-description">Scheduled job to expire credits and handle grace periods</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CRD-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Credit Restrictions</div>
+                            <div class="task-description">Service/product restrictions on credit usage</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Credit API</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">CRD-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Credit Application API</div>
+                            <div class="task-description">POST /v1/credits/apply - Add credits to account</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">CRD-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Credit Balance API</div>
+                            <div class="task-description">GET /v1/credits/balance - Query credit balance by account</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 6: Tax Engine -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-tax">🏛️</div>
+                <h2>6. Tax Engine</h2>
+                <span class="task-count">8 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Tax Calculation</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">TAX-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Tax Line Entity</div>
+                            <div class="task-description">tax_line__m with charge_id, jurisdiction, rate, amount</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">TAX-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Create TaxCalculationFunc Step</div>
+                            <div class="task-description">MFlow step function for line-level tax calculation</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">TAX-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Tax Jurisdiction Resolution</div>
+                            <div class="task-description">Determine applicable tax jurisdiction based on account/service location</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Tax Rate Management</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">TAX-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Tax Rate Entity</div>
+                            <div class="task-description">tax_rate__m with jurisdiction, rate, effective dates, product categories</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">TAX-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Tax Exemption Handling</div>
+                            <div class="task-description">Support tax-exempt accounts and products</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 External Integration</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">TAX-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Tax Provider Integration Framework</div>
+                            <div class="task-description">Abstract interface for external tax providers (Avalara, Vertex, etc.)</div>
+                            <div class="task-meta">
+                                <span class="tag tag-integration">Integration</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">TAX-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Avalara Integration</div>
+                            <div class="task-description">Integration with Avalara tax calculation API</div>
+                            <div class="task-meta">
+                                <span class="tag tag-integration">Integration</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">TAX-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Tax Calculation Fallback</div>
+                            <div class="task-description">Local calculation when external provider unavailable</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 7: Aggregation & Invoice -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-aggregation">📊</div>
+                <h2>7. Aggregation & Invoice Generation</h2>
+                <span class="task-count">8 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Invoice Generation</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">AGG-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Invoice Generation API</div>
+                            <div class="task-description">POST /v1/invoices/generate - Generate invoice for billing period</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">AGG-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Invoice Grouping Logic</div>
+                            <div class="task-description">Group charge lines by service, invoice_group, custom rules</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Multi-Level Rollups</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">AGG-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Account Hierarchy Rollup</div>
+                            <div class="task-description">Aggregate charges across child accounts to parent</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">AGG-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Service-Level Aggregation</div>
+                            <div class="task-description">Aggregate charges by service with subtotals</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">AGG-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Custom Aggregation Dimensions</div>
+                            <div class="task-description">Support custom grouping by metadata fields (region, project, etc.)</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Bill Item Enhancements</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">AGG-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Enhance Bill Item with Breakdown</div>
+                            <div class="task-description">Include base, discount, credit, tax breakdown in bill items</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">AGG-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Invoice Preview API</div>
+                            <div class="task-description">Preview invoice without committing for validation</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">AGG-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Billing Period Management</div>
+                            <div class="task-description">Configurable billing periods with proration support</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 8: Re-rating & Time Machine -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-rerate">⏪</div>
+                <h2>8. Re-rating & Time Machine</h2>
+                <span class="task-count">10 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Re-rating Engine</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RER-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Re-rating API</div>
+                            <div class="task-description">POST /v1/rerate - Reprocess historical events with version-aware pricing</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RER-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Version-Aware Rate Card Loading</div>
+                            <div class="task-description">Load rate card effective at event timestamp, not current</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">RER-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Version-Aware Contract Loading</div>
+                            <div class="task-description">Load contract version effective at event timestamp</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Charge Adjustment</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">RER-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Delta Charge Calculation</div>
+                            <div class="task-description">Calculate difference between old and new charges for adjustments</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RER-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Adjustment Charge Entity</div>
+                            <div class="task-description">Track re-rating adjustments separately from original charges</div>
+                            <div class="task-meta">
+                                <span class="tag tag-db">Database</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RER-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Credit/Debit Adjustment Generation</div>
+                            <div class="task-description">Generate credit for overcharges, debit for undercharges</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Simulation Mode</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RER-007</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Simulation API</div>
+                            <div class="task-description">POST /v1/simulate - What-if analysis without persisting</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">RER-008</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Rate Card Simulation</div>
+                            <div class="task-description">Simulate charges with proposed rate card changes</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">RER-009</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Bulk Re-rating Job</div>
+                            <div class="task-description">Async job for re-rating large event sets with progress tracking</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">RER-010</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Re-rating Audit Trail</div>
+                            <div class="task-description">Full audit log of re-rating operations with before/after</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 9: Explainability -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-explain">📋</div>
+                <h2>9. Explainability & Audit</h2>
+                <span class="task-count">6 tasks</span>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Charge Explainability</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-high">
+                        <span class="task-id">EXP-001</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Charge Breakdown in Response</div>
+                            <div class="task-description">Every charge includes rate_card_id, discount_rule_ids, credit_source, tax_jurisdiction</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-high">
+                        <span class="task-id">EXP-002</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Charge Explanation API</div>
+                            <div class="task-description">GET /v1/charges/{id}/explain - Detailed explanation of charge calculation</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge high">High</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">EXP-003</span>
+                        <div class="task-content">
+                            <div class="task-title">Enhance RatingContext with Audit Fields</div>
+                            <div class="task-description">Track all resolution decisions and versions used</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="task-group">
+                <h3>🔹 Audit Logging</h3>
+                <ul class="task-list">
+                    <li class="task-item priority-medium">
+                        <span class="task-id">EXP-004</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Full Audit Trail</div>
+                            <div class="task-description">Log all rating decisions, config changes, re-ratings</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-medium">
+                        <span class="task-id">EXP-005</span>
+                        <div class="task-content">
+                            <div class="task-title">Create Audit Query API</div>
+                            <div class="task-description">Query audit logs with filtering and date ranges</div>
+                            <div class="task-meta">
+                                <span class="tag tag-api">API</span>
+                                <span class="tag tag-new">New</span>
+                                <span class="priority-badge medium">Medium</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="task-item priority-low">
+                        <span class="task-id">EXP-006</span>
+                        <div class="task-content">
+                            <div class="task-title">Implement Calculation Logs Storage</div>
+                            <div class="task-description">Store detailed calculation steps for debugging</div>
+                            <div class="task-meta">
+                                <span class="tag tag-backend">Backend</span>
+                                <span class="tag tag-enhance">Enhance</span>
+                                <span class="priority-badge low">Low</span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Component 10: API Specifications -->
+        <section class="component-section">
+            <div class="component-header">
+                <div class="component-icon icon-api">🔌</div>
+                <h2>10. API Specifications Summary</h2>
+                <span class="task-count">Reference</span>
+            </div>
+
+            <table class="mapping-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                        <th>Task ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/events</td>
+                        <td>Ingest usage event</td>
+                        <td>ING-001</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/events/batch</td>
+                        <td>Batch event ingestion</td>
+                        <td>ING-005</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method get">GET</span></td>
+                        <td>/v1/events</td>
+                        <td>Query events</td>
+                        <td>ING-008</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/rate</td>
+                        <td>Real-time rating</td>
+                        <td>RAT-008</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/rate/bulk</td>
+                        <td>Bulk rating</td>
+                        <td>RAT-009</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method get">GET</span></td>
+                        <td>/v1/charges</td>
+                        <td>Query charges</td>
+                        <td>RAT-010</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method get">GET</span></td>
+                        <td>/v1/charges/{id}/explain</td>
+                        <td>Explain charge</td>
+                        <td>EXP-002</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/credits/apply</td>
+                        <td>Apply credits</td>
+                        <td>CRD-007</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method get">GET</span></td>
+                        <td>/v1/credits/balance</td>
+                        <td>Credit balance</td>
+                        <td>CRD-008</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/invoices/generate</td>
+                        <td>Generate invoice</td>
+                        <td>AGG-001</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/rerate</td>
+                        <td>Re-rate events</td>
+                        <td>RER-001</td>
+                    </tr>
+                    <tr>
+                        <td><span class="api-method post">POST</span></td>
+                        <td>/v1/simulate</td>
+                        <td>Simulation/what-if</td>
+                        <td>RER-007</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PRD to Task Mapping -->
+        <section class="component-section">
+            <div class="component-header">
+                <h2>PRD Requirements to Task Mapping</h2>
+            </div>
+
+            <table class="mapping-table">
+                <thead>
+                    <tr>
+                        <th>PRD Requirement</th>
+                        <th>Related Tasks</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Accept events via API, batch, streaming</td>
+                        <td>ING-001, ING-005, ING-006</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Idempotent ingestion</td>
+                        <td>ING-002</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Resolve account hierarchy</td>
+                        <td>CTX-001, CTX-002</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Resolve contract (date-effective)</td>
+                        <td>CTX-003, CTX-004</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Support all pricing models</td>
+                        <td>RAT-001 to RAT-007</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Rule-based discounting</td>
+                        <td>DSC-001 to DSC-010</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Wallet-based credits</td>
+                        <td>CRD-001 to CRD-008</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Line-level tax calculation</td>
+                        <td>TAX-001 to TAX-008</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>Invoice grouping & rollups</td>
+                        <td>AGG-001 to AGG-008</td>
+                        <td><span class="priority-badge medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td>Re-rating with version-aware pricing</td>
+                        <td>RER-001 to RER-010</td>
+                        <td><span class="priority-badge medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td>Full explainability</td>
+                        <td>EXP-001 to EXP-006</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>1B+ events/day throughput</td>
+                        <td>RAT-016, RAT-017, CTX-008</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td>&lt;200ms latency</td>
+                        <td>RAT-008, CTX-008</td>
+                        <td><span class="priority-badge high">High</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer style="text-align: center; padding: 2rem; color: var(--gray-600);">
+            <p>Monetize360 Rating Engine Implementation Tasks | Based on PRD v1.0</p>
+            <p>Total: 72 Tasks | 10 Components | 15 API Endpoints</p>
+        </footer>
+    </div>
+</body>
+</html>
