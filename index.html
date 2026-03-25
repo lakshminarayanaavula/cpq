@@ -119,8 +119,6 @@
         .page-section.active { display: block; }
 
         /* Response Panel */
-        .response-panel { background: #1e1e1e; border-radius: 8px; overflow: hidden; position: fixed; bottom: 20px; right: 20px; width: 400px; max-height: 300px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 100; }
-        .response-panel.collapsed { max-height: 40px; }
         .response-header { background: #2d2d2d; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .response-header span { color: #fff; font-weight: 500; font-size: 14px; }
         .response-content { padding: 15px; max-height: 250px; overflow: auto; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; color: #d4d4d4; white-space: pre-wrap; }
@@ -320,7 +318,7 @@
         .ac-verified { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; border:2px solid #28a745; color:#28a745; }
         .ac-verified svg { width:12px; height:12px; }
         .ac-unverified { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; border:2px solid #ddd; color:#aaa; }
-        /* Account modal form layout */
+        /* Account/Quote modal form grid */
         .ac-modal-form { display:grid; grid-template-columns:1fr 1fr; gap:16px 24px; }
         .ac-modal-form .full-width { grid-column:1/-1; }
         .ac-modal-form .form-group { display:flex; flex-direction:column; gap:6px; }
@@ -329,13 +327,129 @@
             padding:9px 12px; border:1px solid #ddd; border-radius:8px; font-size:13px; font-family:inherit;
             background:#fafafa; transition:border-color 0.15s;
         }
-        .ac-modal-form input:focus, .ac-modal-form select:focus, .ac-modal-form textarea:focus {
-            outline:none; border-color:#1a1a2e; background:white;
-        }
+        .ac-modal-form input:focus, .ac-modal-form select:focus, .ac-modal-form textarea:focus { outline:none; border-color:#1a1a2e; background:white; }
         .ac-modal-form textarea { resize:vertical; min-height:72px; }
         .ac-checkbox-row { display:flex; align-items:center; gap:10px; padding:4px 0; }
         .ac-checkbox-row input[type=checkbox] { width:16px; height:16px; cursor:pointer; }
         .ac-checkbox-row label { font-size:13px; font-weight:500; color:#555; cursor:pointer; }
+        /* Quote detail */
+        .qt-detail-header { background:white; border:1px solid #e8e8e8; border-radius:12px; padding:24px 28px; margin-bottom:20px; }
+        .qt-detail-title { font-size:22px; font-weight:700; color:#1a1a2e; margin-bottom:4px; display:flex; align-items:center; gap:12px; }
+        .qt-detail-title button { background:none; border:1px solid #ddd; border-radius:8px; padding:6px 10px; cursor:pointer; color:#555; display:inline-flex; align-items:center; }
+        .qt-detail-title button:hover { background:#f5f5f5; }
+        .qt-subtitle { color:#777; font-size:14px; margin-bottom:16px; }
+        .qt-badges { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:0; }
+        .qt-badge { padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; background:#f0f0f0; color:#555; }
+        .qt-badge.dark { background:#1a1a2e; color:#fff; }
+        .qt-badge.blue { background:#e3f0ff; color:#0066cc; }
+        .qt-summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+        .qt-summary-card { background:white; border:1px solid #e8e8e8; border-radius:10px; padding:20px 24px; text-align:center; }
+        .qt-summary-card .label { font-size:12px; color:#999; font-weight:500; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; }
+        .qt-summary-card .value { font-size:26px; font-weight:700; color:#1a1a2e; }
+        .qt-summary-note { font-size:12px; color:#aaa; margin-top:4px; }
+        /* Segment card */
+        .qt-segment { background:white; border:1px solid #e0e0e0; border-radius:10px; margin-bottom:12px; overflow:hidden; }
+        .qt-seg-hdr { display:flex; align-items:flex-start; padding:14px 18px; cursor:pointer; user-select:none; gap:10px; }
+        .qt-seg-hdr:hover { background:#fafafa; }
+        .qt-seg-chevron { color:#aaa; font-size:13px; margin-top:2px; transition:transform 0.2s; flex-shrink:0; }
+        .qt-seg-chevron.open { transform:rotate(90deg); }
+        .qt-seg-hdr-left { flex:1; min-width:0; }
+        .qt-seg-title { font-size:14px; font-weight:700; color:#1a1a2e; margin-bottom:2px; }
+        .qt-seg-subtitle { font-size:12px; color:#999; }
+        .qt-seg-hdr-right { display:flex; align-items:center; gap:16px; flex-shrink:0; }
+        .qt-seg-stats { display:flex; gap:16px; font-size:12px; color:#666; }
+        .qt-seg-stats span { white-space:nowrap; }
+        .qt-seg-icon-btns { display:flex; gap:4px; align-items:center; }
+        .qt-seg-icon-btn { background:none; border:none; cursor:pointer; padding:5px 7px; border-radius:5px; color:#999; font-size:15px; line-height:1; }
+        .qt-seg-icon-btn:hover { background:#f0f0f0; color:#333; }
+        .qt-seg-icon-btn.del:hover { background:#ffeaea; color:#e53935; }
+        /* Segment body */
+        .qt-seg-body { border-top:1px solid #f0f0f0; display:none; }
+        .qt-seg-body.open { display:block; }
+        .qt-seg-info { display:grid; grid-template-columns:repeat(6,1fr); gap:10px 16px; padding:14px 18px; background:#fafbfc; border-bottom:1px solid #f0f0f0; font-size:12px; }
+        .qt-seg-info-field label { font-size:10px; color:#aaa; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; display:block; }
+        .qt-seg-info-field span { color:#333; font-weight:500; display:block; margin-top:1px; }
+        /* Inline product add bar */
+        .qt-inline-add { display:flex; align-items:center; gap:8px; padding:10px 18px; border-bottom:1px solid #f0f0f0; background:white; }
+        .qt-inline-prod-sel { flex:1; padding:7px 10px; border:1px solid #d8d8d8; border-radius:6px; font-size:13px; color:#333; background:white; }
+        .qt-inline-prod-sel:focus { outline:none; border-color:#1a1a2e; }
+        .qt-inline-uom-sel { width:80px; padding:7px 8px; border:1px solid #d8d8d8; border-radius:6px; font-size:13px; background:white; }
+        .qt-inline-add-btn { background:#1a1a2e; color:white; border:none; border-radius:6px; padding:8px 18px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+        .qt-inline-add-btn:hover { background:#2d2d4e; }
+        /* Item table */
+        .qt-items-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .qt-items-table thead th { font-size:11px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:0.3px; padding:8px 12px; border-bottom:1px solid #eee; text-align:left; background:#fafafa; white-space:nowrap; }
+        .qt-items-table tbody td { padding:10px 12px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+        .qt-items-table tbody tr:last-child td { border-bottom:none; }
+        .qt-items-table tbody tr:hover td { background:#fafbfc; }
+        .qt-inline-qty { width:52px; padding:4px 8px; border:1px solid #e0e0e0; border-radius:5px; font-size:12px; text-align:center; }
+        .qt-inline-qty:focus { outline:none; border-color:#1a1a2e; }
+        .qt-inline-pct { width:55px; padding:4px 8px; border:1px solid #e0e0e0; border-radius:5px; font-size:12px; text-align:center; }
+        .qt-inline-pct:focus { outline:none; border-color:#1a1a2e; }
+        .qt-item-uom { width:72px; padding:4px 6px; border:1px solid #e0e0e0; border-radius:5px; font-size:12px; }
+        .qt-config-text { font-size:11px; color:#888; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+        .qt-item-actions { display:flex; gap:2px; align-items:center; }
+        .qt-item-action-btn { background:none; border:none; cursor:pointer; padding:5px 6px; border-radius:4px; font-size:14px; color:#aaa; }
+        .qt-item-action-btn:hover { background:#f0f0f0; color:#555; }
+        .qt-item-action-btn.del:hover { background:#ffeaea; color:#e53935; }
+        .qt-cfg-btn { border:1px solid #3949ab !important; color:#3949ab !important; font-size:12px !important; padding:4px 10px !important; border-radius:6px !important; display:inline-flex; align-items:center; font-weight:500; }
+        .qt-cfg-btn:hover { background:#e8eaf6 !important; color:#3949ab !important; }
+        .qt-empty-items { text-align:center; color:#bbb; font-size:13px; padding:24px; }
+        /* Quote header */
+        .qt-recalc-btn { background:none; border:1px solid #1a1a2e; color:#1a1a2e; border-radius:8px; padding:6px 14px; font-size:13px; cursor:pointer; }
+        .qt-recalc-btn:hover { background:#1a1a2e; color:white; }
+        /* Segment modal */
+        .seg-modal-form { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
+        .seg-modal-form .full-width { grid-column:1/-1; }
+
+        /* ── Bundle Configurator ───────────────────────────────────────── */
+        .bc-hdr { display:flex; align-items:center; gap:14px; background:white; border:1px solid #e8e8e8; border-radius:12px; padding:18px 24px; margin-bottom:20px; }
+        .bc-back { background:none; border:1px solid #e0e0e0; border-radius:8px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#555; flex-shrink:0; }
+        .bc-back:hover { background:#f5f5f5; }
+        .bc-hdr-info { flex:1; min-width:0; }
+        .bc-hdr-title { font-size:20px; font-weight:700; color:#1a1a2e; }
+        .bc-hdr-sub { font-size:13px; color:#999; margin-top:2px; }
+        .bc-save-btn { background:#1a1a2e; color:white; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:7px; }
+        .bc-save-btn:hover { background:#2d2d4e; }
+        .bc-save-btn svg { width:15px; height:15px; }
+        .bc-features-label { font-size:16px; font-weight:700; color:#1a1a2e; margin-bottom:14px; }
+        /* Feature card */
+        .bc-feature-card { background:white; border:1px solid #e8e8e8; border-radius:12px; margin-bottom:12px; overflow:hidden; }
+        .bc-feature-hdr { display:flex; align-items:center; gap:10px; padding:16px 20px 12px; }
+        .bc-feature-name { font-size:15px; font-weight:700; color:#1a1a2e; }
+        .bc-req-badge { background:#e53935; color:white; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; }
+        .bc-ok-badge { background:#43a047; color:white; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+        .bc-feature-divider { border:none; border-top:1px solid #f0f0f0; margin:0; }
+        .bc-prod-section { padding:14px 20px 12px; }
+        .bc-prod-label { font-size:11px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; }
+        .bc-prod-select { width:100%; padding:10px 14px; border:1px solid #e0e0e0; border-radius:8px; font-size:14px; color:#1a1a2e; background:white; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:16px; padding-right:36px; cursor:pointer; }
+        .bc-prod-select:focus { outline:none; border-color:#1a1a2e; }
+        .bc-cfg-section { padding:12px 20px 16px; border-top:1px solid #f5f5f5; background:#fafbfc; }
+        .bc-cfg-label { font-size:11px; font-weight:600; color:#aaa; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:10px; }
+        .bc-attr-field { margin-bottom:10px; }
+        .bc-attr-field:last-child { margin-bottom:0; }
+        .bc-attr-label { font-size:12px; color:#888; margin-bottom:5px; display:block; }
+        .bc-attr-select { width:100%; padding:9px 14px; border:1px solid #e0e0e0; border-radius:8px; font-size:13px; color:#333; background:white; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:14px; padding-right:32px; cursor:pointer; }
+        .bc-attr-input { width:100%; padding:9px 14px; border:1px solid #e0e0e0; border-radius:8px; font-size:13px; color:#333; box-sizing:border-box; }
+        .bc-attr-select:focus, .bc-attr-input:focus { outline:none; border-color:#1a1a2e; }
+        .bc-attr-hint { font-size:10px; color:#bbb; margin-top:3px; }
+        /* Pricing bar */
+        .bc-pricing-bar { display:flex; gap:24px; background:white; border:1px solid #e8e8e8; border-radius:10px; padding:14px 20px; margin-top:16px; font-size:13px; }
+        .bc-pricing-bar span { color:#666; }
+        .bc-pricing-bar b { color:#1a1a2e; }
+        /* Validation */
+        .bc-val-errors { background:#fff5f5; border:1px solid #fecaca; border-radius:10px; padding:14px 18px; margin-top:12px; }
+        .bc-val-errors h5 { color:#e53935; font-size:13px; margin:0 0 8px; }
+        .bc-val-errors ul { color:#e53935; font-size:12px; margin:0 0 0 16px; padding:0; }
+        .bc-feature-card--error { border:1.5px solid #fca5a5 !important; background:#fff8f8; }
+        .bc-feature-card--error .bc-feature-name { color:#e53935; }
+        .bc-prod-select option[value=""][disabled] { color:#aaa; }
+        /* Raw response */
+        .bc-raw-card { background:white; border:1px solid #e8e8e8; border-radius:10px; margin-top:16px; overflow:hidden; }
+        .bc-raw-hdr { padding:12px 18px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0f0f0; }
+        .bc-raw-hdr:hover { background:#fafafa; }
+        .bc-raw-hdr span { font-size:13px; font-weight:600; color:#666; }
+        .bc-raw-body { font-family:monospace; font-size:11px; white-space:pre-wrap; max-height:300px; overflow:auto; padding:14px 18px; background:#fafbfc; display:none; }
 
         /* Constraint Cards */
         .constraint-card { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; }
@@ -517,9 +631,9 @@
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                         Assets
                     </a></li>
-                    <li><a data-page="rated-transactions">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                        Rated Transactions
+                    <li><a data-page="bundle-configurator">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        Bundle Configurator
                     </a></li>
                 </ul>
             </div>
@@ -1100,7 +1214,7 @@ VALIDATION_INFO
             <div id="pmDetailView" style="display:none;"></div>
         </div>
 
-        <!-- ===== ACCOUNTS ===== -->
+        <!-- ============= ACCOUNTS ============= -->
         <div class="page-section" id="page-accounts">
             <div class="page-header">
                 <div>
@@ -1112,17 +1226,9 @@ VALIDATION_INFO
             <table class="data-table" style="width:100%;">
                 <thead>
                     <tr>
-                        <th>Account #</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Owner</th>
-                        <th>Billing Freq.</th>
-                        <th>Net Term</th>
-                        <th>Last Bill</th>
-                        <th>Next Bill</th>
-                        <th>Verified</th>
-                        <th>Currency</th>
-                        <th>Actions</th>
+                        <th>Account #</th><th>Name</th><th>Type</th><th>Owner</th>
+                        <th>Billing Freq.</th><th>Net Term</th><th>Last Bill</th><th>Next Bill</th>
+                        <th>Verified</th><th>Currency</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="accountTableBody">
@@ -1131,72 +1237,118 @@ VALIDATION_INFO
             </table>
         </div>
 
-        <!-- ===== QUOTES ===== -->
+        <!-- ============= QUOTES ============= -->
         <div class="page-section" id="page-quotes">
-            <div class="page-header">
-                <div>
-                    <div class="page-title">Quotes</div>
-                    <div class="page-subtitle">Manage sales quotes</div>
+            <div id="qtListView">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Quotes</div>
+                        <div class="page-subtitle">Manage quotes across accounts</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showQuoteModal(null)">+ Add Quote</button>
                 </div>
+                <table class="data-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Quote #</th><th>Account</th><th>Type</th>
+                            <th>Approval</th><th>Status</th><th>Start Date</th>
+                            <th>End Date</th><th>Renewal</th><th>Products</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qtTableBody">
+                        <tr><td colspan="10" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div style="text-align:center;padding:80px;color:#aaa;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <div style="font-size:16px;font-weight:500;">Quotes coming soon</div>
-            </div>
+            <div id="qtDetailView" style="display:none;"></div>
         </div>
 
-        <!-- ===== ORDERS ===== -->
+        <!-- ============= ORDERS ============= -->
         <div class="page-section" id="page-orders">
-            <div class="page-header">
-                <div>
-                    <div class="page-title">Orders</div>
-                    <div class="page-subtitle">Manage sales orders</div>
-                </div>
-            </div>
+            <div class="page-header"><div><div class="page-title">Orders</div><div class="page-subtitle">Manage sales orders</div></div></div>
             <div style="text-align:center;padding:80px;color:#aaa;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
                 <div style="font-size:16px;font-weight:500;">Orders coming soon</div>
             </div>
         </div>
 
-        <!-- ===== ASSETS ===== -->
+        <!-- ============= ASSETS ============= -->
         <div class="page-section" id="page-assets">
-            <div class="page-header">
-                <div>
-                    <div class="page-title">Assets</div>
-                    <div class="page-subtitle">Manage customer assets</div>
-                </div>
-            </div>
+            <div class="page-header"><div><div class="page-title">Assets</div><div class="page-subtitle">Manage customer assets</div></div></div>
             <div style="text-align:center;padding:80px;color:#aaa;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
                 <div style="font-size:16px;font-weight:500;">Assets coming soon</div>
             </div>
         </div>
 
-        <!-- ===== RATED TRANSACTIONS ===== -->
+        <!-- ============= RATED TRANSACTIONS ============= -->
         <div class="page-section" id="page-rated-transactions">
-            <div class="page-header">
-                <div>
-                    <div class="page-title">Rated Transactions</div>
-                    <div class="page-subtitle">View billing rated transactions</div>
-                </div>
-            </div>
+            <div class="page-header"><div><div class="page-title">Rated Transactions</div><div class="page-subtitle">View billing rated transactions</div></div></div>
             <div style="text-align:center;padding:80px;color:#aaa;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 <div style="font-size:16px;font-weight:500;">Rated Transactions coming soon</div>
             </div>
         </div>
 
+        <!-- ============= Bundle Configurator ============= -->
+        <div class="page-section" id="page-bundle-configurator">
+
+            <!-- Hidden state (populated by reconfigureItem / JS) -->
+            <input type="hidden" id="bcQuoteId">
+            <input type="hidden" id="bcSegmentId">
+            <input type="hidden" id="bcAccountId">
+            <input type="hidden" id="bcItemId">
+            <select id="bcBundleSelect" style="display:none;"></select>
+            <span id="bcSessionId"    style="display:none;"></span>
+            <span id="bcItemIdDisplay" style="display:none;"></span>
+            <span id="bcStatus"       style="display:none;"></span>
+            <span id="bcValid"        style="display:none;"></span>
+
+            <!-- ── Header ── -->
+            <div class="bc-hdr" id="bcConfigPanel">
+                <button class="bc-back" onclick="bcGoBack()" title="Back to quote">&#8592;</button>
+                <div class="bc-hdr-info">
+                    <div class="bc-hdr-title" id="bcBundleName">Bundle Configurator</div>
+                    <div class="bc-hdr-sub"   id="bcSubtitle">Open a bundle item from a quote to configure it</div>
+                </div>
+                <div id="bcSaveWrap" style="display:none;align-items:center;gap:10px;margin-left:auto;">
+                    <button class="bc-save-btn" onclick="confirmBundleConfiguration()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Configuration
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── Empty state ── -->
+            <div id="bcEmptyState" style="text-align:center;padding:80px 20px;color:#bbb;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" stroke-width="1.5" style="width:56px;height:56px;margin-bottom:16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <div style="font-size:15px;font-weight:600;color:#999;margin-bottom:6px;">No bundle selected</div>
+                <div style="font-size:13px;">Click the <b>Configure</b> button on a bundle product inside a Quote segment.</div>
+            </div>
+
+            <!-- ── Features ── -->
+            <div id="bcFeaturesWrap" style="display:none;">
+                <div class="bc-features-label">Features</div>
+                <div id="bcFeaturesContainer"></div>
+
+                <div class="bc-pricing-bar">
+                    <span>Total OTC: <b>$<span id="bcTotalOtc">0.00</span></b></span>
+                    <span>Total MRC: <b>$<span id="bcTotalMrc">0.00</span></b></span>
+                    <span>Price Tier: <b><span id="bcPriceTier">LIST</span></b></span>
+                </div>
+
+                <div id="bcValidationErrors" class="bc-val-errors" style="display:none;">
+                    <h5>Validation Errors</h5>
+                    <ul id="bcErrorList"></ul>
+                </div>
+
+                <div id="bcRawResponse" style="display:none;"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Response Panel -->
-    <div class="response-panel" id="responsePanel">
-        <div class="response-header" onclick="toggleResponsePanel()">
-            <span>API Response</span>
-            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); clearResponse()" style="color: white; border-color: #555;">Clear</button>
-        </div>
-        <div class="response-content" id="responseContent">Ready...</div>
-    </div>
 
     <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
@@ -1227,7 +1379,8 @@ const API = {
     pricingMatrices: '/api/v1/cpq/pricing-matrices',
     pricingEntries: '/api/v1/cpq/pricing-entries',
     currencies: '/api/v1/mdata/mobject/4daa3a2d-b398-44da-9b4a-2219a0877186/with-related',
-    accounts: '/api/v1/cpq/accounts'
+    accounts: '/api/v1/cpq/accounts',
+    quotes: '/api/v1/cpq/quotes'
 };
 
 // Default page size for pagination
@@ -1263,7 +1416,6 @@ async function apiCall(method, endpoint, body = null) {
     try {
         const response = await fetch(url, options);
         const data = await response.json();
-        showResponse(data, response.ok);
         if (!response.ok) {
             const errorMsg = data.message || data.error || 'API Error';
             showToast(errorMsg, 'error');
@@ -1271,7 +1423,6 @@ async function apiCall(method, endpoint, body = null) {
         }
         return data;
     } catch (error) {
-        showResponse({ error: error.message }, false);
         if (!error.message.includes('API Error')) {
             showToast(error.message || 'Request failed', 'error');
         }
@@ -1296,17 +1447,9 @@ function extractData(response) {
     return { data: [], pagination: null };
 }
 
-function showResponse(data, success = true) {
-    const content = $('responseContent');
-    content.className = 'response-content ' + (success ? 'response-success' : 'response-error');
-    content.textContent = JSON.stringify(data, null, 2);
-}
-
-function clearResponse() { $('responseContent').textContent = ''; }
-
-function toggleResponsePanel() {
-    $('responsePanel').classList.toggle('collapsed');
-}
+function showResponse() {}
+function clearResponse() {}
+function toggleResponsePanel() {}
 
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -1370,7 +1513,9 @@ document.querySelectorAll('.sidebar-menu a').forEach(link => {
         if (page === 'attribute-options') populateAttributeDropdowns();
         if (page === 'cost-matrices') loadCostMatrices();
         if (page === 'price-matrices') loadPriceMatrices();
+        if (page === 'bundle-configurator') loadBundleConfiguratorPage();
         if (page === 'accounts') loadAccounts();
+        if (page === 'quotes') loadQuotes();
     });
 });
 
@@ -2993,7 +3138,7 @@ function manageBundleFeatures(bundleId) {
     state.selectedBundleId = bundleId;
     document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
     document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-    document.querySelector('[data-page="bundle-features"]').classList.add('active');
+    document.querySelector('[data-page="bundle-features"]')?.classList.add('active');
     $('page-bundle-features').classList.add('active');
     $('featureBundleSelect').value = bundleId;
     selectBundleForFeatures();
@@ -3218,7 +3363,7 @@ function manageFeatureProducts(featureId) {
     state.selectedFeatureId = featureId;
     document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
     document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-    document.querySelector('[data-page="feature-products"]').classList.add('active');
+    document.querySelector('[data-page="feature-products"]')?.classList.add('active');
     $('page-feature-products').classList.add('active');
     $('fpBundleSelect').value = state.selectedBundleId;
     onFPBundleChange();
@@ -4361,18 +4506,309 @@ function saveModal() {
         case 'costMatrix': saveCostMatrix(); break;
         case 'priceMatrix': savePriceMatrix(); break;
         case 'account': saveAccount(); break;
+        case 'quote': saveQuote(); break;
+        case 'segment': saveSegment(); break;
     }
 }
 
 $('modalOverlay').addEventListener('click', e => { if (e.target === $('modalOverlay')) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-console.log('CPQ Console ready. Enter JWT token and click Load All Data.');
+// ============= Bundle Configurator =============
+let bcState = {
+    sessionId: null,
+    itemId: null,
+    quoteId: null,
+    segmentId: null,
+    configData: null
+};
+
+async function loadBundleConfiguratorPage() {
+    // Load products/bundles if not already loaded
+    if (!state.bundles.length) {
+        $('bcBundleSelect').innerHTML = '<option value="">Loading bundles…</option>';
+        try {
+            await loadProducts();
+        } catch(e) { /* ignore, will show empty */ }
+    }
+    // Populate bundle dropdown with bundle products
+    const bundleOpts = state.bundles.map(b =>
+        `<option value="${b.id}">${b.label || b.name || b.sku || String(b.id).slice(0, 8)} (${b.sku || 'No SKU'})</option>`
+    ).join('');
+    $('bcBundleSelect').innerHTML = '<option value="">Select Bundle Product...</option>' + bundleOpts;
+    if (!bundleOpts) {
+        $('bcBundleSelect').innerHTML = '<option value="">No bundle products found</option>';
+    }
+}
+
+// ── Helper: extract BundleConfigurationResponse from ApiResponse wrapper ──────
+function _bcExtract(raw) {
+    // Controller returns ApiResponse<BundleConfigurationResponse>
+    // so raw = { success:true, data:{ sessionId, features, ... }, ... }
+    return (raw && raw.data) ? raw.data : raw;
+}
+
+function _bcApply(raw, quoteId, segmentId) {
+    const config = _bcExtract(raw);
+    if (!config) return;
+    if (quoteId)   bcState.quoteId   = quoteId;
+    if (segmentId) bcState.segmentId = segmentId;
+    bcState.sessionId  = config.sessionId;
+    bcState.itemId     = config.itemId || bcState.itemId;
+    bcState.configData = config;
+    renderBundleConfiguration(config);
+    const rawEl = $('bcRawResponse');
+    if (rawEl) rawEl.textContent = JSON.stringify(config, null, 2);
+}
+
+async function initializeBundleConfiguration() {
+    const quoteId = $('bcQuoteId').value.trim();
+    const segmentId = $('bcSegmentId').value.trim();
+    const bundleProductId = $('bcBundleSelect').value;
+    const accountId = $('bcAccountId').value.trim() || null;
+
+    if (!quoteId || !segmentId || !bundleProductId) {
+        showToast('Please provide Quote ID, Segment ID and select a Bundle Product', 'error');
+        return;
+    }
+    try {
+        const url = `/api/v1/quotes/${quoteId}/segments/${segmentId}/items/configure`;
+        const raw = await apiCall('POST', url, { bundleProductId, accountId });
+        _bcApply(raw, quoteId, segmentId);
+    } catch (err) {
+        const rawEl = $('bcRawResponse');
+        if (rawEl) rawEl.textContent = 'Error: ' + (err.message || err);
+    }
+}
+
+async function loadBundleConfiguration() {
+    const quoteId = $('bcQuoteId').value.trim();
+    const segmentId = $('bcSegmentId').value.trim();
+    const itemId = $('bcItemId').value.trim();
+
+    if (!quoteId || !segmentId || !itemId) {
+        showToast('Please provide Quote ID, Segment ID and Item ID', 'error');
+        return;
+    }
+    try {
+        const url = `/api/v1/quotes/${quoteId}/segments/${segmentId}/items/${itemId}/configure`;
+        const raw = await apiCall('GET', url);
+        _bcApply(raw, quoteId, segmentId);
+    } catch (err) {
+        const rawEl = $('bcRawResponse');
+        if (rawEl) rawEl.textContent = 'Error: ' + (err.message || err);
+    }
+}
+
+async function refreshBundleConfiguration() {
+    if (!bcState.itemId) return;
+    await loadBundleConfigurationById(bcState.quoteId, bcState.segmentId, bcState.itemId);
+}
+
+async function loadBundleConfigurationById(quoteId, segmentId, itemId) {
+    try {
+        const url = `/api/v1/quotes/${quoteId}/segments/${segmentId}/items/${itemId}/configure`;
+        const raw = await apiCall('GET', url);
+        _bcApply(raw, quoteId, segmentId);
+    } catch (err) {
+        const rawEl = $('bcRawResponse');
+        if (rawEl) rawEl.textContent = 'Error: ' + (err.message || err);
+    }
+}
+
+async function patchBundleSelection(featureId, productId) {
+    if (!bcState.itemId || !bcState.sessionId) return;
+    try {
+        const url = `/api/v1/quotes/${bcState.quoteId}/segments/${bcState.segmentId}/items/${bcState.itemId}/configure`;
+        const raw = await apiCall('PATCH', url, {
+            sessionId: bcState.sessionId,
+            selections: [{ featureId, productId }]
+        });
+        _bcApply(raw);
+    } catch (err) {
+        showToast('Failed to update selection: ' + err.message, 'error');
+    }
+}
+
+async function patchBundleAttribute(featureId, productId, attributeId, value) {
+    if (!bcState.itemId || !bcState.sessionId) return;
+    try {
+        const url = `/api/v1/quotes/${bcState.quoteId}/segments/${bcState.segmentId}/items/${bcState.itemId}/configure`;
+        const raw = await apiCall('PATCH', url, {
+            sessionId: bcState.sessionId,
+            attributeSelections: [{ featureId, productId, attributeId, value }]
+        });
+        _bcApply(raw);
+    } catch (err) {
+        showToast('Failed to update attribute: ' + err.message, 'error');
+    }
+}
+
+async function confirmBundleConfiguration() {
+    if (!bcState.itemId) {
+        showToast('No configuration loaded', 'error');
+        return;
+    }
+    try {
+        const url = `/api/v1/quotes/${bcState.quoteId}/segments/${bcState.segmentId}/items/${bcState.itemId}/confirm`;
+        await apiCall('POST', url);
+        showToast('Configuration saved successfully!', 'success');
+        // Go back to the quote detail
+        bcGoBack();
+    } catch (err) {
+        showToast('Error saving configuration: ' + (err.message || err), 'error');
+    }
+}
+
+function bcGoBack() {
+    // If we came from a quote, go back to it
+    if (bcState.quoteId) {
+        viewQuote(bcState.quoteId);
+        // Activate quotes nav
+        document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+        const ql = document.querySelector('.sidebar-menu a[data-page="quotes"]');
+        if (ql) ql.classList.add('active');
+        const qp = $('page-quotes');
+        if (qp) qp.classList.add('active');
+    }
+}
+
+function renderBundleConfiguration(config) {
+    // Show features, hide empty state
+    $('bcEmptyState').style.display  = 'none';
+    $('bcFeaturesWrap').style.display = 'block';
+    $('bcSaveWrap') && ($('bcSaveWrap').style.display = 'flex');
+
+    // Update hidden state inputs
+    if (config.itemId) $('bcItemId').value = config.itemId;
+
+    // Header
+    const bundleName = config.bundleName || 'Bundle Configuration';
+    $('bcBundleName').textContent = 'Configure ' + bundleName;
+
+    // Subtitle: quote number if available
+    const quoteNum = (typeof qtState !== 'undefined' && qtState?.currentQuote?.quoteNumber) || '';
+    $('bcSubtitle').textContent = quoteNum ? 'Contract ' + quoteNum : 'Bundle Configuration';
+
+    // Pricing
+    $('bcTotalOtc').textContent = (config.pricing?.totalOtc || 0).toFixed(2);
+    $('bcTotalMrc').textContent = (config.pricing?.totalMrc || 0).toFixed(2);
+    $('bcPriceTier').textContent = config.pricing?.priceTier || 'LIST';
+
+    // Validation errors
+    if (config.validationErrors && config.validationErrors.length > 0) {
+        $('bcValidationErrors').style.display = 'block';
+        $('bcErrorList').innerHTML = config.validationErrors.map(e => `<li>${e}</li>`).join('');
+    } else {
+        $('bcValidationErrors').style.display = 'none';
+    }
+
+    // Features
+    const container = $('bcFeaturesContainer');
+    container.innerHTML = '';
+
+    const features = config.features || [];
+    if (!features.length) {
+        container.innerHTML = '<div style="color:#aaa;padding:20px;text-align:center;">No features available for this bundle.</div>';
+        return;
+    }
+
+    const errorSet = new Set((config.validationErrors || []).map(e => {
+        const m = e.match(/^([^:]+):/);
+        return m ? m[1].trim().toLowerCase() : '';
+    }));
+
+    features.forEach(feature => {
+        const featureHasError = feature.required && !feature.satisfied;
+        const reqBadge  = feature.required  ? '<span class="bc-req-badge">Required</span>'  : '';
+        const okBadge   = feature.satisfied ? '<span class="bc-ok-badge">✓ Satisfied</span>' : '';
+        const products  = feature.products || [];
+        const selected  = products.find(p => p.selected);
+
+        // Build product <select> options
+        const hasSelection = products.some(p => p.selected);
+        const placeholderOpt = `<option value="" ${!hasSelection ? 'selected' : ''} disabled>— Select product —</option>`;
+        const prodOpts = products.map(p => {
+            const isDisabled = p.availability === 'SUPPRESSED' || p.availability === 'HIDDEN';
+            const label = [p.name || p.sku, p.sku && p.name ? `(${p.sku})` : '', p.isDefault ? '★' : ''].filter(Boolean).join(' ');
+            return `<option value="${p.productId}" ${p.selected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}>${label}</option>`;
+        }).join('');
+
+        // Build configuration (attributes of selected product)
+        let cfgHtml = '';
+        if (selected && selected.attributes && selected.attributes.length > 0) {
+            cfgHtml = `<div class="bc-cfg-section">
+                <div class="bc-cfg-label">Configuration</div>
+                ${renderProductAttributes(feature.featureId, selected.productId, selected.attributes)}
+            </div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'bc-feature-card' + (featureHasError ? ' bc-feature-card--error' : '');
+        card.innerHTML = `
+            <div class="bc-feature-hdr">
+                <span class="bc-feature-name">${feature.label}</span>
+                ${reqBadge}${okBadge}
+            </div>
+            <hr class="bc-feature-divider">
+            <div class="bc-prod-section">
+                <div class="bc-prod-label">Product</div>
+                <select class="bc-prod-select"
+                    onchange="patchBundleSelection('${feature.featureId}', this.value)">
+                    ${products.length === 0
+                        ? '<option value="">No products available</option>'
+                        : placeholderOpt + prodOpts}
+                </select>
+            </div>
+            ${cfgHtml}
+        `;
+        container.appendChild(card);
+    });
+}
+
+function renderProductAttributes(featureId, productId, attributes) {
+    if (!attributes || attributes.length === 0) return '';
+    return attributes.map(attr => {
+        const label = attr.customLabel || attr.name || attr.attributeId;
+        const fid   = featureId;
+        const pid   = productId;
+        const aid   = attr.attributeId;
+        let input   = '';
+
+        if (attr.picklistOptions && attr.picklistOptions.length > 0) {
+            const opts = attr.picklistOptions.map(opt =>
+                `<option value="${opt.value}" ${opt.selected ? 'selected' : ''} ${!opt.available ? 'disabled' : ''}>${opt.value}${!opt.available ? ' (unavailable)' : ''}</option>`
+            ).join('');
+            input = `<select class="bc-attr-select" onchange="patchBundleAttribute('${fid}','${pid}','${aid}',this.value)">
+                <option value="">Select…</option>${opts}
+            </select>`;
+        } else if (attr.numericalRange) {
+            const r = attr.numericalRange;
+            input = `<input type="number" class="bc-attr-input"
+                value="${attr.currentValue ?? attr.defaultValue ?? ''}"
+                min="${r.min}" max="${r.max}" step="${r.step || 1}"
+                onchange="patchBundleAttribute('${fid}','${pid}','${aid}',this.value)">
+                ${r.min != null ? `<div class="bc-attr-hint">Range: ${r.min} – ${r.max}${r.unitLabel ? ' ' + r.unitLabel : ''}</div>` : ''}`;
+        } else {
+            input = `<input type="text" class="bc-attr-input"
+                value="${attr.currentValue ?? attr.defaultValue ?? ''}"
+                onchange="patchBundleAttribute('${fid}','${pid}','${aid}',this.value)">`;
+        }
+
+        return `<div class="bc-attr-field">
+            <label class="bc-attr-label">${label}</label>
+            ${input}
+        </div>`;
+    }).join('');
+
+}
+
+// loadBundleConfiguratorPage is called from the main nav handler when page === 'bundle-configurator'
 
 // ============================================================
 // ACCOUNTS
 // ============================================================
-
 const NET_TERMS = [
     {id: '027c95ee-987b-11ec-99d4-cb6c94765bb6', label: 'Immediate'},
     {id: 'fe0fc8ac-e283-4424-8c2f-94716248b9f1', label: 'Net 7'},
@@ -4381,7 +4817,6 @@ const NET_TERMS = [
     {id: '24e8bc8e-987b-11ec-8c0e-b7fad745afc7', label: 'Net 45'},
     {id: '31cec56a-987b-11ec-861a-e7a573f7825b', label: 'Net 90'}
 ];
-
 const BILLING_FREQS = [
     {id: '615e3bc3-9d23-4c0e-88ca-1f36900c7517', label: 'Daily'},
     {id: '303b8364-7aa2-43ff-bcac-cb168abaf63d', label: 'Weekly'},
@@ -4391,317 +4826,723 @@ const BILLING_FREQS = [
     {id: 'd4088d82-1eec-4c69-9e94-683ffbe1f8db', label: 'Half Yearly'},
     {id: '29c91569-1ad9-433b-9dd8-791a2060db3d', label: 'Yearly'}
 ];
-
 const ACCOUNT_TYPES = ['EC', 'SMB', 'Partner', 'Government', 'Internal'];
 
-let acState = {
-    accounts: [],
-    currencies: []  // shared/reused from cmState if available
-};
+let acState = { accounts: [], currencies: [] };
 
-function _acNetTermLabel(id) {
-    if (!id) return '—';
-    const t = NET_TERMS.find(x => x.id === String(id));
-    return t ? t.label : String(id).slice(0, 8);
-}
-
-function _acBillingFreqLabel(id) {
-    if (!id) return '—';
-    const f = BILLING_FREQS.find(x => x.id === String(id));
-    return f ? f.label : String(id).slice(0, 8);
-}
-
+function _acNetTermLabel(id) { if (!id) return '—'; const t = NET_TERMS.find(x => x.id === String(id)); return t ? t.label : String(id).slice(0,8); }
+function _acBillingFreqLabel(id) { if (!id) return '—'; const f = BILLING_FREQS.find(x => x.id === String(id)); return f ? f.label : String(id).slice(0,8); }
 function _acCurrencyLabel(id) {
     if (!id) return '—';
-    // Reuse cmState currencies if available, else acState currencies
     const pool = (typeof cmState !== 'undefined' && cmState.currencies.length) ? cmState.currencies : acState.currencies;
     const c = pool.find(x => String(x.id) === String(id));
-    return c ? (c.data?.currency_code || c.data?.currency_name || String(id).slice(0, 8)) : String(id).slice(0, 8);
+    return c ? (c.data?.currency_code || c.data?.currency_name || String(id).slice(0,8)) : String(id).slice(0,8);
 }
-
-function _acNetTermOpts(selected) {
-    return NET_TERMS.map(t =>
-        `<option value="${t.id}" ${String(t.id) === String(selected) ? 'selected' : ''}>${t.label}</option>`
-    ).join('');
-}
-
-function _acBillingFreqOpts(selected) {
-    return BILLING_FREQS.map(f =>
-        `<option value="${f.id}" ${String(f.id) === String(selected) ? 'selected' : ''}>${f.label}</option>`
-    ).join('');
-}
-
-function _acCurrencyOpts(selected) {
+function _acNetTermOpts(sel) { return NET_TERMS.map(t => `<option value="${t.id}" ${t.id===sel?'selected':''}>${t.label}</option>`).join(''); }
+function _acBillingFreqOpts(sel) { return BILLING_FREQS.map(f => `<option value="${f.id}" ${f.id===sel?'selected':''}>${f.label}</option>`).join(''); }
+function _acCurrencyOpts(sel) {
     const pool = (typeof cmState !== 'undefined' && cmState.currencies.length) ? cmState.currencies : acState.currencies;
-    return pool.map(c => {
-        const code = c.data?.currency_code || c.data?.currency_name || String(c.id).slice(0, 8);
-        return `<option value="${c.id}" ${String(c.id) === String(selected) ? 'selected' : ''}>${code}</option>`;
-    }).join('');
+    return pool.map(c => { const code = c.data?.currency_code || c.data?.currency_name || String(c.id).slice(0,8); return `<option value="${c.id}" ${String(c.id)===String(sel)?'selected':''}>${code}</option>`; }).join('');
 }
-
-function _acPriceMatrixOpts(selected) {
-    // Use pmState matrices if available
-    const pool = (typeof pmState !== 'undefined' && pmState.matrices.length) ? pmState.matrices : [];
-    let opts = `<option value="">None (use global)</option>`;
-    opts += pool.map(m =>
-        `<option value="${m.id}" ${String(m.id) === String(selected) ? 'selected' : ''}>${m.name || String(m.id).slice(0, 8)}</option>`
-    ).join('');
-    return opts;
-}
-
-function _acAccountOpts(selected, excludeId) {
+function _acAccountOpts(sel, excludeId) {
     let opts = `<option value="">None</option>`;
-    opts += acState.accounts
-        .filter(a => !excludeId || String(a.id) !== String(excludeId))
-        .map(a => {
-            const d = a.data || {};
-            const label = d.name || d.number || String(a.id).slice(0, 8);
-            return `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${label}</option>`;
-        }).join('');
+    opts += acState.accounts.filter(a => !excludeId || String(a.id) !== String(excludeId)).map(a => { const d = a.data||{}; const label = d.name||d.number||String(a.id).slice(0,8); return `<option value="${a.id}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
     return opts;
 }
 
 async function loadAccounts() {
-    // Ensure currencies are loaded (reuse cmState if available)
     if (typeof cmState !== 'undefined' && !cmState.currencies.length) {
-        try {
-            const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0');
-            if (cRes) {
-                const content = cRes.content || cRes.data || cRes;
-                cmState.currencies = Array.isArray(content) ? content : [];
-            }
-        } catch(e) { /* ignore */ }
-    } else if (!acState.currencies.length && (typeof cmState === 'undefined' || !cmState.currencies.length)) {
-        try {
-            const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0');
-            if (cRes) {
-                const content = cRes.content || cRes.data || cRes;
-                acState.currencies = Array.isArray(content) ? content : [];
-            }
-        } catch(e) { /* ignore */ }
+        try { const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0'); if (cRes) { const content = cRes.content||cRes.data||cRes; cmState.currencies = Array.isArray(content) ? content : []; } } catch(e) {}
     }
-
     const tbody = $('accountTableBody');
     tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>';
-
     try {
         const res = await apiCall('GET', API.accounts + '?page=0&size=100');
         if (!res) return;
-
-        // Response: ApiResponse<Page<MDataDTO>> → res.data.content or res.content
         const page = res.data || res;
         const content = page.content || page;
         acState.accounts = Array.isArray(content) ? content : [];
         renderAccountsList();
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#e55;padding:32px;">Error loading accounts: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#e55;padding:32px;">Error: ${e.message}</td></tr>`;
     }
 }
 
 function renderAccountsList() {
     const tbody = $('accountTableBody');
-    if (!acState.accounts.length) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px;">No accounts yet. Click "+ Add Account" to create one.</td></tr>';
-        return;
-    }
+    if (!acState.accounts.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px;">No accounts yet.</td></tr>'; return; }
     tbody.innerHTML = acState.accounts.map(a => {
-        const d = a.data || {};
-        const number = d.number || '—';
-        const name = d.name || '—';
-        const type = d.type || '—';
-        const owner = d.owner || '—';
-        const billingFreq = _acBillingFreqLabel(d.billing_frequency);
-        const netTerm = _acNetTermLabel(d.net_term);
-        const lastBill = d.last_bill_date ? d.last_bill_date : '—';
-        const nextBill = d.next_bill_date ? d.next_bill_date : '—';
+        const d = a.data||{};
         const isVerified = d.is_verified === true || d.is_verified === 'true';
         const verifiedIcon = isVerified
             ? `<span class="ac-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>`
             : `<span class="ac-unverified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>`;
-        const currency = _acCurrencyLabel(d.default_currency_id);
-
         return `<tr>
-            <td style="font-weight:500;font-family:monospace;">${number}</td>
-            <td>${name}</td>
-            <td><span class="badge badge-secondary">${type}</span></td>
-            <td>${owner}</td>
-            <td>${billingFreq}</td>
-            <td>${netTerm}</td>
-            <td style="color:#777;font-size:12px;">${lastBill}</td>
-            <td style="color:#777;font-size:12px;">${nextBill}</td>
+            <td style="font-weight:500;font-family:monospace;">${d.number||'—'}</td>
+            <td>${d.name||'—'}</td>
+            <td><span class="badge badge-secondary">${d.type||'—'}</span></td>
+            <td>${d.owner||'—'}</td>
+            <td>${_acBillingFreqLabel(d.billing_frequency)}</td>
+            <td>${_acNetTermLabel(d.net_term)}</td>
+            <td style="color:#777;font-size:12px;">${d.last_bill_date||'—'}</td>
+            <td style="color:#777;font-size:12px;">${d.next_bill_date||'—'}</td>
             <td style="text-align:center;">${verifiedIcon}</td>
-            <td><span style="font-weight:500;">${currency}</span></td>
+            <td><span style="font-weight:500;">${_acCurrencyLabel(d.default_currency_id)}</span></td>
             <td>
-                <button class="btn btn-sm btn-outline" onclick="showAccountModal('${a.id}')" title="Edit">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${a.id}')" title="Delete" style="margin-left:4px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
+                <button class="btn btn-sm btn-outline" onclick="showAccountModal('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${a.id}')" style="margin-left:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
             </td>
         </tr>`;
     }).join('');
 }
 
 async function showAccountModal(accountId) {
-    let existing = null;
-    if (accountId) {
-        const found = acState.accounts.find(a => String(a.id) === String(accountId));
-        existing = found ? (found.data || {}) : null;
-    }
-    const d = existing || {};
-    const isEdit = !!accountId;
-
-    // Ensure price matrices are loaded if pmState available
-    if (typeof pmState !== 'undefined' && !pmState.matrices.length) {
-        try {
-            const res = await apiCall('GET', API.pricingMatrices + '?matrixType=LIST&size=100');
-            if (res) {
-                const content = (res.data?.content) || (res.content) || [];
-                pmState.matrices = Array.isArray(content) ? content : [];
-            }
-        } catch(e) { /* ignore */ }
-    }
-
-    const curOpts = _acCurrencyOpts(d.default_currency_id);
-    const netTermOpts = _acNetTermOpts(d.net_term);
-    const billingFreqOpts = _acBillingFreqOpts(d.billing_frequency);
-    const typeOpts = ACCOUNT_TYPES.map(t =>
-        `<option value="${t}" ${d.type === t ? 'selected' : ''}>${t}</option>`
-    ).join('');
-    const parentOpts = _acAccountOpts(d.parent_id, accountId);
-    const pmOpts = _acPriceMatrixOpts(d.price_matrix_id);
-
-    $('modalTitle').textContent = isEdit ? 'Edit Account' : 'Add Account';
+    let d = {};
+    if (accountId) { const found = acState.accounts.find(a => String(a.id)===String(accountId)); d = found ? (found.data||{}) : {}; }
+    $('modalTitle').textContent = accountId ? 'Edit Account' : 'Add Account';
     $('modalBody').innerHTML = `
         <div class="ac-modal-form">
-            <div class="form-group">
-                <label>Account Number</label>
-                <input id="acNumber" type="text" placeholder="e.g. ACC-001" value="${d.number || ''}">
-            </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input id="acName" type="text" placeholder="Account name" value="${d.name || ''}">
-            </div>
-            <div class="form-group full-width">
-                <label>Description</label>
-                <textarea id="acDescription" placeholder="Description">${d.description || ''}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Type</label>
-                <select id="acType">
-                    <option value="">Select type</option>
-                    ${typeOpts}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Owner</label>
-                <input id="acOwner" type="text" placeholder="Account owner" value="${d.owner || ''}">
-            </div>
-            <div class="form-group">
-                <label>Parent Account</label>
-                <select id="acParent">${parentOpts}</select>
-            </div>
-            <div class="form-group">
-                <label>Billing Frequency</label>
-                <select id="acBillingFreq">
-                    <option value="">Select frequency</option>
-                    ${billingFreqOpts}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Net Term</label>
-                <select id="acNetTerm">
-                    <option value="">Select net term</option>
-                    ${netTermOpts}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Last Bill Date</label>
-                <input id="acLastBill" type="date" value="${d.last_bill_date || ''}">
-            </div>
-            <div class="form-group">
-                <label>Next Bill Date</label>
-                <input id="acNextBill" type="date" value="${d.next_bill_date || ''}">
-            </div>
-            <div class="form-group">
-                <label>Currency</label>
-                <select id="acCurrency">
-                    <option value="">Select currency</option>
-                    ${curOpts}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Price Matrix</label>
-                <select id="acPriceMatrix">${pmOpts}</select>
-            </div>
-            <div class="form-group full-width">
-                <div class="ac-checkbox-row">
-                    <input type="checkbox" id="acVerified" ${d.is_verified === true || d.is_verified === 'true' ? 'checked' : ''}>
-                    <label for="acVerified">Is Verified</label>
-                </div>
-            </div>
+            <div class="form-group"><label>Account Number</label><input id="acNumber" type="text" placeholder="e.g. ACC-001" value="${d.number||''}"></div>
+            <div class="form-group"><label>Name</label><input id="acName" type="text" placeholder="Account name" value="${d.name||''}"></div>
+            <div class="form-group full-width"><label>Description</label><textarea id="acDescription" placeholder="Description">${d.description||''}</textarea></div>
+            <div class="form-group"><label>Type</label><select id="acType"><option value="">Select type</option>${ACCOUNT_TYPES.map(t=>`<option value="${t}" ${d.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Owner</label><input id="acOwner" type="text" placeholder="Account owner" value="${d.owner||''}"></div>
+            <div class="form-group"><label>Parent Account</label><select id="acParent">${_acAccountOpts(d.parent_id, accountId)}</select></div>
+            <div class="form-group"><label>Billing Frequency</label><select id="acBillingFreq"><option value="">Select frequency</option>${_acBillingFreqOpts(d.billing_frequency)}</select></div>
+            <div class="form-group"><label>Net Term</label><select id="acNetTerm"><option value="">Select net term</option>${_acNetTermOpts(d.net_term)}</select></div>
+            <div class="form-group"><label>Last Bill Date</label><input id="acLastBill" type="date" value="${d.last_bill_date||''}"></div>
+            <div class="form-group"><label>Next Bill Date</label><input id="acNextBill" type="date" value="${d.next_bill_date||''}"></div>
+            <div class="form-group"><label>Currency</label><select id="acCurrency"><option value="">Select currency</option>${_acCurrencyOpts(d.default_currency_id)}</select></div>
+            <div class="form-group"><label>Price Matrix</label><select id="acPriceMatrix"><option value="">None (use global)</option></select></div>
+            <div class="form-group full-width"><div class="ac-checkbox-row"><input type="checkbox" id="acVerified" ${d.is_verified===true||d.is_verified==='true'?'checked':''}><label for="acVerified">Is Verified</label></div></div>
         </div>`;
-
     state.currentModal = { type: 'account', id: accountId };
-    $('modalSaveBtn').textContent = isEdit ? 'Update' : 'Create';
+    $('modalSaveBtn').textContent = accountId ? 'Update' : 'Create';
     openModal();
 }
 
 async function saveAccount() {
     const modal = state.currentModal;
     if (!modal || modal.type !== 'account') return;
-
-    const number = $('acNumber')?.value?.trim();
     const name = $('acName')?.value?.trim();
     if (!name) { showToast('Account name is required', 'error'); return; }
-
-    const payload = {
-        number: number || undefined,
-        name,
-        description: $('acDescription')?.value?.trim() || undefined,
-        type: $('acType')?.value || undefined,
-        owner: $('acOwner')?.value?.trim() || undefined,
-        parent_id: $('acParent')?.value || undefined,
-        billing_frequency: $('acBillingFreq')?.value || undefined,
-        net_term: $('acNetTerm')?.value || undefined,
-        last_bill_date: $('acLastBill')?.value || undefined,
-        next_bill_date: $('acNextBill')?.value || undefined,
-        default_currency_id: $('acCurrency')?.value || undefined,
-        price_matrix_id: $('acPriceMatrix')?.value || undefined,
-        is_verified: $('acVerified')?.checked || false
-    };
-
-    // Remove undefined keys
-    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
-
+    const payload = { number: $('acNumber')?.value?.trim()||undefined, name, description: $('acDescription')?.value?.trim()||undefined, type: $('acType')?.value||undefined, owner: $('acOwner')?.value?.trim()||undefined, parent_id: $('acParent')?.value||undefined, billing_frequency: $('acBillingFreq')?.value||undefined, net_term: $('acNetTerm')?.value||undefined, last_bill_date: $('acLastBill')?.value||undefined, next_bill_date: $('acNextBill')?.value||undefined, default_currency_id: $('acCurrency')?.value||undefined, is_verified: $('acVerified')?.checked||false };
+    Object.keys(payload).forEach(k => payload[k]===undefined && delete payload[k]);
     try {
-        if (modal.id) {
-            await apiCall('PUT', `${API.accounts}/${modal.id}`, payload);
-            showToast('Account updated successfully', 'success');
-        } else {
-            await apiCall('POST', API.accounts, payload);
-            showToast('Account created successfully', 'success');
-        }
-        closeModal();
-        loadAccounts();
-    } catch(e) {
-        showToast('Failed to save account: ' + e.message, 'error');
-    }
+        if (modal.id) { await apiCall('PUT', `${API.accounts}/${modal.id}`, payload); showToast('Account updated', 'success'); }
+        else { await apiCall('POST', API.accounts, payload); showToast('Account created', 'success'); }
+        closeModal(); loadAccounts();
+    } catch(e) { showToast('Failed to save account: ' + e.message, 'error'); }
 }
 
 async function deleteAccount(accountId) {
-    if (!confirm('Delete this account? This action cannot be undone.')) return;
+    if (!confirm('Delete this account?')) return;
     try {
         await apiCall('DELETE', `${API.accounts}/${accountId}`);
         showToast('Account deleted', 'success');
-        acState.accounts = acState.accounts.filter(a => String(a.id) !== String(accountId));
+        acState.accounts = acState.accounts.filter(a => String(a.id)!==String(accountId));
         renderAccountsList();
+    } catch(e) { showToast('Failed to delete account: ' + e.message, 'error'); }
+}
+
+// ============================================================
+// QUOTES
+// ============================================================
+const QUOTE_TYPES = ['New', 'Renewal', 'Add-on', 'Extension', 'Upgrade'];
+const QUOTE_APPROVAL_STATUSES = ['Draft', 'Submitted', 'Approved', 'Rejected'];
+const QUOTE_STATUSES = ['Not Sent', 'Sent', 'Accepted', 'Cancelled'];
+const RENEWAL_OPTIONS = ['None', 'Monthly', 'Quarterly', 'Half Yearly', 'Yearly'];
+
+let qtState = { quotes: [], currentQuote: null };
+
+// Normalize both snake_case (list endpoint → Quote entity) and camelCase (detail endpoint → QuoteResponse)
+function _qtNorm(q) {
+    if (!q) return {};
+    return {
+        id: q.id,
+        quoteNumber:    q.quoteNumber    || q.quote_number,
+        accountId:      q.accountId      || q.account_id,
+        accountName:    q.accountName    || q.account_name,
+        quoteType:      q.quoteType      || q.quote_type,
+        approvalStatus: q.approvalStatus || q.approval_status,
+        quoteStatus:    q.quoteStatus    || q.quote_status,
+        renewal:        q.renewal,
+        startDate:      q.startDate      || q.start_date,
+        endDate:        q.endDate        || q.end_date,
+        expiryDate:     q.expiryDate     || q.expiry_date,
+        totalCost:      q.totalCost      || q.total_cost      || 0,
+        totalFinalPrice:q.totalFinalPrice|| q.total_final_price|| 0,
+        totalListPrice: q.totalListPrice || q.total_list_price || 0,
+        totalMargin:    q.totalMargin    || q.total_margin     || 0,
+        avgMarginPct:   q.avgMarginPct   || q.avg_margin_pct   || 0,
+        notes:          q.notes,
+        segments:       q.segments       || []
+    };
+}
+
+function _qtApprovalBadge(v) {
+    if (!v) return '';
+    const dark = ['Approved', 'Accepted'].includes(v);
+    return `<span class="qt-badge${dark?' dark':''}">${v}</span>`;
+}
+
+function _qtStatusBadge(v) {
+    if (!v) return '';
+    const dark = ['Accepted'].includes(v);
+    return `<span class="qt-badge${dark?' dark':''}">${v}</span>`;
+}
+
+function _qtFmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}); } catch(e) { return d; }
+}
+
+function _qtProductCount(quote) {
+    if (!quote.segments) return 0;
+    return quote.segments.reduce((sum, s) => sum + (s.items ? s.items.length : 0), 0);
+}
+
+function _qtAccountOpts(sel) {
+    let opts = `<option value="">Select account</option>`;
+    opts += acState.accounts.map(a => { const d = a.data||{}; const label = d.name||d.number||String(a.id).slice(0,8); return `<option value="${a.id}" data-name="${label}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
+    return opts;
+}
+
+async function loadQuotes() {
+    // Ensure accounts loaded for display
+    if (!acState.accounts.length) {
+        try { await loadAccounts(); } catch(e) {}
+    }
+    const tbody = $('qtTableBody');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>';
+    try {
+        const res = await apiCall('GET', API.quotes + '?page=0&size=100');
+        if (!res) return;
+        const page = res.data || res;
+        const content = page.content || page;
+        qtState.quotes = (Array.isArray(content) ? content : []).map(_qtNorm);
+        renderQuotesList();
     } catch(e) {
-        showToast('Failed to delete account: ' + e.message, 'error');
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#e55;padding:32px;">Error: ${e.message}</td></tr>`;
     }
 }
 
+function renderQuotesList() {
+    const tbody = $('qtTableBody');
+    if (!qtState.quotes.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#aaa;padding:40px;">No quotes yet. Click "+ Add Quote" to create one.</td></tr>'; return; }
+    tbody.innerHTML = qtState.quotes.map(q => {
+        const productCount = _qtProductCount(q);
+        return `<tr style="cursor:pointer;" onclick="viewQuote('${q.id}')">
+            <td style="font-weight:600;color:#1a1a2e;">${q.quoteNumber||'—'}</td>
+            <td>${q.accountName||'—'}</td>
+            <td>${q.quoteType||'New'}</td>
+            <td>${_qtApprovalBadge(q.approvalStatus||'Draft')}</td>
+            <td>${_qtStatusBadge(q.quoteStatus||'Not Sent')}</td>
+            <td>${_qtFmtDate(q.startDate)}</td>
+            <td>${_qtFmtDate(q.endDate)}</td>
+            <td>${q.renewal||'None'}</td>
+            <td>${productCount} ${productCount===1?'product':'products'}</td>
+            <td onclick="event.stopPropagation()">
+                <button class="btn btn-sm btn-danger" onclick="deleteQuote('${q.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function viewQuote(quoteId) {
+    try {
+        // Products needed for inline selector in each segment
+        if (!state.products || !state.products.length) {
+            try { await loadProducts(); } catch(e) {}
+        }
+        const res = await apiCall('GET', `${API.quotes}/${quoteId}`);
+        if (!res) return;
+        const q = _qtNorm(res.data || res);
+        qtState.currentQuote = q;
+        $('qtListView').style.display = 'none';
+        $('qtDetailView').style.display = 'block';
+        renderQuoteDetail(q);
+    } catch(e) { showToast('Failed to load quote: ' + e.message, 'error'); }
+}
+
+function _qtConfigSummary(item) {
+    try {
+        const cfg = item.attributeSelections || item.bundleConfig;
+        if (!cfg || (typeof cfg === 'object' && Object.keys(cfg).length === 0)) return '—';
+        if (typeof cfg === 'string') return cfg;
+        return Object.entries(cfg).map(([k, v]) => `${k}: ${v}`).join(' | ');
+    } catch(e) { return '—'; }
+}
+
+const _QT_BUNDLE_UUID  = 'e5f6a7b8-c3d4-6012-def0-345678901234';
+const _QT_DYNAMIC_UUID = 'd4e5f6a7-b2c3-5901-cdef-234567890123';
+
+function _qtProductType(p) {
+    if (p.product_type__r) return p.product_type__r;          // resolved label already present
+    const raw = String(p.product_type || p.productType || '');
+    if (raw === _QT_BUNDLE_UUID)  return 'Bundle';
+    if (raw === _QT_DYNAMIC_UUID) return 'Dynamic';
+    if (raw.toLowerCase() === 'bundle') return 'Bundle';
+    return 'Simple';
+}
+
+function _qtInlineProdOpts() {
+    return (state.products||[])
+        .filter(p => _qtProductType(p) === 'Bundle')
+        .map(p => {
+            const label = p.label || p.name || p.sku || String(p.id).slice(0,8);
+            const sku   = p.sku ? ` (${p.sku})` : '';
+            const typeId = p.product_type || p.productType || _QT_BUNDLE_UUID;
+            return `<option value="${p.id}" data-label="${label}" data-sku="${p.sku||''}" data-price="${p.listPrice||0}" data-cost="${p.costPrice||0}" data-typeid="${typeId}" data-chargetype="${p.defaultChargeType||p.chargeType||''}" data-uom="${p.defaultUsageUom||p.usageUom||''}">${label}${sku}</option>`;
+        }).join('');
+}
+
+function _qtSegmentHtml(seg, idx, q) {
+    const segName = seg.name || `Segment ${idx+1}`;
+    const disc = seg.defaultDiscountPct || 0;
+    const uplift = seg.defaultUpliftPct || 0;
+    const isRootTag = seg.isRoot ? ' · Root' : '';
+    const dateRange = (seg.startDate || seg.endDate)
+        ? `${isRootTag} · ${_qtFmtDate(seg.startDate)} — ${_qtFmtDate(seg.endDate)}`
+        : isRootTag || 'No dates set';
+    const items = seg.items || [];
+    const quoteId = q.id;
+    const title = disc ? `${segName} — ${seg.name ? disc+'%' : ''}`.trim() : segName;
+
+    // Inline product rows
+    const rowsHtml = items.map(item => {
+        const cfg = _qtConfigSummary(item);
+        const matchedProd = (state.products||[]).find(p => String(p.id) === String(item.productId));
+        const isBundle = (matchedProd && _qtProductType(matchedProd) === 'Bundle')
+            || (state.bundles||[]).some(b => String(b.id) === String(item.productId))
+            || (cfg && cfg !== '—');
+        const uomOpts = ['MRC','ARC','QRC','OTC'].map(u =>
+            `<option${(item.chargeType||item.usageUom||'MRC')===u?' selected':''}>${u}</option>`
+        ).join('');
+        return `<tr data-item-id="${item.id}">
+            <td><input type="number" class="qt-inline-qty" min="1" value="${item.quantity||1}"
+                onblur="_qtSaveItemField('${quoteId}','${seg.id}','${item.id}','quantity',this.value)"></td>
+            <td>
+                <div style="font-weight:500;color:#1a1a2e;font-size:13px;">${item.productLabel||item.sku||'—'}</div>
+                ${item.sku && item.productLabel ? `<div style="font-size:11px;color:#aaa;">${item.sku}</div>` : ''}
+            </td>
+            <td><span class="qt-config-text" title="${cfg}">${cfg}</span></td>
+            <td><select class="qt-item-uom">${uomOpts}</select></td>
+            <td style="text-align:right;">${(item.listPrice||0).toFixed(2)}</td>
+            <td><input type="number" class="qt-inline-pct" min="0" max="100" step="0.01" value="${item.discountPct||0}"
+                onblur="_qtSaveItemField('${quoteId}','${seg.id}','${item.id}','discountPct',this.value)"></td>
+            <td><input type="number" class="qt-inline-pct" min="0" step="0.01" value="${item.upliftPct||0}"
+                onblur="_qtSaveItemField('${quoteId}','${seg.id}','${item.id}','upliftPct',this.value)"></td>
+            <td style="text-align:right;">${item.finalPrice != null ? item.finalPrice.toFixed(2) : '—'}</td>
+            <td style="text-align:right;">${item.costPrice != null ? item.costPrice.toFixed(2) : '—'}</td>
+            <td style="text-align:right;">${item.marginPct != null ? item.marginPct.toFixed(1)+'%' : '—'}</td>
+            <td>
+                <div class="qt-item-actions">
+                    ${isBundle ? `<button class="qt-item-action-btn qt-cfg-btn" title="Configure bundle"
+                        onclick="reconfigureItem('${quoteId}','${seg.id}','${item.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configure
+                    </button>` : ''}
+                    <button class="qt-item-action-btn del" title="Remove"
+                        onclick="deleteSegmentItem('${quoteId}','${seg.id}','${item.id}')">🗑</button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+
+    const productOpts = _qtInlineProdOpts();
+
+    return `<div class="qt-segment" id="seg-${seg.id}">
+        <div class="qt-seg-hdr" onclick="_qtToggleSeg(this)">
+            <span class="qt-seg-chevron">▶</span>
+            <div class="qt-seg-hdr-left">
+                <div class="qt-seg-title">${segName}${disc ? ' <span style="font-weight:400;color:#888;">'+disc+'%</span>' : ''}</div>
+                <div class="qt-seg-subtitle">${dateRange.replace(/^ · /,'')}</div>
+            </div>
+            <div class="qt-seg-hdr-right">
+                <div class="qt-seg-stats">
+                    <span>Cost: <b>${(seg.subtotalCost||0).toFixed(2)}</b></span>
+                    <span>Price: <b>${(seg.subtotalFinalPrice||0).toFixed(2)}</b></span>
+                    <span>Margin: <b>${(seg.subtotalMarginPct||0).toFixed(1)}%</b></span>
+                    <span style="color:#aaa;">*100 hrs/mo</span>
+                </div>
+                <div class="qt-seg-icon-btns" onclick="event.stopPropagation()">
+                    <button class="qt-seg-icon-btn" title="Edit segment" onclick="showSegmentModal('${quoteId}','${seg.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="qt-seg-body">
+            <div class="qt-seg-info">
+                <div class="qt-seg-info-field"><label>Billing Account</label><span>${q.accountName||'—'}</span></div>
+                <div class="qt-seg-info-field"><label>Service Account</label><span>${q.accountName||'—'}</span></div>
+                <div class="qt-seg-info-field"><label>Billing Address</label><span>—</span></div>
+                <div class="qt-seg-info-field"><label>Service Address</label><span>—</span></div>
+                <div class="qt-seg-info-field"><label>Renewal</label><span>${q.renewal||'None'}</span></div>
+                <div class="qt-seg-info-field"><label>Discount % / Uplift %</label><span>${disc}% / ${uplift}%</span></div>
+            </div>
+            <div class="qt-inline-add">
+                <select id="inlineProdSel-${seg.id}" class="qt-inline-prod-sel">
+                    <option value="">Select a product to add</option>
+                    ${productOpts}
+                </select>
+                <button class="qt-inline-add-btn" onclick="addProductInline('${quoteId}','${seg.id}')">+ Add</button>
+            </div>
+            ${items.length ? `
+            <table class="qt-items-table">
+                <thead><tr>
+                    <th>Qty</th><th>Product</th><th>Configuration</th><th>UOM</th>
+                    <th style="text-align:right;">List Price</th>
+                    <th>Discount %</th><th>Uplift %</th>
+                    <th style="text-align:right;">Price</th>
+                    <th style="text-align:right;">Cost</th>
+                    <th style="text-align:right;">Margin</th>
+                    <th>Actions</th>
+                </tr></thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>` : `<div class="qt-empty-items">No products yet — use the selector above to add one.</div>`}
+        </div>
+    </div>`;
+}
+
+function _qtToggleSeg(hdrEl) {
+    const body = hdrEl.parentElement.querySelector('.qt-seg-body');
+    const chevron = hdrEl.querySelector('.qt-seg-chevron');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open');
+}
+
+function renderQuoteDetail(q) {
+    const segments = q.segments || [];
+    const productCount = _qtProductCount(q);
+    const segmentCount = segments.length;
+
+    const segmentsHtml = segments.map((seg, idx) => _qtSegmentHtml(seg, idx, q)).join('');
+
+    $('qtDetailView').innerHTML = `
+        <div class="qt-detail-header">
+            <div class="qt-detail-title">
+                <button onclick="backToQuotesList()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                </button>
+                Quote ${q.quoteNumber||'—'}
+                <div style="flex:1;"></div>
+                <button class="qt-recalc-btn" onclick="recalculateQuote('${q.id}')">⟳ Recalculate</button>
+                <button onclick="showQuoteModal('${q.id}')" title="Edit" style="margin-left:8px;background:none;border:1px solid #e0e0e0;border-radius:8px;padding:6px 10px;cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;vertical-align:middle;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+            <div class="qt-subtitle">${q.accountName||'—'} · ${_qtFmtDate(q.startDate)} — ${_qtFmtDate(q.endDate)}</div>
+            <div class="qt-badges">
+                <span class="qt-badge">${q.quoteType||'New'}</span>
+                ${q.approvalStatus ? `<span class="qt-badge dark">${q.approvalStatus}</span>` : ''}
+                ${q.quoteStatus ? `<span class="qt-badge dark">${q.quoteStatus}</span>` : ''}
+                <span class="qt-badge blue">${segmentCount} segment${segmentCount!==1?'s':''}</span>
+                <span class="qt-badge blue">${productCount} product${productCount!==1?'s':''}</span>
+            </div>
+        </div>
+        <div class="qt-summary-grid">
+            <div class="qt-summary-card"><div class="label">Total Cost</div><div class="value">${(q.totalCost||0).toFixed(2)}</div></div>
+            <div class="qt-summary-card"><div class="label">Total List Price</div><div class="value">${(q.totalListPrice||0).toFixed(2)}</div></div>
+            <div class="qt-summary-card"><div class="label">Total Final Price</div><div class="value">${(q.totalFinalPrice||0).toFixed(2)}</div></div>
+            <div class="qt-summary-card"><div class="label">Avg Margin</div><div class="value">${(q.avgMarginPct||0).toFixed(1)}%</div></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:16px;font-weight:700;color:#1a1a2e;">Segments</div>
+            <button class="qt-seg-btn primary" onclick="showSegmentModal('${q.id}',null)">+ Add Segment</button>
+        </div>
+        ${segmentsHtml || '<div style="color:#aaa;padding:20px;text-align:center;border:2px dashed #eee;border-radius:10px;font-size:14px;">No segments yet. Click <b>+ Add Segment</b> to get started.</div>'}`;
+}
+
+function backToQuotesList() {
+    $('qtDetailView').style.display = 'none';
+    $('qtListView').style.display = 'block';
+    qtState.currentQuote = null;
+}
+
+// ── Segment Modal ────────────────────────────────────────────────────────────
+async function showSegmentModal(quoteId, segmentId) {
+    let seg = {};
+    if (segmentId && qtState.currentQuote) {
+        seg = (qtState.currentQuote.segments||[]).find(s => String(s.id)===String(segmentId)) || {};
+    }
+    $('modalTitle').textContent = segmentId ? 'Edit Segment' : 'Add Segment';
+    $('modalBody').innerHTML = `
+        <input type="hidden" id="segModalQuoteId" value="${quoteId}">
+        <input type="hidden" id="segModalSegId" value="${segmentId||''}">
+        <div class="seg-modal-form">
+            <div class="form-group full-width">
+                <label>Segment Name *</label>
+                <input id="segName" class="form-control" placeholder="e.g. Year 1" value="${seg.name||''}">
+            </div>
+            <div class="form-group">
+                <label>Start Date</label>
+                <input id="segStartDate" type="date" class="form-control" value="${seg.startDate||''}">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input id="segEndDate" type="date" class="form-control" value="${seg.endDate||''}">
+            </div>
+            <div class="form-group">
+                <label>Default Discount %</label>
+                <input id="segDiscount" type="number" min="0" max="100" step="0.01" class="form-control" value="${seg.defaultDiscountPct||0}">
+            </div>
+            <div class="form-group">
+                <label>Default Uplift %</label>
+                <input id="segUplift" type="number" min="0" step="0.01" class="form-control" value="${seg.defaultUpliftPct||0}">
+            </div>
+            <div class="form-group">
+                <label>Sort Order</label>
+                <input id="segSortOrder" type="number" min="0" class="form-control" value="${seg.sortOrder||0}">
+            </div>
+            ${!segmentId ? `<div class="form-group">
+                <label>Is Root Segment</label>
+                <select id="segIsRoot" class="form-control">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+            </div>` : ''}
+        </div>`;
+    $('modalSaveBtn').dataset.type = 'segment';
+    openModal();
+}
+
+async function saveSegment() {
+    const quoteId = ($('segModalQuoteId')||{}).value;
+    const segmentId = ($('segModalSegId')||{}).value;
+    const name = ($('segName')||{}).value?.trim();
+    if (!name) { showToast('Segment name is required', 'error'); return; }
+
+    const payload = {
+        name,
+        startDate: ($('segStartDate')||{}).value || null,
+        endDate: ($('segEndDate')||{}).value || null,
+        defaultDiscountPct: parseFloat(($('segDiscount')||{}).value||0),
+        defaultUpliftPct: parseFloat(($('segUplift')||{}).value||0),
+        sortOrder: parseInt(($('segSortOrder')||{}).value||0)
+    };
+
+    try {
+        let res;
+        if (segmentId) {
+            res = await apiCall('PUT', `${API.quotes}/${quoteId}/segments/${segmentId}`, payload);
+        } else {
+            payload.isRoot = ($('segIsRoot')||{}).value === 'true';
+            res = await apiCall('POST', `${API.quotes}/${quoteId}/segments`, payload);
+        }
+        const savedSegId = segmentId || (res?.data?.id);
+        closeModal();
+        showToast(segmentId ? 'Segment updated' : 'Segment added', 'success');
+        await viewQuote(quoteId);
+        // Auto-open the saved/created segment
+        if (savedSegId) {
+            const segEl = document.getElementById(`seg-${savedSegId}`);
+            if (segEl) {
+                segEl.querySelector('.qt-seg-body')?.classList.add('open');
+                segEl.querySelector('.qt-seg-chevron')?.classList.add('open');
+            }
+        }
+    } catch(e) {
+        showToast('Failed to save segment: ' + e.message, 'error');
+    }
+}
+
+// ── Inline product add ───────────────────────────────────────────────────────
+async function addProductInline(quoteId, segId) {
+    const selEl = document.getElementById(`inlineProdSel-${segId}`);
+    if (!selEl || !selEl.value) { showToast('Please select a product', 'error'); return; }
+
+    const opt = selEl.options[selEl.selectedIndex];
+
+    const payload = {
+        productId: selEl.value,
+        productLabel: opt.dataset.label || opt.text.split(' —')[0].trim(),
+        sku: opt.dataset.sku || '',
+        productType: opt.dataset.typeid || _QT_BUNDLE_UUID,
+        chargeType: opt.dataset.chargetype || null,
+        usageUom: opt.dataset.uom || null,
+        quantity: 1,
+        listPrice: parseFloat(opt.dataset.price||0),
+        costPrice: parseFloat(opt.dataset.cost||0),
+        discountPct: 0,
+        upliftPct: 0,
+        sortOrder: 0
+    };
+
+    const btn = document.querySelector(`#seg-${segId} .qt-inline-add-btn`);
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+        await apiCall('POST', `${API.quotes}/${quoteId}/segments/${segId}/items`, payload);
+        showToast('Product added', 'success');
+        await viewQuote(quoteId);
+    } catch(e) {
+        showToast('Failed to add product: ' + e.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = '+ Add'; }
+    }
+}
+
+// ── Inline field save (qty, discountPct, upliftPct, listPrice, costPrice) ────
+async function _qtSaveItemField(quoteId, segId, itemId, field, value) {
+    const numericFields = ['quantity','discountPct','upliftPct','listPrice','costPrice','sortOrder'];
+    const payload = {};
+    payload[field] = numericFields.includes(field)
+        ? (field === 'quantity' ? (parseInt(value)||1) : (parseFloat(value)||0))
+        : value;
+    try {
+        await apiCall('PUT', `${API.quotes}/${quoteId}/segments/${segId}/items/${itemId}`, payload);
+        // Silently refresh to recalculate totals
+        const res = await apiCall('GET', `${API.quotes}/${quoteId}`);
+        const q = _qtNorm(res?.data || res);
+        qtState.currentQuote = q;
+        renderQuoteDetail(q);
+        // Re-open the segment that was being edited
+        const segEl = document.getElementById(`seg-${segId}`);
+        if (segEl) {
+            segEl.querySelector('.qt-seg-body')?.classList.add('open');
+            segEl.querySelector('.qt-seg-chevron')?.classList.add('open');
+        }
+    } catch(e) {
+        showToast('Failed to save: ' + e.message, 'error');
+    }
+}
+
+async function deleteSegmentItem(quoteId, segmentId, itemId) {
+    if (!confirm('Remove this product from the segment?')) return;
+    try {
+        await apiCall('DELETE', `${API.quotes}/${quoteId}/segments/${segmentId}/items/${itemId}`);
+        showToast('Product removed', 'success');
+        await viewQuote(quoteId);
+        // Re-open the segment
+        const segEl = document.getElementById(`seg-${segmentId}`);
+        if (segEl) {
+            segEl.querySelector('.qt-seg-body')?.classList.add('open');
+            segEl.querySelector('.qt-seg-chevron')?.classList.add('open');
+        }
+    } catch(e) {
+        showToast('Failed to remove product: ' + e.message, 'error');
+    }
+}
+
+async function reconfigureItem(quoteId, segId, itemId) {
+    // Navigate to bundle configurator page
+    document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+    const bcLink = document.querySelector('.sidebar-menu a[data-page="bundle-configurator"]');
+    if (bcLink) bcLink.classList.add('active');
+    const bcPage = $('page-bundle-configurator');
+    if (bcPage) bcPage.classList.add('active');
+
+    // Ensure bundle dropdown is populated
+    await loadBundleConfiguratorPage();
+
+    // Pre-fill the context fields AFTER page load so they aren't wiped
+    if ($('bcQuoteId'))   $('bcQuoteId').value   = quoteId;
+    if ($('bcSegmentId')) $('bcSegmentId').value  = segId;
+    if ($('bcItemId'))    $('bcItemId').value     = itemId;
+
+    // Auto-load the configuration
+    try {
+        const url = `/api/v1/quotes/${quoteId}/segments/${segId}/items/${itemId}/configure`;
+        const raw = await apiCall('GET', url);
+        // Ensure itemId is set in state before _bcApply (it reads bcState.itemId as fallback)
+        bcState.itemId = itemId;
+        _bcApply(raw, quoteId, segId);
+        showToast('Bundle configuration loaded', 'success');
+    } catch(e) {
+        showToast('Could not load bundle configuration: ' + e.message, 'error');
+        const rawEl = $('bcRawResponse');
+        if (rawEl) rawEl.textContent = 'Error: ' + e.message;
+    }
+}
+
+async function recalculateQuote(quoteId) {
+    try {
+        await apiCall('POST', `${API.quotes}/${quoteId}/recalculate`);
+        showToast('Quote recalculated', 'success');
+        await viewQuote(quoteId);
+    } catch(e) {
+        showToast('Recalculation failed: ' + e.message, 'error');
+    }
+}
+
+async function showQuoteModal(quoteId) {
+    // Ensure accounts loaded
+    if (!acState.accounts.length) { try { await loadAccounts(); } catch(e) {} }
+    let raw = {};
+    if (quoteId) { raw = qtState.quotes.find(x => String(x.id)===String(quoteId)) || qtState.currentQuote || {}; }
+    const q = _qtNorm(raw);
+
+    const typeOpts = QUOTE_TYPES.map(t => `<option value="${t}" ${(q.quoteType||'New')===t?'selected':''}>${t}</option>`).join('');
+    const approvalOpts = QUOTE_APPROVAL_STATUSES.map(s => `<option value="${s}" ${(q.approvalStatus||'Draft')===s?'selected':''}>${s}</option>`).join('');
+    const statusOpts = QUOTE_STATUSES.map(s => `<option value="${s}" ${(q.quoteStatus||'Not Sent')===s?'selected':''}>${s}</option>`).join('');
+    const renewalOpts = RENEWAL_OPTIONS.map(r => `<option value="${r}" ${(q.renewal||'None')===r?'selected':''}>${r}</option>`).join('');
+
+    $('modalTitle').textContent = quoteId ? 'Edit Quote' : 'Add Quote';
+    $('modalBody').innerHTML = `
+        <div class="ac-modal-form">
+            <div class="form-group full-width">
+                <label>Account</label>
+                <select id="qtAccount">${_qtAccountOpts(q.accountId)}</select>
+            </div>
+            <div class="form-group"><label>Type</label><select id="qtType">${typeOpts}</select></div>
+            <div class="form-group"><label>Approval Status</label><select id="qtApproval">${approvalOpts}</select></div>
+            <div class="form-group"><label>Status</label><select id="qtStatus">${statusOpts}</select></div>
+            <div class="form-group"><label>Renewal</label><select id="qtRenewal">${renewalOpts}</select></div>
+            <div class="form-group"><label>Start Date</label><input id="qtStartDate" type="date" value="${q.startDate||''}"></div>
+            <div class="form-group"><label>End Date</label><input id="qtEndDate" type="date" value="${q.endDate||''}"></div>
+            <div class="form-group"><label>Expiry Date</label><input id="qtExpiryDate" type="date" value="${q.expiryDate||''}"></div>
+        </div>`;
+
+    state.currentModal = { type: 'quote', id: quoteId };
+    $('modalSaveBtn').textContent = quoteId ? 'Update' : 'Create';
+    openModal();
+}
+
+async function saveQuote() {
+    const modal = state.currentModal;
+    if (!modal || modal.type !== 'quote') return;
+    const accountSel = $('qtAccount');
+    const accountId = accountSel?.value;
+    const accountName = accountSel?.options[accountSel.selectedIndex]?.dataset?.name || '';
+    if (!accountId) { showToast('Please select an account', 'error'); return; }
+
+    const payload = {
+        accountId, accountName,
+        quoteType: $('qtType')?.value || 'New',
+        approvalStatus: $('qtApproval')?.value || 'Draft',
+        quoteStatus: $('qtStatus')?.value || 'Not Sent',
+        renewal: $('qtRenewal')?.value || 'None',
+        startDate: $('qtStartDate')?.value || undefined,
+        endDate: $('qtEndDate')?.value || undefined,
+        expiryDate: $('qtExpiryDate')?.value || undefined
+    };
+    Object.keys(payload).forEach(k => payload[k]===undefined && delete payload[k]);
+
+    try {
+        if (modal.id) {
+            const res = await apiCall('PUT', `${API.quotes}/${modal.id}`, payload);
+            showToast('Quote updated', 'success');
+            if (qtState.currentQuote && String(qtState.currentQuote.id) === String(modal.id)) {
+                const updated = _qtNorm(res?.data || res);
+                if (updated?.id) { qtState.currentQuote = updated; renderQuoteDetail(updated); }
+            }
+        } else {
+            await apiCall('POST', API.quotes, payload);
+            showToast('Quote created', 'success');
+        }
+        closeModal();
+        loadQuotes();
+    } catch(e) { showToast('Failed to save quote: ' + e.message, 'error'); }
+}
+
+async function deleteQuote(quoteId) {
+    if (!confirm('Delete this quote?')) return;
+    try {
+        qtState.quotes = qtState.quotes.filter(q => String(q.id) !== String(quoteId));
+        renderQuotesList();
+        showToast('Quote removed from view (no delete API available)', 'success');
+    } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+console.log('CPQ Console ready. Enter JWT token and click Load All Data.');
 </script>
 </body>
 </html>
