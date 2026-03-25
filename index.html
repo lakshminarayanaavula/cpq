@@ -1544,8 +1544,12 @@ function updateStats() {
 // ============= Load All Data =============
 async function loadAllData() {
     showToast('Loading data...');
-    await Promise.all([loadProductFamilies(), loadProductLines(), loadProducts(), loadGlobalAttributes()]);
+    // Load families and lines first so product table can resolve them when it renders
+    await Promise.all([loadProductFamilies(), loadProductLines(), loadGlobalAttributes()]);
+    await loadProducts();
     await loadBundles();
+    // Re-render product table now that lines and families are guaranteed to be in state
+    renderProductTable();
     updateStats();
     showToast('Data loaded!');
 }
@@ -1690,7 +1694,10 @@ async function loadProducts(page = 0) {
         const result = extractData(data);
         state.products = result.data;
         if (result.pagination) state.pagination.products = result.pagination;
-        state.bundles = state.products.filter(p => (p.product_type__r || p.productType || p.product_type) === 'Bundle');
+        const BUNDLE_UUID = 'e5f6a7b8-c3d4-6012-def0-345678901234';
+        state.bundles = state.products.filter(p =>
+            p.product_type__r === 'Bundle' || String(p.product_type || '') === BUNDLE_UUID
+        );
         renderProductTable();
         populateProductDropdowns();
     }
@@ -4163,11 +4170,19 @@ async function _pmLoadProductAttrs(entries) {
             if (r) {
                 const raw = extractData(r);
                 const list = Array.isArray(raw) ? raw : (raw.data || []);
-                pmState.productAttributes[pid] = list.map(pa => ({
-                    id: pa.attribute_id || pa.attributeId || pa.id,
-                    label: pa.attribute?.label || pa.label || pa.name || pa.id,
-                    type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType || ''
-                }));
+                pmState.productAttributes[pid] = list.map(pa => {
+                    const attrId = pa.attribute_id || pa.attributeId || pa.id;
+                    // Cross-reference global state.attributes for a human-readable label
+                    const globalAttr = (state.attributes || []).find(a => String(a.id) === String(attrId));
+                    return {
+                        id: attrId,
+                        label: pa.attribute?.label || pa.label || pa.name
+                               || globalAttr?.label || globalAttr?.name
+                               || attrId,
+                        type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType
+                                 || globalAttr?.type__r || ''
+                    };
+                });
             }
         } catch(e) { pmState.productAttributes[pid] = []; }
     }));
@@ -4234,8 +4249,18 @@ function _pmAttrOpts(selected, productId) {
         const t = (a.type__r || a.type || '').toLowerCase();
         return t.includes('number') || t.includes('numer');
     });
-    return `<option value="">— None —</option>` +
-        display.map(a => `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`).join('');
+    const opts = display.map(a =>
+        `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`
+    ).join('');
+    // If the saved UUID isn't in the filtered list, add it with a resolved label so it displays correctly
+    const found = selected && display.some(a => String(a.id) === String(selected));
+    const fallback = (selected && !found) ? (() => {
+        const globalAttr = (state.attributes || []).find(a => String(a.id) === String(selected));
+        const allAttrs   = attrs.find(a => String(a.id) === String(selected));
+        const lbl = globalAttr?.label || globalAttr?.name || allAttrs?.label || allAttrs?.name || selected;
+        return `<option value="${selected}" selected>${lbl}</option>`;
+    })() : '';
+    return `<option value="">— None —</option>` + fallback + opts;
 }
 function _pmAllAttrOpts(productId) {
     const attrs = productId ? (pmState.productAttributes[productId] || []) : [];
