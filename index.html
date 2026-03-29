@@ -5384,7 +5384,7 @@ VALIDATION_INFO
             const data = res?.data || res;
             const all  = data?.content || data || [];
             acState.currentProjects = Array.isArray(all)
-                ? all.filter(p => String((p.data||{}).account_id || '') === String(accountId))
+                ? all.filter(p => String(p.account_id || (p.data||{}).account_id || '') === String(accountId))
                 : [];
         } catch(e) { acState.currentProjects = []; }
     }
@@ -5898,11 +5898,11 @@ VALIDATION_INFO
         'b2c3d4e5-f6a7-8901-bcde-200000000002': 'Renewal'
     };
     const QUOTE_APPROVAL_MAP = {
-        'b408d606-f682-45ea-8659-91b7af3ecec5': 'Draft',
-        '598283a9-c53a-4d74-afbc-3ec48df762e9': 'Submitted',
-        'fe07e71d-cba4-4316-9c7c-4935c3adec34': 'Approved',
-        '13a30e5b-0b42-42f7-b3bc-cf121becbf1a': 'Rejected',
-        'c9c2260f-d74e-4660-9a7f-91e6902488d8': 'In Progress'
+        'a56ac062-11de-411d-a1f2-fca159e5094c': 'Draft',
+        '262943c2-aff7-4a74-90aa-7dc9b3cf3fc2': 'Submitted',
+        '8245f78f-4cc6-4255-8f87-224c29a52418': 'In Progress',
+        '1860c39e-f1b7-47cf-9bbc-171761d67065': 'Approved',
+        '5928ab8e-cc09-4256-93ab-cb4615950d10': 'Rejected'
     };
     const QUOTE_STATUS_MAP = {
         'a1b2c3d4-e5f6-7890-abcd-100000000001': 'Not Sent',
@@ -5916,16 +5916,21 @@ VALIDATION_INFO
         'c3d4e5f6-a7b8-9012-cdef-300000000002': 'Auto',
         'c3d4e5f6-a7b8-9012-cdef-300000000003': 'Manual'
     };
+    // enum-name → label fallbacks (in case backend returns name() instead of getId())
+    const QUOTE_TYPE_NAME_MAP     = { 'NEW': 'New', 'RENEWAL': 'Renewal' };
+    const QUOTE_APPROVAL_NAME_MAP = { 'DRAFT': 'Draft', 'SUBMITTED': 'Submitted', 'IN_PROGRESS': 'In Progress', 'APPROVED': 'Approved', 'REJECTED': 'Rejected' };
+    const QUOTE_STATUS_NAME_MAP   = { 'NOT_SENT': 'Not Sent', 'PRESENTED': 'Presented', 'ACCEPTED': 'Accepted', 'REJECTED': 'Rejected', 'EXPIRED': 'Expired' };
+    const QUOTE_RENEWAL_NAME_MAP  = { 'NONE': 'None', 'AUTO': 'Auto', 'MANUAL': 'Manual' };
     // Reverse: label → UUID
     const _qtTypeUUID     = lbl => Object.keys(QUOTE_TYPE_MAP).find(k => QUOTE_TYPE_MAP[k] === lbl)     || lbl;
     const _qtApprovalUUID = lbl => Object.keys(QUOTE_APPROVAL_MAP).find(k => QUOTE_APPROVAL_MAP[k] === lbl) || lbl;
     const _qtStatusUUID   = lbl => Object.keys(QUOTE_STATUS_MAP).find(k => QUOTE_STATUS_MAP[k] === lbl)   || lbl;
     const _qtRenewalUUID  = lbl => Object.keys(QUOTE_RENEWAL_MAP).find(k => QUOTE_RENEWAL_MAP[k] === lbl) || lbl;
-    // Resolve UUID → label (falls back gracefully if a label was stored instead of UUID)
-    const _qtTypeLabel     = v => QUOTE_TYPE_MAP[v]     || v || 'New';
-    const _qtApprovalLabel = v => QUOTE_APPROVAL_MAP[v] || v || 'Draft';
-    const _qtStatusLabel   = v => QUOTE_STATUS_MAP[v]   || v || 'Not Sent';
-    const _qtRenewalLabel  = v => QUOTE_RENEWAL_MAP[v]  || v || 'None';
+    // Resolve UUID → label (also handles enum name strings as fallback)
+    const _qtTypeLabel     = v => QUOTE_TYPE_MAP[v]     || QUOTE_TYPE_NAME_MAP[v]     || v || 'New';
+    const _qtApprovalLabel = v => QUOTE_APPROVAL_MAP[v] || QUOTE_APPROVAL_NAME_MAP[v] || v || 'Draft';
+    const _qtStatusLabel   = v => QUOTE_STATUS_MAP[v]   || QUOTE_STATUS_NAME_MAP[v]   || v || 'Not Sent';
+    const _qtRenewalLabel  = v => QUOTE_RENEWAL_MAP[v]  || QUOTE_RENEWAL_NAME_MAP[v]  || v || 'None';
 
     let qtState = { quotes: [], currentQuote: null };
 
@@ -5980,7 +5985,10 @@ VALIDATION_INFO
 
     function _qtAccountOpts(sel) {
         let opts = `<option value="">Select account</option>`;
-        opts += acState.accounts.map(a => { const d = a.data||{}; const label = d.name||d.number||String(a.id).slice(0,8); return `<option value="${a.id}" data-name="${label}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
+        opts += acState.accounts.map(a => {
+            const label = a.name || a.number || String(a.id).slice(0, 8);
+            return `<option value="${a.id}" data-name="${label}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`;
+        }).join('');
         return opts;
     }
 
