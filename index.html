@@ -5205,7 +5205,8 @@ VALIDATION_INFO
         currentAccountId: null, currentAccount: null,
         currentQuotes: [], currentAddresses: [],
         currentProjects: [], currentContacts: [],
-        expandedProjectIds: new Set()
+        expandedProjectIds: new Set(),
+        addrByAccount: {}
     };
     let saState = { addresses: [] };
 
@@ -5234,7 +5235,7 @@ VALIDATION_INFO
             try { const cRes = await apiCall('GET', API.currencies + '?pageSize=200&page=0'); if (cRes) { const content = cRes.content||cRes.data||cRes; cmState.currencies = Array.isArray(content) ? content : []; } } catch(e) {}
         }
         const tbody = $('accountTableBody');
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>';
         try {
             const res = await apiCall('GET', API.accountDetails + '?page=0&size=100');
             if (!res) return;
@@ -5243,12 +5244,13 @@ VALIDATION_INFO
             acState.accounts = Array.isArray(content) ? content : [];
             renderAccountsList();
         } catch(e) {
-            tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#e55;padding:32px;">Error: ${e.message}</td></tr>`;
+            if (tbody) tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#e55;padding:32px;">Error: ${e.message}</td></tr>`;
         }
     }
 
     function renderAccountsList() {
         const tbody = $('accountTableBody');
+        if (!tbody) return;
         if (!acState.accounts.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px;">No accounts yet.</td></tr>'; return; }
         tbody.innerHTML = acState.accounts.map(a => {
             const isVerified = a.is_verified === true || a.is_verified === 'true';
@@ -5384,7 +5386,7 @@ VALIDATION_INFO
             const data = res?.data || res;
             const all  = data?.content || data || [];
             acState.currentProjects = Array.isArray(all)
-                ? all.filter(p => String(p.account_id || (p.data||{}).account_id || '') === String(accountId))
+                ? all.filter(p => String(p.account_id || p.data?.account_id || '') === String(accountId))
                 : [];
         } catch(e) { acState.currentProjects = []; }
     }
@@ -5542,7 +5544,7 @@ VALIDATION_INFO
     function _renderDetailProjects() {
         if (!acState.currentProjects.length) return `<tr><td colspan="5" class="ac-tbl-empty">No projects yet.</td></tr>`;
         return acState.currentProjects.map(p => {
-            const d   = p.data || {};
+            const d   = p.data || p;
             const pid = p.id;
             const isOpen = acState.expandedProjectIds.has(String(pid));
             const poArr  = (d.po_number || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -5627,8 +5629,7 @@ VALIDATION_INFO
         if (!val) return;
         const proj  = acState.currentProjects.find(p => String(p.id) === String(pid));
         if (!proj) return;
-        const d     = proj.data || {};
-        const poArr = (d.po_number || '').split(',').map(s => s.trim()).filter(Boolean);
+        const poArr = (proj.po_number || '').split(',').map(s => s.trim()).filter(Boolean);
         if (!poArr.includes(val)) poArr.push(val);
         await _savePOs(pid, poArr);
     }
@@ -5636,25 +5637,22 @@ VALIDATION_INFO
     async function _removePO(pid, po) {
         const proj  = acState.currentProjects.find(p => String(p.id) === String(pid));
         if (!proj) return;
-        const d     = proj.data || {};
-        const poArr = (d.po_number || '').split(',').map(s => s.trim()).filter(s => s && s !== po);
+        const poArr = (proj.po_number || '').split(',').map(s => s.trim()).filter(s => s && s !== po);
         await _savePOs(pid, poArr);
     }
 
     async function _savePOs(pid, poArr) {
         const proj   = acState.currentProjects.find(p => String(p.id) === String(pid));
         if (!proj) return;
-        const d      = proj.data || {};
         const payload = {
-            account_id: d.account_id,
-            name: d.name,
-            description: d.description,
+            account_id: proj.account_id,
+            name: proj.name,
+            description: proj.description,
             po_number: poArr.join(', ')
         };
         try {
-            const res = await apiCall('PUT', `${API.accountProjects}/${pid}`, payload);
-            const updated = res?.data || res;
-            proj.data = { ...d, po_number: poArr.join(', ') };
+            await apiCall('PUT', `${API.accountProjects}/${pid}`, payload);
+            proj.po_number = poArr.join(', ');
             const tbody = $('acDetailProjects');
             if (tbody) tbody.innerHTML = _renderDetailProjects();
         } catch(e) { showToast('Failed to update PO: ' + e.message, 'error'); }
@@ -5663,23 +5661,22 @@ VALIDATION_INFO
     function _editAccountProject(pid) {
         const proj = acState.currentProjects.find(p => String(p.id) === String(pid));
         if (!proj) return;
-        const d = proj.data || {};
         $('modalTitle').textContent = 'Edit Project';
         $('modalBody').innerHTML = `
             <input type="hidden" id="apModalId" value="${pid}">
             <div class="seg-modal-form">
                 <div class="form-group full-width">
                     <label>Project Name *</label>
-                    <input id="apName" class="form-control" value="${d.name || ''}">
+                    <input id="apName" class="form-control" value="${proj.name || ''}">
                 </div>
                 <div class="form-group full-width">
                     <label>Description</label>
-                    <textarea id="apDescription" class="form-control" rows="3">${d.description || ''}</textarea>
+                    <textarea id="apDescription" class="form-control" rows="3">${proj.description || ''}</textarea>
                 </div>
             </div>`;
         $('modalSaveBtn').dataset.type = 'accountProjectDetail';
-        $('modalSaveBtn').dataset.accountId = d.account_id || '';
-        $('modalSaveBtn').dataset.poNumber  = d.po_number  || '';
+        $('modalSaveBtn').dataset.accountId = proj.account_id || '';
+        $('modalSaveBtn').dataset.poNumber  = proj.po_number  || '';
         openModal();
     }
 
@@ -6169,9 +6166,14 @@ VALIDATION_INFO
 
     async function viewQuote(quoteId) {
         try {
-            // Products needed for inline selector in each segment
             if (!state.products || !state.products.length) {
                 try { await loadProducts(); } catch(e) {}
+            }
+            if (!saState.addresses.length) {
+                try { await loadSupplierAddresses(); } catch(e) {}
+            }
+            if (!acState.accounts.length) {
+                try { await loadAccounts(); } catch(e) {}
             }
             const res = await apiCall('GET', `${API.quotes}/${quoteId}`);
             if (!res) return;
@@ -6292,12 +6294,12 @@ VALIDATION_INFO
             </div>
             <div class="qt-seg-body">
                 <div class="qt-seg-info">
-                    <div class="qt-seg-info-field"><label>Billing Account</label><span>${q.accountName||'—'}</span></div>
-                    <div class="qt-seg-info-field"><label>Service Account</label><span>${q.accountName||'—'}</span></div>
-                    <div class="qt-seg-info-field"><label>Billing Address</label><span>—</span></div>
-                    <div class="qt-seg-info-field"><label>Service Address</label><span>—</span></div>
+                    <div class="qt-seg-info-field"><label>Billing Account</label><span>${(() => { const a = acState.accounts.find(ac => String(ac.id) === String(seg.billingAccountId)); return a ? (a.name || a.number || '—') : (seg.billingAccountId ? '—' : '—'); })()}</span></div>
+                    <div class="qt-seg-info-field"><label>Service Account</label><span>${(() => { const a = acState.accounts.find(ac => String(ac.id) === String(seg.serviceAccountId)); return a ? (a.name || a.number || '—') : (seg.serviceAccountId ? '—' : '—'); })()}</span></div>
+                    <div class="qt-seg-info-field"><label>Billing Address</label><span id="seg-billing-addr-${seg.id}">—</span></div>
+                    <div class="qt-seg-info-field"><label>Service Address</label><span id="seg-service-addr-${seg.id}">—</span></div>
                     <div class="qt-seg-info-field"><label>Supplier Address</label><span>${(() => { const sa = saState.addresses.find(a => String(a.id) === String(seg.supplierAddressId)); return sa ? _saLabel(sa) : '—'; })()}</span></div>
-                    <div class="qt-seg-info-field"><label>Renewal</label><span>${q.renewal||'None'}</span></div>
+                    <div class="qt-seg-info-field"><label>Renewal</label><span>${_qtRenewalLabel(q.renewal)||'None'}</span></div>
                     <div class="qt-seg-info-field"><label>Discount % / Uplift %</label><span>${disc}% / ${uplift}%</span></div>
                 </div>
                 <div class="qt-inline-add">
@@ -6370,6 +6372,7 @@ VALIDATION_INFO
                 <button class="qt-seg-btn primary" onclick="showSegmentModal('${q.id}',null)">+ Add Segment</button>
             </div>
             ${segmentsHtml || '<div style="color:#aaa;padding:20px;text-align:center;border:2px dashed #eee;border-radius:10px;font-size:14px;">No segments yet. Click <b>+ Add Segment</b> to get started.</div>'}`;
+        if (segments.length) _qtResolveSegmentAddresses(segments);
     }
 
     function backToQuotesList() {
@@ -6379,23 +6382,126 @@ VALIDATION_INFO
     }
 
     // ── Segment Modal ────────────────────────────────────────────────────────────
+    const _SEG_TYPE_ROOT   = 'd7e8f9a0-b1c2-4345-9012-100000000001';
+    const _SEG_TYPE_LINKED = 'd7e8f9a0-b1c2-4345-9012-100000000002';
+
+    function _acctAddrLabel(a) {
+        const d = a.data || a;
+        const parts = [d.line1 || d.street1, d.city, d.state, d.zipCode || d.zip_code].filter(Boolean);
+        return parts.length ? parts.join(', ') : String(a.id).slice(0, 8);
+    }
+
+    async function _fetchAccountAddresses(accountId) {
+        if (!accountId) return [];
+        const key = String(accountId);
+        if (acState.addrByAccount[key]) return acState.addrByAccount[key];
+        try {
+            const res = await apiCall('GET', `${API.accountAddresses}/by-account/${accountId}`);
+            const all = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+            acState.addrByAccount[key] = all;
+            return all;
+        } catch(e) {
+            return [];
+        }
+    }
+
+    async function _qtResolveSegmentAddresses(segments) {
+        const accountIds = new Set();
+        segments.forEach(seg => {
+            if (seg.billingAccountId) accountIds.add(String(seg.billingAccountId));
+            if (seg.serviceAccountId) accountIds.add(String(seg.serviceAccountId));
+        });
+        await Promise.all([...accountIds].map(id => _fetchAccountAddresses(id)));
+
+        segments.forEach(seg => {
+            if (seg.billingAddressId) {
+                const accountAddrs = acState.addrByAccount[String(seg.billingAccountId)] || [];
+                const addr = accountAddrs.find(a => String(a.id) === String(seg.billingAddressId));
+                const el = document.getElementById(`seg-billing-addr-${seg.id}`);
+                if (el) el.textContent = addr ? _acctAddrLabel(addr) : '—';
+            }
+            if (seg.serviceAddressId) {
+                const accountAddrs = acState.addrByAccount[String(seg.serviceAccountId)] || [];
+                const addr = accountAddrs.find(a => String(a.id) === String(seg.serviceAddressId));
+                const el = document.getElementById(`seg-service-addr-${seg.id}`);
+                if (el) el.textContent = addr ? _acctAddrLabel(addr) : '—';
+            }
+        });
+    }
+
+    async function _segLoadBillingAddresses(accountId, selectedId = '') {
+        const sel = $('segBillingAddress');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">Select billing address</option>';
+        if (!accountId) return;
+        try {
+            const res = await apiCall('GET', `${API.accountAddresses}/by-account/${accountId}`);
+            const all = res?.data || [];
+            (Array.isArray(all) ? all : []).forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = _acctAddrLabel(a);
+                if (String(a.id) === String(selectedId)) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        } catch(e) {}
+    }
+
+    async function _segLoadServiceAddresses(accountId, selectedId = '') {
+        const sel = $('segServiceAddress');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">Select service address</option>';
+        if (!accountId) return;
+        try {
+            const res = await apiCall('GET', `${API.accountAddresses}/by-account/${accountId}`);
+            const all = res?.data || [];
+            (Array.isArray(all) ? all : []).forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = _acctAddrLabel(a);
+                if (String(a.id) === String(selectedId)) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        } catch(e) {}
+    }
+
     async function showSegmentModal(quoteId, segmentId) {
         let seg = {};
         if (segmentId && qtState.currentQuote) {
             seg = (qtState.currentQuote.segments||[]).find(s => String(s.id)===String(segmentId)) || {};
         }
-        // Ensure supplier addresses are loaded for the dropdown
+        const q = qtState.currentQuote || {};
         if (!saState.addresses.length) {
             try { await loadSupplierAddresses(); } catch(e) {}
         }
+        if (!acState.accounts.length) {
+            try { await loadAccounts(); } catch(e) {}
+        }
+
+        const segType = seg.segmentType || seg.segment_type || (seg.isRoot ? _SEG_TYPE_ROOT : _SEG_TYPE_LINKED);
+        const billingAccId  = seg.billingAccountId  || seg.billing_account_id  || '';
+        const serviceAccId  = seg.serviceAccountId  || seg.service_account_id  || '';
+        const billingAddrId = seg.billingAddressId  || seg.billing_address_id  || '';
+        const serviceAddrId = seg.serviceAddressId  || seg.service_address_id  || '';
+        const renewalLabel  = _qtRenewalLabel(q.renewal);
+
+        const segTypeOpts = [
+            { id: _SEG_TYPE_ROOT,   label: 'Root' },
+            { id: _SEG_TYPE_LINKED, label: 'Linked' }
+        ].map(t => `<option value="${t.id}" ${String(segType)===t.id?'selected':''}>${t.label}</option>`).join('');
+
         $('modalTitle').textContent = segmentId ? 'Edit Segment' : 'Add Segment';
         $('modalBody').innerHTML = `
             <input type="hidden" id="segModalQuoteId" value="${quoteId}">
             <input type="hidden" id="segModalSegId" value="${segmentId||''}">
             <div class="seg-modal-form">
                 <div class="form-group full-width">
-                    <label>Segment Name *</label>
+                    <label>Description</label>
                     <input id="segName" class="form-control" placeholder="e.g. Year 1" value="${seg.name||''}">
+                </div>
+                <div class="form-group full-width">
+                    <label>Segment Type</label>
+                    <select id="segType" class="form-control">${segTypeOpts}</select>
                 </div>
                 <div class="form-group">
                     <label>Start Date</label>
@@ -6406,53 +6512,83 @@ VALIDATION_INFO
                     <input id="segEndDate" type="date" class="form-control" value="${seg.endDate||''}">
                 </div>
                 <div class="form-group">
-                    <label>Default Discount %</label>
-                    <input id="segDiscount" type="number" min="0" max="100" step="0.01" class="form-control" value="${seg.defaultDiscountPct||0}">
+                    <label>Billing Account</label>
+                    <select id="segBillingAccount" class="form-control" onchange="_segLoadBillingAddresses(this.value)">
+                        ${_qtAccountOpts(billingAccId)}
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Default Uplift %</label>
-                    <input id="segUplift" type="number" min="0" step="0.01" class="form-control" value="${seg.defaultUpliftPct||0}">
+                    <label>Service Account</label>
+                    <select id="segServiceAccount" class="form-control" onchange="_segLoadServiceAddresses(this.value)">
+                        ${_qtAccountOpts(serviceAccId)}
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Sort Order</label>
-                    <input id="segSortOrder" type="number" min="0" class="form-control" value="${seg.sortOrder||0}">
+                    <label>Billing Address</label>
+                    <select id="segBillingAddress" class="form-control">
+                        <option value="">Select billing address</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Service Address</label>
+                    <select id="segServiceAddress" class="form-control">
+                        <option value="">Select service address</option>
+                    </select>
                 </div>
                 <div class="form-group full-width">
                     <label>Supplier Address</label>
                     <select id="segSupplierAddress" class="form-control">
-                        ${_saAddressOpts(seg.supplierAddressId||'')}
+                        ${_saAddressOpts(seg.supplierAddressId||seg.supplier_address_id||'')}
                     </select>
                     <div style="margin-top:6px;">
                         <a href="#" onclick="event.preventDefault();showSupplierAddressModal(null);" style="font-size:12px;color:#0052cc;">+ New Supplier Address</a>
                     </div>
                 </div>
-                ${!segmentId ? `<div class="form-group">
-                    <label>Is Root Segment</label>
-                    <select id="segIsRoot" class="form-control">
-                        <option value="false">No</option>
-                        <option value="true">Yes</option>
-                    </select>
-                </div>` : ''}
+                <div class="form-group full-width">
+                    <label>Renewal</label>
+                    <input class="form-control" value="${renewalLabel}" readonly style="background:#f5f7fa;color:#888;">
+                    <div style="font-size:12px;color:#888;margin-top:4px;">Inherited from Quote</div>
+                </div>
+                <div class="form-group">
+                    <label>Discount %</label>
+                    <input id="segDiscount" type="number" min="0" max="100" step="0.01" class="form-control" value="${seg.defaultDiscountPct||0}">
+                </div>
+                <div class="form-group">
+                    <label>Uplift %</label>
+                    <input id="segUplift" type="number" min="0" step="0.01" class="form-control" value="${seg.defaultUpliftPct||0}">
+                </div>
             </div>`;
         $('modalSaveBtn').dataset.type = 'segment';
         openModal();
+        if (billingAccId) _segLoadBillingAddresses(billingAccId, billingAddrId);
+        if (serviceAccId) _segLoadServiceAddresses(serviceAccId, serviceAddrId);
     }
 
     async function saveSegment() {
         const quoteId = ($('segModalQuoteId')||{}).value;
         const segmentId = ($('segModalSegId')||{}).value;
         const name = ($('segName')||{}).value?.trim();
-        if (!name) { showToast('Segment name is required', 'error'); return; }
+        if (!name) { showToast('Description is required', 'error'); return; }
 
-        const supplierAddrVal = ($('segSupplierAddress')||{}).value || null;
+        const segTypeVal        = ($('segType')||{}).value || _SEG_TYPE_ROOT;
+        const billingAccountVal = ($('segBillingAccount')||{}).value || null;
+        const serviceAccountVal = ($('segServiceAccount')||{}).value || null;
+        const billingAddrVal    = ($('segBillingAddress')||{}).value || null;
+        const serviceAddrVal    = ($('segServiceAddress')||{}).value || null;
+        const supplierAddrVal   = ($('segSupplierAddress')||{}).value || null;
+
         const payload = {
             name,
-            startDate: ($('segStartDate')||{}).value || null,
-            endDate: ($('segEndDate')||{}).value || null,
+            segmentType:       segTypeVal,
+            billingAccountId:  billingAccountVal,
+            serviceAccountId:  serviceAccountVal,
+            billingAddressId:  billingAddrVal,
+            serviceAddressId:  serviceAddrVal,
+            supplierAddressId: supplierAddrVal,
+            startDate:         ($('segStartDate')||{}).value || null,
+            endDate:           ($('segEndDate')||{}).value || null,
             defaultDiscountPct: parseFloat(($('segDiscount')||{}).value||0),
-            defaultUpliftPct: parseFloat(($('segUplift')||{}).value||0),
-            sortOrder: parseInt(($('segSortOrder')||{}).value||0),
-            supplierAddressId: supplierAddrVal || null
+            defaultUpliftPct:   parseFloat(($('segUplift')||{}).value||0)
         };
 
         try {
@@ -6460,7 +6596,7 @@ VALIDATION_INFO
             if (segmentId) {
                 res = await apiCall('PUT', `${API.quotes}/${quoteId}/segments/${segmentId}`, payload);
             } else {
-                payload.isRoot = ($('segIsRoot')||{}).value === 'true';
+                payload.isRoot = segTypeVal === _SEG_TYPE_ROOT;
                 res = await apiCall('POST', `${API.quotes}/${quoteId}/segments`, payload);
             }
             const savedSegId = segmentId || (res?.data?.id);
