@@ -203,17 +203,21 @@
         .layout-btn { display: flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1.5px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 13px; background: white; color: #555; font-weight: 500; }
         .layout-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: white; }
         .layout-drop-list { display: flex; flex-direction: column; gap: 8px; }
-        .layout-drop-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; }
+        .layout-drop-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; color: #333; cursor: move; }
         .layout-drop-item .drag-handle { color: #bbb; font-size: 16px; cursor: grab; user-select: none; }
-        .layout-drop-item .attr-sort-input { width: 52px; padding: 5px 7px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; text-align: center; }
-        .layout-drop-item .attr-sort-input:focus { border-color: #1a1a2e; outline: none; }
         .layout-drop-item .attr-name { font-weight: 500; font-size: 13px; color: #555; min-width: 90px; }
         .layout-drop-item .attr-label-input { flex: 1; padding: 5px 9px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
         .layout-drop-item .attr-label-input:focus { border-color: #1a1a2e; outline: none; }
         .layout-drop-item .attr-save-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: #bbb; padding: 2px 4px; border-radius: 4px; }
         .layout-drop-item .attr-save-btn:hover { color: #1a1a2e; background: #eef3ff; }
+        .layout-drop-item.dragging { opacity: 0.5; background: #f0f0f0; }
+        .layout-drop-item.drag-over { border-top: 2px solid #1e3a5f; }
         /* Feature rows matching screenshot */
-        .feature-row { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; }
+        .feature-row { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; cursor: default; }
+        .feature-row .drag-handle { cursor: grab; color: #bbb; font-size: 16px; margin-right: 8px; user-select: none; }
+        .feature-row .drag-handle:active { cursor: grabbing; }
+        .feature-row.dragging { opacity: 0.5; background: #e3f2fd; }
+        .feature-row.drag-over { border-top: 3px solid #1976d2; margin-top: -3px; }
         .feature-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .feature-row-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: #1a1a2e; }
         .req-badge { font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 10px; background: #f0f0f0; color: #555; }
@@ -221,6 +225,12 @@
         .feature-row-actions button { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: 5px; font-size: 15px; color: #888; }
         .feature-row-actions button:hover { background: #f4f4f4; }
         .feature-row-actions button.del:hover { color: #e53935; }
+        /* Draggable feature table rows */
+        .feature-drag-row { cursor: default; }
+        .feature-drag-row .drag-handle { cursor: grab; color: #999; font-size: 16px; padding: 0 8px; user-select: none; }
+        .feature-drag-row .drag-handle:active { cursor: grabbing; }
+        .feature-drag-row.dragging { opacity: 0.5; background: #e3f2fd; }
+        .feature-drag-row.drag-over { border-top: 2px solid #1976d2; }
         .feature-products-row { display: flex; flex-wrap: wrap; gap: 8px; }
         .feature-chip-default { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; background: #1a1a2e; color: white; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; }
         .feature-chip-default:hover { background: #2d2d4e; }
@@ -511,9 +521,13 @@
         .modal-feature { max-width: 700px; }
 
         /* Attribute modal option pairs */
-        .option-pair-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .option-pair-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: move; }
         .option-pair-row input { flex: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
         .option-pair-row input:focus { border-color: #1e3a5f; outline: none; }
+        .option-pair-row.dragging { opacity: 0.5; background: #f0f0f0; }
+        .option-pair-row .drag-handle { cursor: grab; color: #999; font-size: 16px; padding: 0 4px; user-select: none; }
+        .option-pair-row .drag-handle:active { cursor: grabbing; }
+        .option-pair-row.drag-over { border-top: 2px solid #1e3a5f; }
         .option-remove-btn { background: none; border: none; cursor: pointer; color: #aaa; font-size: 18px; padding: 0 4px; line-height: 1; flex-shrink: 0; }
         .option-remove-btn:hover { color: #dc3545; }
         .add-option-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #1e3a5f; font-size: 13px; font-weight: 500; cursor: pointer; padding: 6px 0; }
@@ -560,17 +574,21 @@
 
         <div class="sidebar-divider"></div>
 
-        <!-- Product Definition -->
+        <!-- Products -->
         <div class="sidebar-section">
-            <div class="sidebar-section-title">Product Definition</div>
+            <div class="sidebar-section-title">Products</div>
             <ul class="sidebar-menu">
                 <li><a data-page="product-families">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    Product Families
+                    Product Family
                 </a></li>
                 <li><a data-page="product-lines">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                    Product Lines
+                    Product Line
+                </a></li>
+                <li><a data-page="global-attributes">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    Attributes
                 </a></li>
                 <li><a data-page="products">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
@@ -581,30 +599,13 @@
 
         <div class="sidebar-divider"></div>
 
-        <!-- Configuration -->
+        <!-- Supplier Info -->
         <div class="sidebar-section">
-            <div class="sidebar-section-title">Configuration</div>
+            <div class="sidebar-section-title">Supplier Info</div>
             <ul class="sidebar-menu">
-                <li><a data-page="global-attributes">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                    Attributes
-                </a></li>
-            </ul>
-        </div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- Pricing -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">Pricing</div>
-            <ul class="sidebar-menu">
-                <li><a data-page="cost-matrices">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                    Cost Matrices
-                </a></li>
-                <li><a data-page="price-matrices">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    Price Matrices
+                <li><a data-page="supplier-addresses">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Supplier Address
                 </a></li>
             </ul>
         </div>
@@ -630,10 +631,6 @@
                 <li><a data-page="assets">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                     Assets
-                </a></li>
-                <li><a data-page="bundle-configurator">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                    Bundle Configurator
                 </a></li>
             </ul>
         </div>
@@ -669,13 +666,12 @@
             <h3 style="margin-bottom: 15px;">Quick Start</h3>
             <ol style="padding-left: 20px; line-height: 2;">
                 <li>Enter your JWT token in the sidebar and click "Load All Data"</li>
-                <li>Create <strong>Product Families</strong> to organize your catalog</li>
-                <li>Add <strong>Product Lines</strong> within each family</li>
-                <li>Create <strong>Products</strong> (Standard or Bundle type)</li>
-                <li>Define <strong>Global Attributes</strong> for product configuration</li>
-                <li>For Bundles: Add <strong>Features</strong> and <strong>Feature Products</strong></li>
-                <li>Create <strong>Constraint Rules</strong> for business logic</li>
-                <li>Test your configuration in <strong>Evaluate Config</strong></li>
+                <li>Create <strong>Product Family</strong> to organize your catalog</li>
+                <li>Add <strong>Product Line</strong> within each family</li>
+                <li>Define <strong>Attributes</strong> for product configuration</li>
+                <li>Create <strong>Products</strong> (Simple, Dynamic, or Bundle type)</li>
+                <li>Add <strong>Supplier Address</strong> records under Supplier Info</li>
+                <li>Manage <strong>Accounts</strong>, <strong>Quotes</strong>, <strong>Orders</strong>, and <strong>Assets</strong> under Sales</li>
             </ol>
         </div>
     </div>
@@ -684,7 +680,7 @@
     <div class="page-section" id="page-product-families">
         <div class="page-header">
             <div>
-                <div class="page-title">Product Families</div>
+                <div class="page-title">Product Family</div>
                 <div class="page-subtitle">Top-level categorization of your products</div>
             </div>
             <div class="section-actions">
@@ -700,7 +696,7 @@
             </div>
             <div class="data-table-wrapper">
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Created By</th><th>Updated At</th><th>Actions</th></tr></thead>
                     <tbody id="productFamilyTable"></tbody>
                 </table>
             </div>
@@ -715,7 +711,7 @@
     <div class="page-section" id="page-product-lines">
         <div class="page-header">
             <div>
-                <div class="page-title">Product Lines</div>
+                <div class="page-title">Product Line</div>
                 <div class="page-subtitle">Organize products within families</div>
             </div>
             <div class="section-actions">
@@ -734,7 +730,7 @@
             </div>
             <div class="data-table-wrapper">
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>Family</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Family</th><th>Description</th><th>Status</th><th>Created By</th><th>Updated At</th><th>Actions</th></tr></thead>
                     <tbody id="productLineTable"></tbody>
                 </table>
             </div>
@@ -775,7 +771,7 @@
             </div>
             <div class="data-table-wrapper" style="max-height: 500px;">
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>SKU</th><th>Type</th><th>Product Line</th><th>Family</th><th></th></tr></thead>
+                    <thead><tr><th>Name</th><th>SKU</th><th>Type</th><th>Product Line</th><th>Family</th><th>Created By</th><th>Updated At</th><th></th></tr></thead>
                     <tbody id="productTable"></tbody>
                 </table>
             </div>
@@ -811,11 +807,12 @@
                     <option value="">All Types</option>
                     <option value="Dropdown">Dropdown</option>
                     <option value="Number">Number</option>
+                    <option value="Boolean">Boolean</option>
                 </select>
             </div>
             <div class="data-table-wrapper">
                 <table class="data-table">
-                    <thead><tr><th>Name</th><th>Label</th><th>Type</th><th>Details</th><th>Assigned</th><th></th></tr></thead>
+                    <thead><tr><th>Name</th><th>Label</th><th>Type</th><th>Details</th><th>Assigned</th><th>Created By</th><th>Updated At</th><th></th></tr></thead>
                     <tbody id="globalAttributeTable"></tbody>
                 </table>
             </div>
@@ -978,7 +975,7 @@
             </div>
             <div class="data-table-wrapper">
                 <table class="data-table">
-                    <thead><tr><th>Label</th><th>Description</th><th>Min</th><th>Max</th><th>Required</th><th>Actions</th></tr></thead>
+                    <thead><tr><th style="width:40px;"></th><th>Label</th><th>Description</th><th>Min</th><th>Max</th><th>Required</th><th>Actions</th></tr></thead>
                     <tbody id="bundleFeatureTable"></tbody>
                 </table>
             </div>
@@ -1111,40 +1108,6 @@ VALIDATION_INFO
         </div>
     </div>
 
-    <!-- Evaluate Page -->
-    <div class="page-section" id="page-evaluate">
-        <div class="page-header">
-            <div>
-                <div class="page-title">Evaluate Configuration</div>
-                <div class="page-subtitle">Test constraint rules against a bundle configuration</div>
-            </div>
-        </div>
-        <div class="grid">
-            <div class="card">
-                <h4 style="margin-bottom: 15px;">Configuration</h4>
-                <div class="form-group">
-                    <label>Select Bundle</label>
-                    <select id="evalBundleId" onchange="generateSampleSelection()"></select>
-                </div>
-                <div class="form-group">
-                    <label>Selections (JSON)</label>
-                    <textarea id="evalSelections" style="min-height: 300px; font-family: monospace;">{"selections": []}</textarea>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="evaluateConstraints()">Evaluate</button>
-                    <button class="btn btn-info" onclick="generateSampleSelection()">Generate Sample</button>
-                    <button class="btn btn-outline" onclick="formatJson('evalSelections')">Format JSON</button>
-                </div>
-            </div>
-            <div class="card">
-                <h4 style="margin-bottom: 15px;">Result</h4>
-                <div id="evalResult" style="font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 400px; background: #f8f9fa; padding: 15px; border-radius: 4px; overflow: auto;">
-                    Select a bundle and click "Evaluate" to test your configuration...
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ============= Cost Matrices ============= -->
     <div class="page-section" id="page-cost-matrices">
         <div class="page-header">
@@ -1216,25 +1179,31 @@ VALIDATION_INFO
 
     <!-- ============= ACCOUNTS ============= -->
     <div class="page-section" id="page-accounts">
-        <div class="page-header">
-            <div>
-                <div class="page-title">Accounts</div>
-                <div class="page-subtitle">Manage customer accounts</div>
+        <!-- ── List View ── -->
+        <div id="acListView">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Accounts</div>
+                    <div class="page-subtitle">Manage customer accounts</div>
+                </div>
+                <button class="btn btn-primary" onclick="showAccountModal(null)">+ Add Account</button>
             </div>
-            <button class="btn btn-primary" onclick="showAccountModal(null)">+ Add Account</button>
+            <table class="data-table" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Account #</th><th>Name</th><th>Type</th><th>Owner</th>
+                    <th>Billing Freq.</th><th>Net Term</th><th>Last Bill</th><th>Next Bill</th>
+                    <th>Verified</th><th>Currency</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="accountTableBody">
+                <tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+                </tbody>
+            </table>
         </div>
-        <table class="data-table" style="width:100%;">
-            <thead>
-            <tr>
-                <th>Account #</th><th>Name</th><th>Type</th><th>Owner</th>
-                <th>Billing Freq.</th><th>Net Term</th><th>Last Bill</th><th>Next Bill</th>
-                <th>Verified</th><th>Currency</th><th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="accountTableBody">
-            <tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
-            </tbody>
-        </table>
+
+        <!-- ── Detail View ── -->
+        <div id="acDetailView" style="display:none;"></div>
     </div>
 
     <!-- ============= QUOTES ============= -->
@@ -1263,6 +1232,27 @@ VALIDATION_INFO
         <div id="qtDetailView" style="display:none;"></div>
     </div>
 
+    <!-- ============= SUPPLIER ADDRESSES ============= -->
+    <div class="page-section" id="page-supplier-addresses">
+        <div class="page-header">
+            <div>
+                <div class="page-title">Supplier Address</div>
+                <div class="page-subtitle">Manage supplier address records</div>
+            </div>
+            <button class="btn btn-primary" onclick="showSupplierAddressModal(null)">+ Add Address</button>
+        </div>
+        <table class="data-table" style="width:100%;">
+            <thead>
+            <tr>
+                <th>Line 1</th><th>City</th><th>State</th><th>Zip Code</th><th>Tax ID</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="supplierAddrTableBody">
+            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- ============= ORDERS ============= -->
     <div class="page-section" id="page-orders">
         <div class="page-header"><div><div class="page-title">Orders</div><div class="page-subtitle">Manage sales orders</div></div></div>
@@ -1278,15 +1268,6 @@ VALIDATION_INFO
         <div style="text-align:center;padding:80px;color:#aaa;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
             <div style="font-size:16px;font-weight:500;">Assets coming soon</div>
-        </div>
-    </div>
-
-    <!-- ============= RATED TRANSACTIONS ============= -->
-    <div class="page-section" id="page-rated-transactions">
-        <div class="page-header"><div><div class="page-title">Rated Transactions</div><div class="page-subtitle">View billing rated transactions</div></div></div>
-        <div style="text-align:center;padding:80px;color:#aaa;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <div style="font-size:16px;font-weight:500;">Rated Transactions coming soon</div>
         </div>
     </div>
 
@@ -1379,8 +1360,13 @@ VALIDATION_INFO
         pricingMatrices: '/api/v1/cpq/pricing-matrices',
         pricingEntries: '/api/v1/cpq/pricing-entries',
         currencies: '/api/v1/mdata/mobject/4daa3a2d-b398-44da-9b4a-2219a0877186/with-related',
-        accounts: '/api/v1/cpq/accounts',
-        quotes: '/api/v1/cpq/quotes'
+        accountDetails: '/api/v1/cpq/account-details',
+        accountProjects: '/api/v1/cpq/account-projects',
+        quotes: '/api/v1/cpq/quotes',
+        pricingResolve: '/api/v1/cpq/pricing/resolve',
+        supplierAddresses: '/api/v1/cpq/supplier-addresses',
+        contactDetails: '/api/v1/cpq/contact-details',
+        accountAddresses: '/api/v1/cpq/account-addresses'
     };
 
     // Default page size for pagination
@@ -1515,6 +1501,7 @@ VALIDATION_INFO
             if (page === 'price-matrices') loadPriceMatrices();
             if (page === 'bundle-configurator') loadBundleConfiguratorPage();
             if (page === 'accounts') loadAccounts();
+            if (page === 'supplier-addresses') loadSupplierAddresses();
             if (page === 'quotes') loadQuotes();
         });
     });
@@ -1532,13 +1519,6 @@ VALIDATION_INFO
         $('statBundles').textContent = state.bundles.length;
         $('statAttributes').textContent = totalAttrs;
         $('statConstraints').textContent = state.constraints.length;
-        // Update badges
-        $('badgeFamilies').textContent = totalFamilies;
-        $('badgeLines').textContent = totalLines;
-        $('badgeProducts').textContent = totalProducts;
-        $('badgeBundles').textContent = state.bundles.length;
-        $('badgeAttrs').textContent = totalAttrs;
-        $('badgeConstraints').textContent = state.constraints.length;
     }
 
     // ============= Load All Data =============
@@ -1572,9 +1552,11 @@ VALIDATION_INFO
         $('productFamilyTable').innerHTML = filtered.length ? filtered.map(f => `
             <tr><td><strong>${f.name || ''}</strong></td><td>${f.description || '-'}</td>
             <td><span class="badge ${f.status__r === 'Active' ? 'badge-success' : 'badge-secondary'}">${f.status__r || '-'}</span></td>
+            <td>${f.created_by__r || '-'}</td>
+            <td>${f.updated_at ? new Date(f.updated_at).toLocaleDateString() : '-'}</td>
             <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editFamily('${f.id}')">Edit</button>
             <button class="btn btn-sm btn-danger" onclick="deleteFamily('${f.id}')">Delete</button></td></tr>
-        `).join('') : '<tr><td colspan="4" class="empty-state">No families found</td></tr>';
+        `).join('') : '<tr><td colspan="6" class="empty-state">No families found</td></tr>';
 
         const pg = state.pagination.families;
         if ($('familyPageInfo')) {
@@ -1594,12 +1576,21 @@ VALIDATION_INFO
     function showFamilyModal(family = null) {
         state.currentModal = { type: 'family', data: family };
         $('modalTitle').textContent = family ? 'Edit Product Family' : 'New Product Family';
+        const auditInfo = family ? `
+            <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:12px;color:#666;">
+                <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                    <div><strong>Created By:</strong> ${family.created_by__r || '-'}</div>
+                    <div><strong>Created At:</strong> ${family.created_at ? new Date(family.created_at).toLocaleString() : '-'}</div>
+                    <div><strong>Updated By:</strong> ${family.updated_by__r || '-'}</div>
+                    <div><strong>Updated At:</strong> ${family.updated_at ? new Date(family.updated_at).toLocaleString() : '-'}</div>
+                </div>
+            </div>` : '';
         $('modalBody').innerHTML = `
             <div class="form-group"><label>Name *</label><input type="text" id="modalFamilyName" value="${family?.name || ''}"></div>
             <div class="form-group"><label>Description</label><input type="text" id="modalFamilyDescription" value="${family?.description || ''}"></div>
             <div class="form-group"><label>Status</label><select id="modalFamilyStatus">
                 ${Object.entries(STATUS_IDS).map(([lbl, uuid]) => `<option value="${uuid}" ${(family?.status === uuid) ? 'selected' : ''}>${lbl}</option>`).join('')}
-            </select></div>`;
+            </select></div>${auditInfo}`;
         openModal();
     }
 
@@ -1640,9 +1631,11 @@ VALIDATION_INFO
             const family = state.families.find(f => f.id === fId);
             return `<tr><td><strong>${l.name || ''}</strong></td><td>${family?.name || '-'}</td><td>${l.description || '-'}</td>
             <td><span class="badge ${l.status__r === 'Active' ? 'badge-success' : 'badge-secondary'}">${l.status__r || '-'}</span></td>
+            <td>${l.created_by__r || '-'}</td>
+            <td>${l.updated_at ? new Date(l.updated_at).toLocaleDateString() : '-'}</td>
             <td class="actions-cell"><button class="btn btn-sm btn-warning" onclick="editLine('${l.id}')">Edit</button>
             <button class="btn btn-sm btn-danger" onclick="deleteLine('${l.id}')">Delete</button></td></tr>`;
-        }).join('') : '<tr><td colspan="5" class="empty-state">No lines found</td></tr>';
+        }).join('') : '<tr><td colspan="7" class="empty-state">No lines found</td></tr>';
 
         const pg = state.pagination.lines;
         if ($('linePageInfo')) {
@@ -1664,13 +1657,22 @@ VALIDATION_INFO
         $('modalTitle').textContent = line ? 'Edit Product Line' : 'New Product Line';
         const fId = line?.prodFamilyId || line?.prod_family_id;
         const familyOpts = state.families.map(f => `<option value="${f.id}" ${fId === f.id ? 'selected' : ''}>${f.name}</option>`).join('');
+        const auditInfo = line ? `
+            <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:12px;color:#666;">
+                <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                    <div><strong>Created By:</strong> ${line.created_by__r || '-'}</div>
+                    <div><strong>Created At:</strong> ${line.created_at ? new Date(line.created_at).toLocaleString() : '-'}</div>
+                    <div><strong>Updated By:</strong> ${line.updated_by__r || '-'}</div>
+                    <div><strong>Updated At:</strong> ${line.updated_at ? new Date(line.updated_at).toLocaleString() : '-'}</div>
+                </div>
+            </div>` : '';
         $('modalBody').innerHTML = `
             <div class="form-group"><label>Name *</label><input type="text" id="modalLineName" value="${line?.name || ''}"></div>
             <div class="form-group"><label>Description</label><input type="text" id="modalLineDescription" value="${line?.description || ''}"></div>
             <div class="form-group"><label>Product Family *</label><select id="modalLineFamily">${familyOpts}</select></div>
             <div class="form-group"><label>Status</label><select id="modalLineStatus">
                 ${Object.entries(STATUS_IDS).map(([lbl, uuid]) => `<option value="${uuid}" ${(line?.status === uuid) ? 'selected' : ''}>${lbl}</option>`).join('')}
-            </select></div>`;
+            </select></div>${auditInfo}`;
         openModal();
     }
 
@@ -1737,11 +1739,13 @@ VALIDATION_INFO
             <td><span style="padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;${typeBadgeStyle}">${pTypeLabel || '-'}</span></td>
             <td><span style="padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;background:#f0f0f0;color:#444;">${line?.name || '-'}</span></td>
             <td style="font-size:13px;color:#555;">${family?.name || '-'}</td>
+            <td style="font-size:12px;color:#666;">${p.created_by__r || '-'}</td>
+            <td style="font-size:12px;color:#666;">${p.updated_at ? new Date(p.updated_at).toLocaleDateString() : '-'}</td>
             <td class="actions-cell" style="white-space:nowrap;" onclick="event.stopPropagation()">
                 <button style="padding:4px 8px;border:none;background:none;color:#555;" onclick="editProduct('${p.id}')" title="Edit">&#9998;</button>
                 <button style="padding:4px 8px;border:none;background:none;color:#e53935;" onclick="deleteProduct('${p.id}')" title="Delete">&#128465;</button>
             </td></tr>`;
-        }).join('') : '<tr><td colspan="6" class="empty-state">No products found</td></tr>';
+        }).join('') : '<tr><td colspan="8" class="empty-state">No products found</td></tr>';
 
         // Update page info and pagination
         const pg = state.pagination.products;
@@ -1778,7 +1782,7 @@ VALIDATION_INFO
         const prodOpts = state.products.map(p => `<option value="${p.id}">${p.label} (${p.sku})</option>`).join('');
         const bundleOpts = state.bundles.map(b => `<option value="${b.id}">${b.label}</option>`).join('');
         if ($('prodAttrFilterProduct')) $('prodAttrFilterProduct').innerHTML = '<option value="">Select Product...</option>' + prodOpts;
-        ['constraintBundleId', 'evalBundleId', 'featureBundleSelect', 'fpBundleSelect', 'overrideBundleSelect'].forEach(id => {
+        ['constraintBundleId', 'featureBundleSelect', 'fpBundleSelect', 'overrideBundleSelect'].forEach(id => {
             if ($(id)) $(id).innerHTML = '<option value="">Select Bundle...</option>' + bundleOpts;
         });
     }
@@ -1797,6 +1801,15 @@ VALIDATION_INFO
         const isOrd = product ? (product.isOrderable !== false && product.is_orderable !== false) : false;
         const typeOpts = Object.entries(PRODUCT_TYPE_IDS).map(([label, uuid]) => `<option value="${uuid}" ${pTypeId === uuid ? 'selected' : ''}>${label}</option>`).join('');
         const statusOpts = Object.entries(STATUS_IDS).map(([label, uuid]) => `<option value="${uuid}" ${statusId === uuid ? 'selected' : ''}>${label}</option>`).join('');
+        const auditInfo = product ? `
+            <div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:12px;color:#666;">
+                <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                    <div><strong>Created By:</strong> ${product.created_by__r || '-'}</div>
+                    <div><strong>Created At:</strong> ${product.created_at ? new Date(product.created_at).toLocaleString() : '-'}</div>
+                    <div><strong>Updated By:</strong> ${product.updated_by__r || '-'}</div>
+                    <div><strong>Updated At:</strong> ${product.updated_at ? new Date(product.updated_at).toLocaleString() : '-'}</div>
+                </div>
+            </div>` : '';
         $('modalBox').className = 'modal product-modal';
         $('modalBody').innerHTML = `
             <div class="form-row">
@@ -1836,7 +1849,7 @@ VALIDATION_INFO
                     <label>Status</label>
                     <select id="modalProductStatus">${statusOpts}</select>
                 </div>
-            </div>`;
+            </div>${auditInfo}`;
         openModal();
     }
 
@@ -2014,17 +2027,82 @@ VALIDATION_INFO
         list.innerHTML = linked.map(a => {
             const pa = paMap[a.id];
             const paId = pa?.id || '';
-            const sortOrder = pa?.sort_order ?? pa?.sortOrder ?? 0;
             const customLabel = pa?.custom_label || pa?.customLabel || '';
-            return `<div class="layout-drop-item" data-pa-id="${paId}" data-attr-id="${a.id}">
-                <span class="drag-handle">&#8942;&#8942;</span>
-                <input type="number" class="attr-sort-input" value="${sortOrder}" min="0" placeholder="#" title="Sort order">
+            return `<div class="layout-drop-item" data-pa-id="${paId}" data-attr-id="${a.id}" draggable="true">
+                <span class="drag-handle">&#9776;</span>
                 <span class="attr-name">${a.name}</span>
                 <input type="text" class="attr-label-input" value="${customLabel}" placeholder="Custom label (optional)">
                 <span class="attr-card-type">${attrTypeDisplay(a.type__r)}</span>
                 <button class="attr-save-btn" onclick="saveLayoutItem(this)" title="Save changes">&#10003;</button>
             </div>`;
         }).join('');
+
+        // Add drag-and-drop events
+        initLayoutDragDrop();
+    }
+
+    function initLayoutDragDrop() {
+        const items = document.querySelectorAll('#detailLayoutList .layout-drop-item');
+        items.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            item.addEventListener('dragend', async () => {
+                item.classList.remove('dragging');
+                document.querySelectorAll('.layout-drop-item').forEach(r => r.classList.remove('drag-over'));
+                // Auto-save order after drag
+                await saveLayoutOrder();
+            });
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector('.layout-drop-item.dragging');
+                if (dragging && dragging !== item) {
+                    item.classList.add('drag-over');
+                }
+            });
+            item.addEventListener('dragleave', () => {
+                item.classList.remove('drag-over');
+            });
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over');
+                const dragging = document.querySelector('.layout-drop-item.dragging');
+                if (dragging && dragging !== item) {
+                    const container = $('detailLayoutList');
+                    const allItems = [...container.querySelectorAll('.layout-drop-item')];
+                    const fromIndex = allItems.indexOf(dragging);
+                    const toIndex = allItems.indexOf(item);
+                    if (fromIndex < toIndex) {
+                        item.after(dragging);
+                    } else {
+                        item.before(dragging);
+                    }
+                }
+            });
+        });
+    }
+
+    async function saveLayoutOrder() {
+        const rows = document.querySelectorAll('#detailLayoutList .layout-drop-item');
+        if (!rows.length) return;
+        const productId = detailState.product?.id;
+        let sortOrder = 1;
+        for (const row of rows) {
+            const paId = row.dataset.paId;
+            const attrId = row.dataset.attrId;
+            if (!paId) continue;
+            const customLabel = row.querySelector('.attr-label-input')?.value.trim() || null;
+            await apiCall('PUT', `${API.attributes}/products/${productId}/attributes/${paId}`, {
+                attribute_id: attrId,
+                sort_order: sortOrder++,
+                custom_label: customLabel
+            });
+            // Update local state
+            const pa = detailState.productAttributes.find(p => p.id === paId);
+            if (pa) { pa.sort_order = sortOrder - 1; pa.sortOrder = sortOrder - 1; }
+        }
+        showToast('Order saved', 'success');
     }
 
     async function saveLayoutItem(btn) {
@@ -2034,8 +2112,10 @@ VALIDATION_INFO
         const productId = detailState.product?.id;
         if (!paId || !productId) return showToast('Cannot save — missing record ID', 'error');
 
-        const sortOrder   = parseInt(row.querySelector('.attr-sort-input').value) || 0;
         const customLabel = row.querySelector('.attr-label-input').value.trim();
+        // Get current sort order from position in DOM
+        const allRows = [...document.querySelectorAll('#detailLayoutList .layout-drop-item')];
+        const sortOrder = allRows.indexOf(row) + 1;
 
         const result = await apiCall('PUT', `${API.attributes}/products/${productId}/attributes/${paId}`, {
             attribute_id:  attrId,
@@ -2047,7 +2127,6 @@ VALIDATION_INFO
             const pa = detailState.productAttributes.find(p => p.id === paId);
             if (pa) { pa.sort_order = sortOrder; pa.sortOrder = sortOrder; pa.custom_label = customLabel; pa.customLabel = customLabel; }
             showToast('Attribute updated', 'success');
-            renderDetailLayout();
         }
     }
 
@@ -2056,11 +2135,11 @@ VALIDATION_INFO
         if (!rows.length) return;
         const productId = detailState.product?.id;
         let saved = 0;
+        let sortOrder = 1;
         for (const row of rows) {
             const paId     = row.dataset.paId;
             const attrId   = row.dataset.attrId;
             if (!paId) continue;
-            const sortOrder   = parseInt(row.querySelector('.attr-sort-input').value) || 0;
             const customLabel = row.querySelector('.attr-label-input').value.trim();
             const result = await apiCall('PUT', `${API.attributes}/products/${productId}/attributes/${paId}`, {
                 attribute_id:  attrId,
@@ -2072,6 +2151,7 @@ VALIDATION_INFO
                 if (pa) { pa.sort_order = sortOrder; pa.sortOrder = sortOrder; pa.custom_label = customLabel; pa.customLabel = customLabel; }
                 saved++;
             }
+            sortOrder++;
         }
         if (saved) { showToast(`${saved} attribute(s) saved`, 'success'); renderDetailLayout(); }
     }
@@ -2089,47 +2169,121 @@ VALIDATION_INFO
             container.innerHTML = '<div style="color:#bbb;font-size:13px;padding:20px 0;">No features yet. Click + Add Feature to get started.</div>';
             return;
         }
-        container.innerHTML = detailState.features
-            .slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-            .map(f => {
-                const fps = detailState.featureProducts[f.id] || [];
-                const isReq = f.is_required || f.isRequired || f.required;
+        container.innerHTML = '';
 
-                // Build chips: default product gets dark chip with star, others get light chip
-                const chips = fps.filter(fp => fp.product_id || fp.productId).map(fp => {
-                    const pid = fp.product_id || fp.productId;
-                    const prod = state.products.find(p => p.id === pid);
-                    const name = fp.product_label || prod?.label || pid || 'Unknown';
-                    const isDef = fp.is_default || fp.isDefault || fp.default;
-                    // Count saved attribute overrides for this product
-                    const overrideCount = detailState.attrOverrides.filter(o =>
-                        (o.product_id || o.productId) === pid).length;
-                    // Only show badge when there are overrides; otherwise show a subtle edit hint
-                    const countBadge = overrideCount > 0
-                        ? `<span class="chip-override-count">${overrideCount}</span>`
-                        : `<span class="chip-override-hint">&#8963;</span>`;
-                    const safeName = name.replace(/'/g, "\\'");
-                    if (isDef) {
-                        return `<span class="feature-chip-default" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">&#9733; ${name} ${countBadge}</span>`;
-                    } else {
-                        return `<span class="feature-chip-alt" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">${name} ${countBadge}</span>`;
-                    }
-                }).join('');
+        const sortedFeatures = detailState.features.slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
-                return `<div class="feature-row">
-                    <div class="feature-row-header">
-                        <div class="feature-row-title">
-                            ${f.label}
+        sortedFeatures.forEach(f => {
+            const fps = detailState.featureProducts[f.id] || [];
+            const isReq = f.is_required || f.isRequired || f.required;
+
+            // Build chips: default product gets dark chip with star, others get light chip
+            const chips = fps.filter(fp => fp.product_id || fp.productId).map(fp => {
+                const pid = fp.product_id || fp.productId;
+                const prod = state.products.find(p => p.id === pid);
+                const name = fp.product_label || prod?.label || pid || 'Unknown';
+                const isDef = fp.is_default || fp.isDefault || fp.default;
+                // Count saved attribute overrides for this product
+                const overrideCount = detailState.attrOverrides.filter(o =>
+                    (o.product_id || o.productId) === pid).length;
+                // Only show badge when there are overrides; otherwise show a subtle edit hint
+                const countBadge = overrideCount > 0
+                    ? `<span class="chip-override-count">${overrideCount}</span>`
+                    : `<span class="chip-override-hint">&#8963;</span>`;
+                const safeName = name.replace(/'/g, "\\'");
+                if (isDef) {
+                    return `<span class="feature-chip-default" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">&#9733; ${name} ${countBadge}</span>`;
+                } else {
+                    return `<span class="feature-chip-alt" onclick="openAttrRestrictionsModal('${pid}','${safeName}')" title="Set attribute restrictions">${name} ${countBadge}</span>`;
+                }
+            }).join('');
+
+            const featureDiv = document.createElement('div');
+            featureDiv.className = 'feature-row';
+            featureDiv.draggable = true;
+            featureDiv.dataset.featureId = f.id;
+            const desc = f.description || f.label_description || '';
+            featureDiv.innerHTML = `
+                <div class="feature-row-header">
+                    <div class="feature-row-title">
+                        <span class="drag-handle" title="Drag to reorder">&#9776;</span>
+                        <div>
+                            <span style="font-weight:600;color:#1a1a2e;">${f.label}</span>
                             ${isReq ? '<span class="req-badge">Required</span>' : ''}
-                        </div>
-                        <div class="feature-row-actions">
-                            <button onclick="editFeatureFromDetail('${f.id}')" title="Edit">&#9998;</button>
-                            <button class="del" onclick="deleteFeatureFromDetail('${f.id}')" title="Delete">&#128465;</button>
+                            ${desc ? `<div style="font-size:11px;color:#888;margin-top:2px;">${desc}</div>` : ''}
                         </div>
                     </div>
-                    <div class="feature-products-row">${chips || '<span style="color:#bbb;font-size:12px;">No products linked</span>'}</div>
-                </div>`;
-            }).join('');
+                    <div class="feature-row-actions">
+                        <button onclick="editFeatureFromDetail('${f.id}')" title="Edit">&#9998;</button>
+                        <button class="del" onclick="deleteFeatureFromDetail('${f.id}')" title="Delete">&#128465;</button>
+                    </div>
+                </div>
+                <div class="feature-products-row">${chips || '<span style="color:#bbb;font-size:12px;">No products linked</span>'}</div>`;
+
+            // Drag events
+            featureDiv.addEventListener('dragstart', (e) => {
+                featureDiv.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', f.id);
+            });
+            featureDiv.addEventListener('dragend', () => {
+                featureDiv.classList.remove('dragging');
+                document.querySelectorAll('.feature-row').forEach(r => r.classList.remove('drag-over'));
+            });
+            featureDiv.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector('.feature-row.dragging');
+                if (dragging && dragging !== featureDiv) {
+                    featureDiv.classList.add('drag-over');
+                }
+            });
+            featureDiv.addEventListener('dragleave', () => {
+                featureDiv.classList.remove('drag-over');
+            });
+            featureDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                featureDiv.classList.remove('drag-over');
+                const dragging = document.querySelector('.feature-row.dragging');
+                if (dragging && dragging !== featureDiv) {
+                    const allRows = [...container.querySelectorAll('.feature-row')];
+                    const fromIndex = allRows.indexOf(dragging);
+                    const toIndex = allRows.indexOf(featureDiv);
+                    if (fromIndex < toIndex) {
+                        featureDiv.after(dragging);
+                    } else {
+                        featureDiv.before(dragging);
+                    }
+                    // Save new order
+                    saveDetailFeatureSortOrder();
+                }
+            });
+
+            container.appendChild(featureDiv);
+        });
+    }
+
+    async function saveDetailFeatureSortOrder() {
+        const container = $('detailFeatureList');
+        const rows = [...container.querySelectorAll('.feature-row')];
+        const bundleId = detailState.product?.id;
+        if (!bundleId) return;
+
+        for (let i = 0; i < rows.length; i++) {
+            const featureId = rows[i].dataset.featureId;
+            const feature = detailState.features.find(f => f.id === featureId);
+            if (feature && feature.sort_order !== (i + 1)) {
+                await apiCall('PUT', `${API.bundles}/${bundleId}/features/${featureId}`, {
+                    label: feature.label,
+                    description: feature.description,
+                    is_required: feature.is_required || feature.isRequired || feature.required,
+                    min_qty: feature.min_qty ?? feature.minOptions ?? feature.min_options ?? 0,
+                    max_qty: feature.max_qty ?? feature.maxOptions ?? feature.max_options ?? 0,
+                    sort_order: i + 1
+                });
+                feature.sort_order = i + 1;
+            }
+        }
+        showToast('Feature order updated', 'success');
     }
 
     // ============= Attribute Restrictions Modal =============
@@ -2194,6 +2348,8 @@ VALIDATION_INFO
         // Build modal body blocks — one per restrictable attribute
         const blocks = restrictableAttrs.map(a => {
             const ov = overrides.find(o => (o.attribute_id || o.attributeId) === a.id);
+            const pa = paRecords.find(r => (r.attribute_id || r.attributeId) === a.id);
+            const displayLabel = pa?.custom_label || pa?.customLabel || a.name;
             const isNumber   = a.type__r === 'Number' || a.type__r === 'Numerical';
             const isDropdown = a.type__r === 'Dropdown' || a.type__r === 'Picklist';
 
@@ -2207,8 +2363,10 @@ VALIDATION_INFO
                 const curVals  = ov?.allowed_values?.values
                     ? (Array.isArray(ov.allowed_values.values) ? ov.allowed_values.values.join(', ') : ov.allowed_values.values)
                     : '';
+                const descHtml = a.description ? `<div class="attr-restrict-block-desc">${a.description}</div>` : '';
                 return `<div class="attr-restrict-block" data-attr-id="${a.id}" data-override-id="${ov?.id || ''}" data-type="Number">
-                    <div class="attr-restrict-block-title">${a.name} <span style="color:#888;font-weight:400;font-size:12px;">(Number)</span></div>
+                    <div class="attr-restrict-block-title">${displayLabel} <span style="color:#888;font-weight:400;font-size:12px;">(Number)</span></div>
+                    ${descHtml}
                     <div class="attr-restrict-row">
                         <div class="form-group">
                             <label>Range Min</label>
@@ -2247,8 +2405,10 @@ VALIDATION_INFO
                 const selectEl = options.length
                     ? `<select class="ar-option-select">${optHtml}</select>`
                     : '<span style="color:#aaa;font-size:12px;">No options defined for this attribute</span>';
+                const descHtml = a.description ? `<div class="attr-restrict-block-desc">${a.description}</div>` : '';
                 return `<div class="attr-restrict-block" data-attr-id="${a.id}" data-override-id="${ov?.id || ''}" data-type="Dropdown">
-                    <div class="attr-restrict-block-title">${a.name} <span style="color:#888;font-weight:400;font-size:12px;">(Dropdown)</span></div>
+                    <div class="attr-restrict-block-title">${displayLabel} <span style="color:#888;font-weight:400;font-size:12px;">(Dropdown)</span></div>
+                    ${descHtml}
                     <div class="attr-restrict-options">
                         <label>Restrict to Option <span style="color:#aaa;font-size:11px;font-weight:400;">(leave "No restriction" to allow all)</span></label>
                         ${selectEl}
@@ -2266,6 +2426,7 @@ VALIDATION_INFO
         const paChips = allLinkedAttrs.length ? allLinkedAttrs.map(a => {
             const pa    = paRecords.find(r => (r.attribute_id || r.attributeId) === a.id);
             const paId  = pa?.id || '';
+            const displayLabel = pa?.custom_label || pa?.customLabel || a.name;
             const typeR = a.type__r || '';
             const chipClass = (typeR === 'Number' || typeR === 'Numerical') ? 'type-number'
                             : (typeR === 'Dropdown' || typeR === 'Picklist') ? 'type-dropdown'
@@ -2274,7 +2435,7 @@ VALIDATION_INFO
                             : (typeR === 'Dropdown' || typeR === 'Picklist') ? 'Dropdown'
                             : (typeR || 'Text');
             return `<span class="pa-chip ${chipClass}" data-attr-id="${a.id}" data-pa-id="${paId}">
-                ${a.name} <span style="opacity:.55;font-size:10px;font-weight:500;">(${typeBadge})</span>
+                ${displayLabel} <span style="opacity:.55;font-size:10px;font-weight:500;">(${typeBadge})</span>
                 <button class="pa-chip-del" onclick="removeProductAttrFromModal('${paId}','${a.id}')" title="Remove">×</button>
             </span>`;
         }).join('') : '<span class="pa-empty-hint">No attributes linked yet.</span>';
@@ -2752,6 +2913,20 @@ VALIDATION_INFO
             populateAttributeDropdowns();
             // Pre-fetch options for all Dropdown attributes
             loadAllAttributeOptions();
+            // Load all product-attribute associations for count display
+            loadAllProductAttributeAssociations();
+        }
+    }
+
+    async function loadAllProductAttributeAssociations() {
+        try {
+            const data = await apiCall('GET', `${API.attributes}/product-attributes`);
+            if (data) {
+                state.productAttributes = extractData(data).data || [];
+                renderAttributeTable(); // Re-render to update counts
+            }
+        } catch (e) {
+            console.warn('Could not load product attribute associations:', e);
         }
     }
 
@@ -2760,6 +2935,7 @@ VALIDATION_INFO
         // Load for any attribute that could be a dropdown — match by type__r OR type UUID
         const dropdownAttrs = state.attributes.filter(a =>
             a.type__r === 'Picklist' ||
+            a.type__r === 'Dropdown' ||
             a.type === ATTRIBUTE_TYPE_IDS.Dropdown ||
             String(a.type) === ATTRIBUTE_TYPE_IDS.Dropdown
         );
@@ -2775,16 +2951,18 @@ VALIDATION_INFO
         renderAttributeTable();
     }
 
-    // Dropdown = Picklist UUID, Number = Numerical UUID
+    // Dropdown = Picklist UUID, Number = Numerical UUID, Boolean
     const ATTRIBUTE_TYPE_IDS = {
         Dropdown: 'a1b2c3d4-e5f6-4789-abcd-111111111111',
-        Number:   'b2c3d4e5-f6a7-4890-bcde-222222222222'
+        Number:   'b2c3d4e5-f6a7-4890-bcde-222222222222',
+        Boolean:  'c3d4e5f6-a7b8-4901-cdef-333333333333'
     };
     // Map backend label → display label
     function attrTypeDisplay(type__r) {
         if (!type__r) return '–';
         if (type__r === 'Picklist') return 'Dropdown';
         if (type__r === 'Numerical') return 'Number';
+        if (type__r === 'Boolean') return 'Boolean';
         return type__r;
     }
 
@@ -2801,14 +2979,18 @@ VALIDATION_INFO
             const isDropdown = displayType === 'Dropdown';
             const isNumber   = displayType === 'Number';
 
-            // Type badge — Dropdown is dark filled, Number is plain gray
+            // Type badge — Dropdown is dark filled, Number is plain gray, Boolean is blue
             const typeBadge = displayType === 'Dropdown'
                 ? `<span style="background:#1a1a2e;color:white;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">Dropdown</span>`
                 : displayType === 'Number'
                 ? `<span style="background:#f0f0f0;color:#444;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">Number</span>`
+                : displayType === 'Boolean'
+                ? `<span style="background:#e3f2fd;color:#1565c0;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">Boolean</span>`
                 : displayType
                 ? `<span style="background:#f0f0f0;color:#444;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:500;">${displayType}</span>`
                 : '';
+
+            const isBoolean = displayType === 'Boolean';
 
             // Details
             let detail = '–';
@@ -2829,6 +3011,8 @@ VALIDATION_INFO
                 const minStr = minV != null ? minV : '0';
                 const maxStr = maxV != null ? maxV : '∞';
                 detail = `${minStr} to ${maxStr}`;
+            } else if (isBoolean) {
+                detail = 'True / False';
             }
 
             // Assigned products count from cached product attributes
@@ -2838,17 +3022,23 @@ VALIDATION_INFO
             // Label comes from description field
             const label = a.description || a.name || '–';
 
+            // Audit info
+            const createdBy = a.created_by__r || a.createdByName || '–';
+            const updatedAt = a.updated_at ? new Date(a.updated_at).toLocaleDateString() : '–';
+
             return `<tr>
             <td style="font-size:13px;font-weight:500;color:#1a1a2e;">${a.name || ''}</td>
             <td style="font-size:13px;color:#1a1a2e;">${label}</td>
             <td>${typeBadge}</td>
             <td style="font-size:13px;color:#444;">${detail}</td>
             <td><span style="font-size:13px;font-weight:600;color:#1a1a2e;">${assignedCount} product${assignedCount !== 1 ? 's' : ''}</span></td>
+            <td style="font-size:12px;color:#666;">${createdBy}</td>
+            <td style="font-size:12px;color:#666;">${updatedAt}</td>
             <td class="actions-cell" style="white-space:nowrap;">
                 <button class="btn btn-sm btn-outline" style="padding:4px 8px;border:none;background:none;color:#555;" onclick="editAttribute('${a.id}')" title="Edit">&#9998;</button>
                 <button class="btn btn-sm btn-danger" style="padding:4px 8px;border:none;background:none;color:#e53935;" onclick="deleteAttribute('${a.id}')" title="Delete">&#128465;</button>
             </td></tr>`;
-        }).join('') : '<tr><td colspan="6" class="empty-state">No attributes found</td></tr>';
+        }).join('') : '<tr><td colspan="8" class="empty-state">No attributes found</td></tr>';
 
         const pg = state.pagination.attributes;
         if ($('attrPageInfo')) {
@@ -2910,10 +3100,15 @@ VALIDATION_INFO
         const typeId = $('modalAttrType')?.value;
         const isDropdown = typeId === ATTRIBUTE_TYPE_IDS.Dropdown;
         const isNumber   = typeId === ATTRIBUTE_TYPE_IDS.Number;
+        const isBoolean  = typeId === ATTRIBUTE_TYPE_IDS.Boolean;
         const optSection = $('attrOptionsSection');
         const numSection = $('attrNumberSection');
+        const boolSection = $('attrBooleanSection');
+        const defaultSection = $('attrDefaultSection');
         if (optSection) optSection.style.display = isDropdown ? 'block' : 'none';
         if (numSection) numSection.style.display = isNumber   ? 'block' : 'none';
+        if (boolSection) boolSection.style.display = isBoolean ? 'block' : 'none';
+        if (defaultSection) defaultSection.style.display = isBoolean ? 'none' : 'block';
         const lbl = $('modalAttrDefaultLabel');
         const inp = $('modalAttrDefault');
         if (lbl) lbl.textContent = isDropdown ? 'Default Value (key)' : 'Default Value';
@@ -2923,10 +3118,49 @@ VALIDATION_INFO
     function addOptionPairRow(key = '', label = '') {
         const row = document.createElement('div');
         row.className = 'option-pair-row';
+        row.draggable = true;
         row.innerHTML = `
+            <span class="drag-handle" title="Drag to reorder">&#9776;</span>
             <input type="text" placeholder="Key (stored value)" value="${key}" class="attr-opt-key">
             <input type="text" placeholder="Label (display)" value="${label}" class="attr-opt-label">
             <button type="button" class="option-remove-btn" onclick="this.closest('.option-pair-row').remove()">&times;</button>`;
+
+        // Drag events
+        row.addEventListener('dragstart', (e) => {
+            row.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        row.addEventListener('dragend', () => {
+            row.classList.remove('dragging');
+            document.querySelectorAll('.option-pair-row').forEach(r => r.classList.remove('drag-over'));
+        });
+        row.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const dragging = document.querySelector('.option-pair-row.dragging');
+            if (dragging && dragging !== row) {
+                row.classList.add('drag-over');
+            }
+        });
+        row.addEventListener('dragleave', () => {
+            row.classList.remove('drag-over');
+        });
+        row.addEventListener('drop', (e) => {
+            e.preventDefault();
+            row.classList.remove('drag-over');
+            const dragging = document.querySelector('.option-pair-row.dragging');
+            if (dragging && dragging !== row) {
+                const container = $('attrOptionPairs');
+                const allRows = [...container.querySelectorAll('.option-pair-row')];
+                const fromIndex = allRows.indexOf(dragging);
+                const toIndex = allRows.indexOf(row);
+                if (fromIndex < toIndex) {
+                    row.after(dragging);
+                } else {
+                    row.before(dragging);
+                }
+            }
+        });
+
         $('attrOptionPairs').appendChild(row);
     }
 
@@ -2939,6 +3173,7 @@ VALIDATION_INFO
         const currentTypeId = attr?.type || '';
         const isDropdown = currentTypeId === ATTRIBUTE_TYPE_IDS.Dropdown;
         const isNumber   = currentTypeId === ATTRIBUTE_TYPE_IDS.Number;
+        const isBoolean  = currentTypeId === ATTRIBUTE_TYPE_IDS.Boolean;
 
         const typeOpts = [
             `<option value="">Select type…</option>`,
@@ -2978,15 +3213,36 @@ VALIDATION_INFO
                     </div>
                 </div>
             </div>
-            <div class="form-group" style="margin-top:12px;">
+            <div id="attrBooleanSection" style="display:${isBoolean ? 'block' : 'none'}">
+                <div class="form-group">
+                    <label style="font-size:13px;font-weight:500;color:#555;">Default Value</label>
+                    <select id="modalAttrBoolDefault">
+                        <option value="" ${!attr?.default_value ? 'selected' : ''}>No default</option>
+                        <option value="true" ${attr?.default_value === 'true' ? 'selected' : ''}>True</option>
+                        <option value="false" ${attr?.default_value === 'false' ? 'selected' : ''}>False</option>
+                    </select>
+                </div>
+            </div>
+            <div id="attrDefaultSection" class="form-group" style="margin-top:12px;display:${isBoolean ? 'none' : 'block'};">
                 <label style="font-size:13px;font-weight:500;color:#555;" id="modalAttrDefaultLabel">${isDropdown ? 'Default Value (key)' : 'Default Value'}</label>
                 <input type="text" id="modalAttrDefault" placeholder="${isDropdown ? 'Optional default key' : 'Optional'}" value="${attr?.default_value || ''}">
-            </div>`;
+            </div>
+            ${attr?.id ? `
+            <div class="audit-info" style="margin-top:20px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:12px;color:#666;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div><strong>Created:</strong> ${attr.created_at ? new Date(attr.created_at).toLocaleString() : '–'}</div>
+                    <div><strong>Created By:</strong> ${attr.created_by__r || attr.createdByName || '–'}</div>
+                    <div><strong>Updated:</strong> ${attr.updated_at ? new Date(attr.updated_at).toLocaleString() : '–'}</div>
+                    <div><strong>Updated By:</strong> ${attr.updated_by__r || attr.updatedByName || '–'}</div>
+                </div>
+            </div>` : ''}`;
 
         // Pre-load existing options for edit mode
         if (attr?.id) {
             const optData = await apiCall('GET', `${API.attributes}/${attr.id}/options`);
-            const opts = optData ? extractData(optData).data : [];
+            let opts = optData ? extractData(optData).data : [];
+            // Sort by sort_order so they appear in correct order
+            opts.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
             // Cache for table display
             if (!state.attrOptionsCache) state.attrOptionsCache = {};
             state.attrOptionsCache[attr.id] = opts;
@@ -3002,7 +3258,14 @@ VALIDATION_INFO
         const name = $('modalAttrName').value.trim();
         const description = $('modalAttrLabel').value.trim() || null;
         const typeId = $('modalAttrType').value || null;
-        const defaultValue = $('modalAttrDefault').value.trim() || null;
+
+        // Handle default value based on type
+        let defaultValue = null;
+        if (typeId === ATTRIBUTE_TYPE_IDS.Boolean) {
+            defaultValue = $('modalAttrBoolDefault')?.value || null;
+        } else {
+            defaultValue = $('modalAttrDefault').value.trim() || null;
+        }
 
         if (!name) return showToast('Name required', 'error');
 
@@ -3030,7 +3293,7 @@ VALIDATION_INFO
                 await Promise.all(existing.map(o => apiCall('DELETE', `${API.attributes}/${attrId}/options/${o.id}`)));
             }
 
-            // Create new options
+            // Create new options - sort_order is based on DOM position
             let sortOrder = 1;
             for (const row of pairRows) {
                 const key = row.querySelector('.attr-opt-key').value.trim();
@@ -3150,7 +3413,6 @@ VALIDATION_INFO
         state.selectedBundleId = bundleId;
         document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-        document.querySelector('[data-page="bundle-features"]')?.classList.add('active');
         $('page-bundle-features').classList.add('active');
         $('featureBundleSelect').value = bundleId;
         selectBundleForFeatures();
@@ -3159,7 +3421,7 @@ VALIDATION_INFO
     // ============= Bundle Features =============
     function selectBundleForFeatures() {
         const bundleId = $('featureBundleSelect').value;
-        if (!bundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="6" class="empty-state">Select bundle</td></tr>'; return; }
+        if (!bundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="7" class="empty-state">Select bundle</td></tr>'; return; }
         state.selectedBundleId = bundleId;
         const bundle = state.bundles.find(b => b.id === bundleId);
         $('selectedBundleLabel').textContent = bundle ? `Selected: ${bundle.label}` : '';
@@ -3167,21 +3429,110 @@ VALIDATION_INFO
     }
 
     async function loadBundleFeatures() {
-        if (!state.selectedBundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="6" class="empty-state">Select bundle</td></tr>'; return; }
+        if (!state.selectedBundleId) { $('bundleFeatureTable').innerHTML = '<tr><td colspan="7" class="empty-state">Select bundle</td></tr>'; return; }
         const data = await apiCall('GET', `${API.bundles}/${state.selectedBundleId}/features`);
         if (data) { state.features = extractData(data).data; renderFeatureTable(); populateFeatureDropdowns(); }
     }
 
     function renderFeatureTable() {
-        $('bundleFeatureTable').innerHTML = state.features.length ? state.features.map(f => {
+        const tbody = $('bundleFeatureTable');
+        tbody.innerHTML = '';
+
+        if (!state.features.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No features</td></tr>';
+            return;
+        }
+
+        // Sort by sort_order
+        const sortedFeatures = [...state.features].sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999));
+
+        sortedFeatures.forEach(f => {
             const minO = f.min_qty ?? f.minOptions ?? f.min_options ?? 0;
             const maxO = f.max_qty ?? f.maxOptions ?? f.max_options ?? 0;
             const isReq = f.is_required || f.isRequired || f.required;
-            return `<tr><td><strong>${f.label || ''}</strong></td><td>${f.description || '-'}</td><td>${minO}</td><td>${maxO}</td><td>${isReq ? 'Yes' : '-'}</td>
-            <td class="actions-cell"><button class="btn btn-sm btn-info" onclick="manageFeatureProducts('${f.id}')">Products</button>
-            <button class="btn btn-sm btn-warning" onclick="editFeature('${f.id}')">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteFeature('${f.id}')">Delete</button></td></tr>`;
-        }).join('') : '<tr><td colspan="6" class="empty-state">No features</td></tr>';
+
+            const row = document.createElement('tr');
+            row.className = 'feature-drag-row';
+            row.draggable = true;
+            row.dataset.featureId = f.id;
+            row.innerHTML = `
+                <td><span class="drag-handle" title="Drag to reorder">&#9776;</span></td>
+                <td><strong>${f.label || ''}</strong></td>
+                <td>${f.description || '-'}</td>
+                <td>${minO}</td>
+                <td>${maxO}</td>
+                <td>${isReq ? 'Yes' : '-'}</td>
+                <td class="actions-cell">
+                    <button class="btn btn-sm btn-info" onclick="manageFeatureProducts('${f.id}')">Products</button>
+                    <button class="btn btn-sm btn-warning" onclick="editFeature('${f.id}')">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteFeature('${f.id}')">Delete</button>
+                </td>`;
+
+            // Drag events
+            row.addEventListener('dragstart', (e) => {
+                row.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', f.id);
+            });
+            row.addEventListener('dragend', () => {
+                row.classList.remove('dragging');
+                document.querySelectorAll('.feature-drag-row').forEach(r => r.classList.remove('drag-over'));
+            });
+            row.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const dragging = document.querySelector('.feature-drag-row.dragging');
+                if (dragging && dragging !== row) {
+                    row.classList.add('drag-over');
+                }
+            });
+            row.addEventListener('dragleave', () => {
+                row.classList.remove('drag-over');
+            });
+            row.addEventListener('drop', (e) => {
+                e.preventDefault();
+                row.classList.remove('drag-over');
+                const dragging = document.querySelector('.feature-drag-row.dragging');
+                if (dragging && dragging !== row) {
+                    const allRows = [...tbody.querySelectorAll('.feature-drag-row')];
+                    const fromIndex = allRows.indexOf(dragging);
+                    const toIndex = allRows.indexOf(row);
+                    if (fromIndex < toIndex) {
+                        row.after(dragging);
+                    } else {
+                        row.before(dragging);
+                    }
+                    // Save new order
+                    saveFeatureSortOrder();
+                }
+            });
+
+            tbody.appendChild(row);
+        });
+    }
+
+    async function saveFeatureSortOrder() {
+        const rows = [...$('bundleFeatureTable').querySelectorAll('.feature-drag-row')];
+        const updates = rows.map((row, index) => ({
+            id: row.dataset.featureId,
+            sort_order: index + 1
+        }));
+
+        // Update each feature's sort_order
+        for (const update of updates) {
+            const feature = state.features.find(f => f.id === update.id);
+            if (feature && feature.sort_order !== update.sort_order) {
+                await apiCall('PUT', `${API.bundles}/${state.selectedBundleId}/features/${update.id}`, {
+                    label: feature.label,
+                    description: feature.description,
+                    is_required: feature.is_required || feature.isRequired || feature.required,
+                    min_qty: feature.min_qty ?? feature.minOptions ?? feature.min_options ?? 0,
+                    max_qty: feature.max_qty ?? feature.maxOptions ?? feature.max_options ?? 0,
+                    sort_order: update.sort_order
+                });
+                feature.sort_order = update.sort_order;
+            }
+        }
+        showToast('Feature order updated', 'success');
     }
 
     function populateFeatureDropdowns() {
@@ -3375,7 +3726,6 @@ VALIDATION_INFO
         state.selectedFeatureId = featureId;
         document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-        document.querySelector('[data-page="feature-products"]')?.classList.add('active');
         $('page-feature-products').classList.add('active');
         $('fpBundleSelect').value = state.selectedBundleId;
         onFPBundleChange();
@@ -3556,42 +3906,6 @@ VALIDATION_INFO
     }
     async function deleteConstraint(id) { if (confirm('Delete this constraint?')) { const r = await apiCall('DELETE', `${API.constraints}/${id}`); if (r) { showToast('Constraint deleted', 'success'); loadConstraintRules(); } } }
 
-    // ============= Evaluate =============
-    async function evaluateConstraints() {
-        const bundleId = $('evalBundleId').value;
-        if (!bundleId) return showToast('Select bundle', 'error');
-        let request;
-        try { request = JSON.parse($('evalSelections').value || '{"selections": []}'); } catch (e) { return showToast('Invalid JSON', 'error'); }
-        const data = await apiCall('POST', `${API.bundles}/${bundleId}/evaluate`, request);
-        const result = $('evalResult');
-        if (data?.data) {
-            let html = `<strong>Valid:</strong> ${data.data.valid ? '<span style="color:#28a745">YES</span>' : '<span style="color:#dc3545">NO</span>'}\n\n`;
-            if (data.data.violations?.length) { html += `<strong style="color:#dc3545;">Violations:</strong>\n`; data.data.violations.forEach(v => { html += `  - ${v.ruleName}: ${v.message}\n`; }); html += '\n'; }
-            if (data.data.actions?.length) { html += `<strong style="color:#17a2b8;">Actions:</strong>\n`; data.data.actions.forEach(a => { html += `  - ${a.ruleName}: ${a.actionType}\n`; }); }
-            if (!data.data.violations?.length && !data.data.actions?.length) html += '<span style="color:#28a745">No violations.</span>';
-            result.innerHTML = html;
-        } else { result.textContent = JSON.stringify(data, null, 2); }
-    }
-
-    async function generateSampleSelection() {
-        const bundleId = $('evalBundleId').value;
-        if (!bundleId) return showToast('Select bundle', 'error');
-        const featuresData = await apiCall('GET', `${API.bundles}/${bundleId}/features`);
-        if (!featuresData) return;
-        const features = extractData(featuresData).data;
-        const selections = [];
-        for (const f of features) {
-            const productsData = await apiCall('GET', `${API.bundles}/${bundleId}/features/${f.id}/products`);
-            const products = extractData(productsData).data;
-            if (products.length) {
-                const defaultProd = products.find(p => p.isDefault || p.is_default) || products[0];
-                selections.push({ featureId: f.id, productId: defaultProd.productId || defaultProd.product_id, quantity: 1, attributes: {} });
-            }
-        }
-        $('evalSelections').value = JSON.stringify({ selections }, null, 2);
-        showToast('Sample generated');
-    }
-
     // ============= Cost Matrices =============
     const cmState = {
         matrices: [],           // all COST type matrices (PricingMatrixWrapper)
@@ -3632,19 +3946,28 @@ VALIDATION_INFO
             (state.products || []).map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${p.label || p.name} (${p.sku || ''})</option>`).join('');
     }
     function _cmAttrOpts(selected, productId) {
-        // Show numeric attributes linked to this product
-        let attrs = productId ? (cmState.productAttributes[productId] || []) : [];
+        const attrs = productId ? (cmState.productAttributes[productId] || []) : [];
         const numericAttrs = attrs.filter(a => {
             const t = (a.type__r || '').toLowerCase();
             return t.includes('number') || t.includes('numer') || t === '';
         });
-        // Fall back to all global number attributes if none found
+        // Fall back to all global numeric attributes if none linked to the product
         const display = numericAttrs.length ? numericAttrs : (state.attributes || []).filter(a => {
             const t = (a.type__r || a.type || '').toLowerCase();
             return t.includes('number') || t.includes('numer');
         });
-        return `<option value="">— None —</option>` +
-            display.map(a => `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`).join('');
+        const opts = display.map(a =>
+            `<option value="${a.id}" ${String(a.id) === String(selected) ? 'selected' : ''}>${a.label || a.name}</option>`
+        ).join('');
+        // If selected UUID isn't in the display list, inject a resolved fallback option
+        const found = selected && display.some(a => String(a.id) === String(selected));
+        const fallback = (selected && !found) ? (() => {
+            const g = (state.attributes || []).find(a => String(a.id) === String(selected));
+            const p = attrs.find(a => String(a.id) === String(selected) || String(a.paId) === String(selected));
+            const lbl = g?.label || g?.name || p?.label || p?.name || selected;
+            return `<option value="${selected}" selected>${lbl}</option>`;
+        })() : '';
+        return `<option value="">— None —</option>` + fallback + opts;
     }
 
     function _cmAllAttrOpts(productId) {
@@ -3709,13 +4032,12 @@ VALIDATION_INFO
         const matrix = cmState.matrices.find(m => m.id === id);
         if (!matrix) return;
         cmState.currentMatrix = matrix;
-        // Load entries
+        cmState.productAttributes = {}; // clear cache so re-load picks up fresh state.attributes
         const res = await apiCall('GET', `${API.pricingMatrices}/${id}/entries`);
         if (!res) return;
         const raw = extractData(res);
         cmState.entries = Array.isArray(raw) ? raw : (raw.data || []);
         cmState.entryCounts[id] = cmState.entries.length;
-        // Load product attributes for all products in entries (for Qty Attr + Conditions dropdowns)
         await _cmLoadProductAttrs(cmState.entries);
         renderCostMatrixDetail();
     }
@@ -3730,12 +4052,18 @@ VALIDATION_INFO
                     const raw = extractData(r);
                     // Each item has {id, attribute_id, attribute: {id, label, type__r, ...}}
                     const list = Array.isArray(raw) ? raw : (raw.data || []);
-                    cmState.productAttributes[pid] = list.map(pa => ({
-                        id: pa.attribute_id || pa.attributeId || pa.id,
-                        paId: pa.id,
-                        label: pa.attribute?.label || pa.label || pa.name || pa.id,
-                        type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType || ''
-                    }));
+                    cmState.productAttributes[pid] = list.map(pa => {
+                        const attrId = pa.attribute_id || pa.attributeId || pa.id;
+                        const globalAttr = (state.attributes || []).find(a => String(a.id) === String(attrId));
+                        return {
+                            id: attrId,
+                            paId: pa.id,
+                            label: pa.attribute?.label || pa.label || pa.name
+                                   || globalAttr?.label || globalAttr?.name || attrId,
+                            type__r: pa.attribute?.type__r || pa.type__r || pa.attributeType
+                                     || globalAttr?.type__r || globalAttr?.type || ''
+                        };
+                    });
                 }
             } catch(e) { cmState.productAttributes[pid] = []; }
         }));
@@ -3847,7 +4175,10 @@ VALIDATION_INFO
 
     function _cmProductIsDynamic(productId) {
         const p = state.products.find(x => x.id === productId);
-        return p && (p.productType__r === 'Dynamic' || p.type__r === 'Dynamic' || p.type === 'Dynamic');
+        if (!p) return false;
+        const label = p.product_type__r || p.productType__r || p.type__r || p.type || '';
+        const raw   = String(p.product_type || p.productType || '');
+        return label === 'Dynamic' || raw === 'd4e5f6a7-b2c3-5901-cdef-234567890123';
     }
     function _cmAttrLabel(attrId) {
         // Check cmState.productAttributes across all products first
@@ -4157,6 +4488,7 @@ VALIDATION_INFO
         const matrix = pmState.matrices.find(m => m.id === id);
         if (!matrix) return;
         pmState.currentMatrix = matrix;
+        pmState.productAttributes = {}; // clear cache so re-load picks up fresh state.attributes
         const res = await apiCall('GET', `${API.pricingMatrices}/${id}/entries`);
         if (!res) return;
         const raw = extractData(res);
@@ -4274,7 +4606,10 @@ VALIDATION_INFO
     }
     function _pmProductIsDynamic(productId) {
         const p = state.products.find(x => x.id === productId);
-        return p && (p.productType__r === 'Dynamic' || p.type__r === 'Dynamic' || p.type === 'Dynamic');
+        if (!p) return false;
+        const label = p.product_type__r || p.productType__r || p.type__r || p.type || '';
+        const raw   = String(p.product_type || p.productType || '');
+        return label === 'Dynamic' || raw === 'd4e5f6a7-b2c3-5901-cdef-234567890123';
     }
     function _pmCondCount(entry) {
         try {
@@ -4519,8 +4854,10 @@ VALIDATION_INFO
     function openModal() { $('modalOverlay').classList.add('active'); }
     function closeModal() { $('modalOverlay').classList.remove('active'); $('modalBox').className = 'modal'; state.currentModal = null; }
     function saveModal() {
-        if (!state.currentModal) return;
-        switch (state.currentModal.type) {
+        // Support both state.currentModal.type (older pattern) and modalSaveBtn.dataset.type (newer pattern)
+        const type = state.currentModal?.type || $('modalSaveBtn')?.dataset?.type;
+        if (!type) return;
+        switch (type) {
             case 'family': saveFamily(); break;
             case 'line': saveLine(); break;
             case 'product': saveProduct(); break;
@@ -4536,8 +4873,13 @@ VALIDATION_INFO
             case 'costMatrix': saveCostMatrix(); break;
             case 'priceMatrix': savePriceMatrix(); break;
             case 'account': saveAccount(); break;
+            case 'accountProjectDetail': saveAccountProjectDetail(); break;
+            case 'accountProjectForAccount': saveAccountProjectForAccount(); break;
+            case 'accountAddress': saveAccountAddress(); break;
+            case 'contact': saveContact(); break;
             case 'quote': saveQuote(); break;
             case 'segment': saveSegment(); break;
+            case 'supplierAddress': saveSupplierAddress(); break;
         }
     }
 
@@ -4858,7 +5200,14 @@ VALIDATION_INFO
     ];
     const ACCOUNT_TYPES = ['EC', 'SMB', 'Partner', 'Government', 'Internal'];
 
-    let acState = { accounts: [], currencies: [] };
+    let acState = {
+        accounts: [], currencies: [],
+        currentAccountId: null, currentAccount: null,
+        currentQuotes: [], currentAddresses: [],
+        currentProjects: [], currentContacts: [],
+        expandedProjectIds: new Set()
+    };
+    let saState = { addresses: [] };
 
     function _acNetTermLabel(id) { if (!id) return '—'; const t = NET_TERMS.find(x => x.id === String(id)); return t ? t.label : String(id).slice(0,8); }
     function _acBillingFreqLabel(id) { if (!id) return '—'; const f = BILLING_FREQS.find(x => x.id === String(id)); return f ? f.label : String(id).slice(0,8); }
@@ -4876,7 +5225,7 @@ VALIDATION_INFO
     }
     function _acAccountOpts(sel, excludeId) {
         let opts = `<option value="">None</option>`;
-        opts += acState.accounts.filter(a => !excludeId || String(a.id) !== String(excludeId)).map(a => { const d = a.data||{}; const label = d.name||d.number||String(a.id).slice(0,8); return `<option value="${a.id}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
+        opts += acState.accounts.filter(a => !excludeId || String(a.id) !== String(excludeId)).map(a => { const label = a.name||a.number||String(a.id).slice(0,8); return `<option value="${a.id}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
         return opts;
     }
 
@@ -4887,7 +5236,7 @@ VALIDATION_INFO
         const tbody = $('accountTableBody');
         tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>';
         try {
-            const res = await apiCall('GET', API.accounts + '?page=0&size=100');
+            const res = await apiCall('GET', API.accountDetails + '?page=0&size=100');
             if (!res) return;
             const page = res.data || res;
             const content = page.content || page;
@@ -4902,25 +5251,28 @@ VALIDATION_INFO
         const tbody = $('accountTableBody');
         if (!acState.accounts.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px;">No accounts yet.</td></tr>'; return; }
         tbody.innerHTML = acState.accounts.map(a => {
-            const d = a.data||{};
-            const isVerified = d.is_verified === true || d.is_verified === 'true';
+            const isVerified = a.is_verified === true || a.is_verified === 'true';
             const verifiedIcon = isVerified
                 ? `<span class="ac-verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>`
                 : `<span class="ac-unverified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>`;
+            const billingFreqLabel = a['billing_frequency__r'] || _acBillingFreqLabel(a.billing_frequency);
+            const netTermLabel     = a['net_term__r']          || _acNetTermLabel(a.net_term);
+            const currencyLabel    = a['currency__r']          || _acCurrencyLabel(a.currency);
             return `<tr>
-                <td style="font-weight:500;font-family:monospace;">${d.number||'—'}</td>
-                <td>${d.name||'—'}</td>
-                <td><span class="badge badge-secondary">${d.type||'—'}</span></td>
-                <td>${d.owner||'—'}</td>
-                <td>${_acBillingFreqLabel(d.billing_frequency)}</td>
-                <td>${_acNetTermLabel(d.net_term)}</td>
-                <td style="color:#777;font-size:12px;">${d.last_bill_date||'—'}</td>
-                <td style="color:#777;font-size:12px;">${d.next_bill_date||'—'}</td>
+                <td style="font-weight:500;font-family:monospace;">${a.number||'—'}</td>
+                <td><a href="#" onclick="event.preventDefault();viewAccount('${a.id}')" style="color:#0052cc;font-weight:500;text-decoration:none;">${a.name||'—'}</a></td>
+                <td><span class="badge badge-secondary">${a.type||'—'}</span></td>
+                <td>${a.owner||'—'}</td>
+                <td>${billingFreqLabel||'—'}</td>
+                <td>${netTermLabel||'—'}</td>
+                <td style="color:#777;font-size:12px;">${a.last_bill_date||'—'}</td>
+                <td style="color:#777;font-size:12px;">${a.next_bill_date||'—'}</td>
                 <td style="text-align:center;">${verifiedIcon}</td>
-                <td><span style="font-weight:500;">${_acCurrencyLabel(d.default_currency_id)}</span></td>
+                <td><span style="font-weight:500;">${currencyLabel||'—'}</span></td>
                 <td>
-                    <button class="btn btn-sm btn-outline" onclick="showAccountModal('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteAccount('${a.id}')" style="margin-left:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+                    <button class="btn btn-sm btn-outline" title="View" onclick="viewAccount('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="btn btn-sm btn-outline" title="Edit" onclick="showAccountModal('${a.id}')" style="margin-left:2px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="btn btn-sm btn-danger" title="Delete" onclick="deleteAccount('${a.id}')" style="margin-left:2px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
                 </td>
             </tr>`;
         }).join('');
@@ -4928,7 +5280,7 @@ VALIDATION_INFO
 
     async function showAccountModal(accountId) {
         let d = {};
-        if (accountId) { const found = acState.accounts.find(a => String(a.id)===String(accountId)); d = found ? (found.data||{}) : {}; }
+        if (accountId) { const found = acState.accounts.find(a => String(a.id)===String(accountId)); d = found || {}; }
         $('modalTitle').textContent = accountId ? 'Edit Account' : 'Add Account';
         $('modalBody').innerHTML = `
             <div class="ac-modal-form">
@@ -4937,12 +5289,12 @@ VALIDATION_INFO
                 <div class="form-group full-width"><label>Description</label><textarea id="acDescription" placeholder="Description">${d.description||''}</textarea></div>
                 <div class="form-group"><label>Type</label><select id="acType"><option value="">Select type</option>${ACCOUNT_TYPES.map(t=>`<option value="${t}" ${d.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
                 <div class="form-group"><label>Owner</label><input id="acOwner" type="text" placeholder="Account owner" value="${d.owner||''}"></div>
-                <div class="form-group"><label>Parent Account</label><select id="acParent">${_acAccountOpts(d.parent_id, accountId)}</select></div>
+                <div class="form-group"><label>Parent Account</label><select id="acParent">${_acAccountOpts(d.parent_account, accountId)}</select></div>
                 <div class="form-group"><label>Billing Frequency</label><select id="acBillingFreq"><option value="">Select frequency</option>${_acBillingFreqOpts(d.billing_frequency)}</select></div>
                 <div class="form-group"><label>Net Term</label><select id="acNetTerm"><option value="">Select net term</option>${_acNetTermOpts(d.net_term)}</select></div>
                 <div class="form-group"><label>Last Bill Date</label><input id="acLastBill" type="date" value="${d.last_bill_date||''}"></div>
                 <div class="form-group"><label>Next Bill Date</label><input id="acNextBill" type="date" value="${d.next_bill_date||''}"></div>
-                <div class="form-group"><label>Currency</label><select id="acCurrency"><option value="">Select currency</option>${_acCurrencyOpts(d.default_currency_id)}</select></div>
+                <div class="form-group"><label>Currency</label><select id="acCurrency"><option value="">Select currency</option>${_acCurrencyOpts(d.currency)}</select></div>
                 <div class="form-group"><label>Price Matrix</label><select id="acPriceMatrix"><option value="">None (use global)</option></select></div>
                 <div class="form-group full-width"><div class="ac-checkbox-row"><input type="checkbox" id="acVerified" ${d.is_verified===true||d.is_verified==='true'?'checked':''}><label for="acVerified">Is Verified</label></div></div>
             </div>`;
@@ -4956,11 +5308,11 @@ VALIDATION_INFO
         if (!modal || modal.type !== 'account') return;
         const name = $('acName')?.value?.trim();
         if (!name) { showToast('Account name is required', 'error'); return; }
-        const payload = { number: $('acNumber')?.value?.trim()||undefined, name, description: $('acDescription')?.value?.trim()||undefined, type: $('acType')?.value||undefined, owner: $('acOwner')?.value?.trim()||undefined, parent_id: $('acParent')?.value||undefined, billing_frequency: $('acBillingFreq')?.value||undefined, net_term: $('acNetTerm')?.value||undefined, last_bill_date: $('acLastBill')?.value||undefined, next_bill_date: $('acNextBill')?.value||undefined, default_currency_id: $('acCurrency')?.value||undefined, is_verified: $('acVerified')?.checked||false };
+        const payload = { number: $('acNumber')?.value?.trim()||undefined, name, description: $('acDescription')?.value?.trim()||undefined, type: $('acType')?.value||undefined, owner: $('acOwner')?.value?.trim()||undefined, parent_account: $('acParent')?.value||undefined, billing_frequency: $('acBillingFreq')?.value||undefined, net_term: $('acNetTerm')?.value||undefined, last_bill_date: $('acLastBill')?.value||undefined, next_bill_date: $('acNextBill')?.value||undefined, currency: $('acCurrency')?.value||undefined, price_matrix_id: $('acPriceMatrix')?.value||undefined, is_verified: $('acVerified')?.checked||false };
         Object.keys(payload).forEach(k => payload[k]===undefined && delete payload[k]);
         try {
-            if (modal.id) { await apiCall('PUT', `${API.accounts}/${modal.id}`, payload); showToast('Account updated', 'success'); }
-            else { await apiCall('POST', API.accounts, payload); showToast('Account created', 'success'); }
+            if (modal.id) { await apiCall('PUT', `${API.accountDetails}/${modal.id}`, payload); showToast('Account updated', 'success'); }
+            else { await apiCall('POST', API.accountDetails, payload); showToast('Account created', 'success'); }
             closeModal(); loadAccounts();
         } catch(e) { showToast('Failed to save account: ' + e.message, 'error'); }
     }
@@ -4968,7 +5320,7 @@ VALIDATION_INFO
     async function deleteAccount(accountId) {
         if (!confirm('Delete this account?')) return;
         try {
-            await apiCall('DELETE', `${API.accounts}/${accountId}`);
+            await apiCall('DELETE', `${API.accountDetails}/${accountId}`);
             showToast('Account deleted', 'success');
             acState.accounts = acState.accounts.filter(a => String(a.id)!==String(accountId));
             renderAccountsList();
@@ -4976,12 +5328,604 @@ VALIDATION_INFO
     }
 
     // ============================================================
+    // ACCOUNT DETAIL VIEW
+    // ============================================================
+    async function viewAccount(accountId) {
+        if (!acState.accounts.length) await loadAccounts();
+        const acc = acState.accounts.find(a => String(a.id) === String(accountId));
+        if (!acc) { showToast('Account not found', 'error'); return; }
+        acState.currentAccountId = accountId;
+        acState.currentAccount   = acc;
+        acState.expandedProjectIds = new Set();
+
+        $('acListView').style.display   = 'none';
+        $('acDetailView').style.display = '';
+        $('acDetailView').innerHTML     = `<div style="text-align:center;padding:60px;color:#aaa;">Loading account data…</div>`;
+
+        await Promise.allSettled([
+            _loadAccountQuotes(accountId),
+            _loadAccountAddresses(accountId),
+            _loadAccountProjects(accountId),
+            _loadAccountContacts(accountId)
+        ]);
+
+        _renderAccountDetailView();
+    }
+
+    function backToAccountList() {
+        acState.currentAccountId = null;
+        acState.currentAccount   = null;
+        $('acDetailView').style.display = 'none';
+        $('acListView').style.display   = '';
+    }
+
+    async function _loadAccountQuotes(accountId) {
+        try {
+            const res = await apiCall('GET', `${API.quotes}?page=0&size=100`);
+            const data = res?.data || res;
+            const all  = data?.content || data || [];
+            acState.currentQuotes = Array.isArray(all)
+                ? all.filter(q => String(q.accountId || q.account_id || '') === String(accountId))
+                : [];
+        } catch(e) { acState.currentQuotes = []; }
+    }
+
+    async function _loadAccountAddresses(accountId) {
+        try {
+            const res = await apiCall('GET', `${API.accountAddresses}/by-account/${accountId}`);
+            const all = res?.data || [];
+            acState.currentAddresses = Array.isArray(all) ? all : [];
+        } catch(e) { acState.currentAddresses = []; }
+    }
+
+    async function _loadAccountProjects(accountId) {
+        try {
+            const res = await apiCall('GET', `${API.accountProjects}?page=0&size=100`);
+            const data = res?.data || res;
+            const all  = data?.content || data || [];
+            acState.currentProjects = Array.isArray(all)
+                ? all.filter(p => String((p.data||{}).account_id || '') === String(accountId))
+                : [];
+        } catch(e) { acState.currentProjects = []; }
+    }
+
+    async function _loadAccountContacts(accountId) {
+        try {
+            const res = await apiCall('GET', `${API.contactDetails}/by-account/${accountId}`);
+            const data = res?.data || res;
+            acState.currentContacts = Array.isArray(data) ? data : [];
+        } catch(e) { acState.currentContacts = []; }
+    }
+
+    function _renderAccountDetailView() {
+        const acc = acState.currentAccount;
+        if (!acc) return;
+        const name     = acc.name || 'Account';
+        const subtitle = [acc.type, acc.owner].filter(Boolean).join(' · ') || acc.number || '';
+
+        $('acDetailView').innerHTML = `
+        <style>
+            .ac-detail-header{display:flex;align-items:center;gap:12px;padding:20px 0 18px;border-bottom:1px solid #e8edf2;margin-bottom:0;}
+            .ac-detail-back{background:none;border:none;cursor:pointer;color:#0052cc;display:flex;align-items:center;gap:4px;font-size:14px;font-weight:500;padding:6px 10px 6px 0;}
+            .ac-detail-back:hover{color:#003d99;}
+            .ac-detail-title{font-size:22px;font-weight:700;color:#172b4d;}
+            .ac-detail-subtitle{font-size:13px;color:#6b778c;margin-top:2px;}
+            .ac-section{margin-top:28px;}
+            .ac-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+            .ac-section-title{font-size:16px;font-weight:700;color:#172b4d;}
+            .ac-table{width:100%;border-collapse:collapse;font-size:13px;}
+            .ac-table th{padding:9px 14px;background:#f4f5f7;color:#5e6c84;font-weight:600;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #dfe1e6;}
+            .ac-table td{padding:11px 14px;border-bottom:1px solid #f0f2f5;color:#172b4d;vertical-align:middle;}
+            .ac-table tr:last-child td{border-bottom:none;}
+            .ac-table tr:hover td{background:#f8f9fc;}
+            .ac-badge-primary{background:#e3fcef;color:#006644;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+            .ac-proj-expand{background:none;border:none;cursor:pointer;color:#6b778c;padding:2px 6px;font-size:14px;transition:transform .2s;}
+            .ac-proj-expand.open{transform:rotate(90deg);}
+            .ac-po-sub{background:#fafbfc;border-bottom:1px solid #e8edf2;}
+            .ac-po-sub td{padding:8px 14px 8px 48px!important;}
+            .ac-po-label{font-size:11px;font-weight:700;text-transform:uppercase;color:#6b778c;letter-spacing:.06em;margin-bottom:6px;}
+            .ac-po-tag{display:inline-flex;align-items:center;gap:6px;background:#ebecf0;border-radius:4px;padding:3px 8px;font-size:12px;font-weight:600;color:#172b4d;margin:2px;}
+            .ac-po-add{display:flex;align-items:center;gap:6px;margin-top:8px;}
+            .ac-po-add input{border:1px solid #dfe1e6;border-radius:4px;padding:4px 8px;font-size:12px;width:120px;outline:none;}
+            .ac-po-add input:focus{border-color:#0052cc;}
+            .ac-tbl-empty{text-align:center;color:#aaa;padding:32px;font-size:13px;}
+            .ac-inline-actions{display:flex;gap:4px;align-items:center;}
+        </style>
+
+        <!-- Header -->
+        <div class="ac-detail-header">
+            <button class="ac-detail-back" onclick="backToAccountList()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
+                Back
+            </button>
+            <div>
+                <div class="ac-detail-title">${name}</div>
+                <div class="ac-detail-subtitle">${subtitle}</div>
+            </div>
+            <div style="margin-left:auto;">
+                <button class="btn btn-sm btn-outline" onclick="showAccountModal('${acc.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;margin-right:4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Account
+                </button>
+            </div>
+        </div>
+
+        <!-- Quotes -->
+        <div class="ac-section">
+            <div class="ac-section-header">
+                <div class="ac-section-title">Quotes</div>
+                <button class="btn btn-primary btn-sm" onclick="showQuoteModal(null,'${acc.id}')">+ Add Quote</button>
+            </div>
+            <table class="ac-table">
+                <thead><tr><th>Start Date</th><th>End Date</th><th>Products</th><th>Actions</th></tr></thead>
+                <tbody id="acDetailQuotes">${_renderDetailQuotes()}</tbody>
+            </table>
+        </div>
+
+        <!-- Addresses -->
+        <div class="ac-section">
+            <div class="ac-section-header">
+                <div class="ac-section-title">Addresses</div>
+                <button class="btn btn-primary btn-sm" onclick="showAccountAddressModal(null,'${acc.id}')">+ Add Address</button>
+            </div>
+            <table class="ac-table">
+                <thead><tr><th>Address Line</th><th>City</th><th>State</th><th>Zip Code</th><th>Actions</th></tr></thead>
+                <tbody id="acDetailAddresses">${_renderDetailAddresses()}</tbody>
+            </table>
+        </div>
+
+        <!-- Projects -->
+        <div class="ac-section">
+            <div class="ac-section-header">
+                <div class="ac-section-title">Projects</div>
+                <button class="btn btn-primary btn-sm" onclick="showAccountProjectForAccount('${acc.id}')">+ Add Project</button>
+            </div>
+            <table class="ac-table">
+                <thead><tr><th style="width:30px;"></th><th>Name</th><th>Description</th><th>PO Numbers</th><th>Actions</th></tr></thead>
+                <tbody id="acDetailProjects">${_renderDetailProjects()}</tbody>
+            </table>
+        </div>
+
+        <!-- Contacts -->
+        <div class="ac-section">
+            <div class="ac-section-header">
+                <div class="ac-section-title">Contacts</div>
+                <button class="btn btn-primary btn-sm" onclick="showContactModal(null,'${acc.id}')">+ Add Contact</button>
+            </div>
+            <table class="ac-table">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Primary</th><th>Actions</th></tr></thead>
+                <tbody id="acDetailContacts">${_renderDetailContacts()}</tbody>
+            </table>
+        </div>`;
+    }
+
+    function _renderDetailQuotes() {
+        if (!acState.currentQuotes.length) return `<tr><td colspan="4" class="ac-tbl-empty">No quotes yet.</td></tr>`;
+        return acState.currentQuotes.map(q => {
+            const itemCount = (q.segments||[]).reduce((s, seg) => s + (seg.items||[]).length, 0);
+            return `<tr>
+                <td>${q.startDate || '—'}</td>
+                <td>${q.endDate || '—'}</td>
+                <td>${itemCount} product${itemCount !== 1 ? 's' : ''}</td>
+                <td><div class="ac-inline-actions">
+                    <button class="btn btn-sm btn-outline" title="View" onclick="viewQuote('${q.id}');$('acDetailView').style.display='none';$('page-quotes').style.display='';">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button class="btn btn-sm btn-outline" title="Edit" onclick="showQuoteModal('${q.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="Delete" onclick="_deleteAccDetailQuote('${q.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function _renderDetailAddresses() {
+        if (!acState.currentAddresses.length) return `<tr><td colspan="5" class="ac-tbl-empty">No addresses yet.</td></tr>`;
+        return acState.currentAddresses.map(a => `<tr>
+                <td>${a.line1 || '—'}</td>
+                <td>${a.city || '—'}</td>
+                <td>${a.state || '—'}</td>
+                <td>${a.zip_code || '—'}</td>
+                <td><div class="ac-inline-actions">
+                    <button class="btn btn-sm btn-outline" onclick="showAccountAddressModal('${a.id}','${acState.currentAccountId}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="_deleteAccDetailAddress('${a.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div></td>
+            </tr>`).join('');
+    }
+
+    function _renderDetailProjects() {
+        if (!acState.currentProjects.length) return `<tr><td colspan="5" class="ac-tbl-empty">No projects yet.</td></tr>`;
+        return acState.currentProjects.map(p => {
+            const d   = p.data || {};
+            const pid = p.id;
+            const isOpen = acState.expandedProjectIds.has(String(pid));
+            const poArr  = (d.po_number || '').split(',').map(s => s.trim()).filter(Boolean);
+            const poText = poArr.length ? poArr.join(', ') : '—';
+
+            const projRow = `<tr>
+                <td>
+                    <button class="ac-proj-expand ${isOpen ? 'open' : ''}" onclick="_toggleProject('${pid}')"
+                        title="${isOpen ? 'Collapse' : 'Expand'}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </td>
+                <td><b>${d.name || '—'}</b></td>
+                <td>${d.description || '—'}</td>
+                <td style="color:#0052cc;font-size:12px;">${poText}</td>
+                <td><div class="ac-inline-actions">
+                    <button class="btn btn-sm btn-outline" onclick="_editAccountProject('${pid}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="_deleteAccDetailProject('${pid}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div></td>
+            </tr>`;
+
+            const subRow = isOpen ? `<tr class="ac-po-sub">
+                <td></td>
+                <td colspan="4">
+                    <div class="ac-po-label">Purchase Orders</div>
+                    <div id="po-tags-${pid}">
+                        ${poArr.map(po => `<span class="ac-po-tag">
+                            ${po}
+                            <button style="background:none;border:none;cursor:pointer;color:#97a0af;padding:0;line-height:1;" onclick="_removePO('${pid}','${po}')" title="Remove">×</button>
+                        </span>`).join('')}
+                    </div>
+                    <div class="ac-po-add" style="margin-top:8px;">
+                        <input id="po-input-${pid}" type="text" placeholder="Add PO #" onkeydown="if(event.key==='Enter')_addPO('${pid}')">
+                        <button class="btn btn-sm btn-primary" onclick="_addPO('${pid}')">Add</button>
+                    </div>
+                </td>
+            </tr>` : '';
+
+            return projRow + subRow;
+        }).join('');
+    }
+
+    function _renderDetailContacts() {
+        if (!acState.currentContacts.length) return `<tr><td colspan="5" class="ac-tbl-empty">No contacts yet.</td></tr>`;
+        return acState.currentContacts.map(c => {
+            const d = c.data || c;
+            const fullName = [d.title, d.first_name || d.firstName, d.last_name || d.lastName].filter(Boolean).join(' ') || '—';
+            const isPrimary = d.is_primary === true || d.is_primary === 'true' || d.isPrimary === true;
+            return `<tr>
+                <td>${fullName}</td>
+                <td>${d.email || '—'}</td>
+                <td>${d.mobile || '—'}</td>
+                <td>${isPrimary ? '<span class="ac-badge-primary">Primary</span>' : ''}</td>
+                <td><div class="ac-inline-actions">
+                    <button class="btn btn-sm btn-outline" onclick="showContactModal('${c.id}','${acState.currentAccountId}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="_deleteAccDetailContact('${c.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                </div></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ── Project expand/collapse + PO management ──────────────────
+    function _toggleProject(pid) {
+        if (acState.expandedProjectIds.has(String(pid))) acState.expandedProjectIds.delete(String(pid));
+        else acState.expandedProjectIds.add(String(pid));
+        const tbody = $('acDetailProjects');
+        if (tbody) tbody.innerHTML = _renderDetailProjects();
+    }
+
+    async function _addPO(pid) {
+        const input = $(`po-input-${pid}`);
+        const val   = (input?.value || '').trim();
+        if (!val) return;
+        const proj  = acState.currentProjects.find(p => String(p.id) === String(pid));
+        if (!proj) return;
+        const d     = proj.data || {};
+        const poArr = (d.po_number || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (!poArr.includes(val)) poArr.push(val);
+        await _savePOs(pid, poArr);
+    }
+
+    async function _removePO(pid, po) {
+        const proj  = acState.currentProjects.find(p => String(p.id) === String(pid));
+        if (!proj) return;
+        const d     = proj.data || {};
+        const poArr = (d.po_number || '').split(',').map(s => s.trim()).filter(s => s && s !== po);
+        await _savePOs(pid, poArr);
+    }
+
+    async function _savePOs(pid, poArr) {
+        const proj   = acState.currentProjects.find(p => String(p.id) === String(pid));
+        if (!proj) return;
+        const d      = proj.data || {};
+        const payload = {
+            account_id: d.account_id,
+            name: d.name,
+            description: d.description,
+            po_number: poArr.join(', ')
+        };
+        try {
+            const res = await apiCall('PUT', `${API.accountProjects}/${pid}`, payload);
+            const updated = res?.data || res;
+            proj.data = { ...d, po_number: poArr.join(', ') };
+            const tbody = $('acDetailProjects');
+            if (tbody) tbody.innerHTML = _renderDetailProjects();
+        } catch(e) { showToast('Failed to update PO: ' + e.message, 'error'); }
+    }
+
+    function _editAccountProject(pid) {
+        const proj = acState.currentProjects.find(p => String(p.id) === String(pid));
+        if (!proj) return;
+        const d = proj.data || {};
+        $('modalTitle').textContent = 'Edit Project';
+        $('modalBody').innerHTML = `
+            <input type="hidden" id="apModalId" value="${pid}">
+            <div class="seg-modal-form">
+                <div class="form-group full-width">
+                    <label>Project Name *</label>
+                    <input id="apName" class="form-control" value="${d.name || ''}">
+                </div>
+                <div class="form-group full-width">
+                    <label>Description</label>
+                    <textarea id="apDescription" class="form-control" rows="3">${d.description || ''}</textarea>
+                </div>
+            </div>`;
+        $('modalSaveBtn').dataset.type = 'accountProjectDetail';
+        $('modalSaveBtn').dataset.accountId = d.account_id || '';
+        $('modalSaveBtn').dataset.poNumber  = d.po_number  || '';
+        openModal();
+    }
+
+    async function saveAccountProjectDetail() {
+        const pid       = ($('apModalId') || {}).value;
+        const name      = ($('apName') || {}).value?.trim();
+        const btn       = $('modalSaveBtn');
+        const accountId = btn?.dataset.accountId || '';
+        const poNumber  = btn?.dataset.poNumber  || '';
+        if (!name) { showToast('Project name is required', 'error'); return; }
+        const payload = { account_id: accountId, name, description: ($('apDescription') || {}).value?.trim() || undefined, po_number: poNumber || undefined };
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        try {
+            const res = await apiCall('PUT', `${API.accountProjects}/${pid}`, payload);
+            showToast('Project updated', 'success');
+            closeModal();
+            await _loadAccountProjects(acState.currentAccountId);
+            const tbody = $('acDetailProjects');
+            if (tbody) tbody.innerHTML = _renderDetailProjects();
+        } catch(e) { showToast('Failed to update: ' + e.message, 'error'); }
+    }
+
+    async function showAccountProjectForAccount(accountId) {
+        $('modalTitle').textContent = 'Add Project';
+        $('modalBody').innerHTML = `
+            <input type="hidden" id="apModalId" value="">
+            <div class="seg-modal-form">
+                <div class="form-group full-width">
+                    <label>Project Name *</label>
+                    <input id="apName" class="form-control" placeholder="e.g. Cloud Migration Phase 1">
+                </div>
+                <div class="form-group full-width">
+                    <label>Description</label>
+                    <textarea id="apDescription" class="form-control" rows="3" placeholder="Project description"></textarea>
+                </div>
+            </div>`;
+        $('modalSaveBtn').dataset.type      = 'accountProjectForAccount';
+        $('modalSaveBtn').dataset.accountId = accountId;
+        openModal();
+    }
+
+    async function saveAccountProjectForAccount() {
+        const accountId = $('modalSaveBtn')?.dataset.accountId || '';
+        const name      = ($('apName') || {}).value?.trim();
+        if (!name) { showToast('Project name is required', 'error'); return; }
+        const payload = { account_id: accountId, name, description: ($('apDescription') || {}).value?.trim() || undefined };
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        try {
+            await apiCall('POST', API.accountProjects, payload);
+            showToast('Project created', 'success');
+            closeModal();
+            await _loadAccountProjects(acState.currentAccountId);
+            const tbody = $('acDetailProjects');
+            if (tbody) tbody.innerHTML = _renderDetailProjects();
+        } catch(e) { showToast('Failed to create: ' + e.message, 'error'); }
+    }
+
+    // ── Address modal ─────────────────────────────────────────────
+    function showAccountAddressModal(addressId, accountId) {
+        const found = addressId ? acState.currentAddresses.find(a => String(a.id) === String(addressId)) : null;
+        const d     = found || {};
+        $('modalTitle').textContent = addressId ? 'Edit Address' : 'Add Address';
+        $('modalBody').innerHTML = `
+            <input type="hidden" id="addrModalId" value="${addressId || ''}">
+            <div class="seg-modal-form">
+                <div class="form-group full-width"><label>Address Line 1</label><input id="addrLine1" class="form-control" placeholder="Street address" value="${d.line1 || ''}"></div>
+                <div class="form-group full-width"><label>Address Line 2</label><input id="addrLine2" class="form-control" placeholder="Apt, suite, etc." value="${d.line2 || ''}"></div>
+                <div class="form-group"><label>City</label><input id="addrCity" class="form-control" placeholder="City" value="${d.city || ''}"></div>
+                <div class="form-group"><label>State</label><input id="addrState" class="form-control" placeholder="State / Province" value="${d.state || ''}"></div>
+                <div class="form-group"><label>Zip Code</label><input id="addrZip" class="form-control" placeholder="Zip / Postal code" value="${d.zip_code || ''}"></div>
+                <div class="form-group"><label>Country</label><input id="addrCountry" class="form-control" placeholder="Country" value="${d.country__r || ''}"></div>
+            </div>`;
+        $('modalSaveBtn').dataset.type      = 'accountAddress';
+        $('modalSaveBtn').dataset.accountId = accountId || acState.currentAccountId;
+        openModal();
+    }
+
+    async function saveAccountAddress() {
+        const addressId = ($('addrModalId') || {}).value;
+        const accountId = $('modalSaveBtn')?.dataset.accountId;
+        const line1     = ($('addrLine1') || {}).value?.trim();
+        const payload   = {
+            account_id: accountId || undefined,
+            line1: line1 || undefined,
+            line2: ($('addrLine2') || {}).value?.trim() || undefined,
+            city:  ($('addrCity')  || {}).value?.trim() || undefined,
+            state: ($('addrState') || {}).value?.trim() || undefined,
+            zip_code: ($('addrZip') || {}).value?.trim() || undefined
+        };
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        try {
+            if (addressId) {
+                await apiCall('PUT', `${API.accountAddresses}/${addressId}`, payload);
+                showToast('Address updated', 'success');
+            } else {
+                await apiCall('POST', API.accountAddresses, payload);
+                showToast('Address added', 'success');
+            }
+            closeModal();
+            await _loadAccountAddresses(acState.currentAccountId);
+            const tbody = $('acDetailAddresses');
+            if (tbody) tbody.innerHTML = _renderDetailAddresses();
+        } catch(e) { showToast('Failed to save address: ' + e.message, 'error'); }
+    }
+
+    async function _deleteAccDetailAddress(addressId) {
+        if (!confirm('Delete this address?')) return;
+        try {
+            await apiCall('DELETE', `${API.accountAddresses}/${addressId}`);
+            showToast('Address deleted', 'success');
+            acState.currentAddresses = acState.currentAddresses.filter(a => String(a.id) !== String(addressId));
+            const tbody = $('acDetailAddresses');
+            if (tbody) tbody.innerHTML = _renderDetailAddresses();
+        } catch(e) { showToast('Failed to delete: ' + e.message, 'error'); }
+    }
+
+    async function _deleteAccDetailProject(pid) {
+        if (!confirm('Delete this project?')) return;
+        try {
+            await apiCall('DELETE', `${API.accountProjects}/${pid}`);
+            showToast('Project deleted', 'success');
+            acState.currentProjects = acState.currentProjects.filter(p => String(p.id) !== String(pid));
+            const tbody = $('acDetailProjects');
+            if (tbody) tbody.innerHTML = _renderDetailProjects();
+        } catch(e) { showToast('Failed to delete: ' + e.message, 'error'); }
+    }
+
+    async function _deleteAccDetailQuote(qid) {
+        if (!confirm('Delete this quote?')) return;
+        try {
+            await apiCall('DELETE', `${API.quotes}/${qid}`);
+            showToast('Quote deleted', 'success');
+            acState.currentQuotes = acState.currentQuotes.filter(q => String(q.id) !== String(qid));
+            const tbody = $('acDetailQuotes');
+            if (tbody) tbody.innerHTML = _renderDetailQuotes();
+        } catch(e) { showToast('Failed to delete: ' + e.message, 'error'); }
+    }
+
+    // ── Contact modal ─────────────────────────────────────────────
+    async function showContactModal(contactId, accountId) {
+        const found = contactId ? acState.currentContacts.find(c => String(c.id) === String(contactId)) : null;
+        const d     = found ? (found.data || found) : {};
+        $('modalTitle').textContent = contactId ? 'Edit Contact' : 'Add Contact';
+        $('modalBody').innerHTML = `
+            <input type="hidden" id="ctModalId" value="${contactId || ''}">
+            <div class="seg-modal-form">
+                <div class="form-group"><label>Title</label><select id="ctTitle" class="form-control">
+                    <option value="">—</option>
+                    ${['Mr.','Mrs.','Ms.','Dr.','Prof.'].map(t => `<option value="${t}" ${(d.title===t)?'selected':''}>${t}</option>`).join('')}
+                </select></div>
+                <div class="form-group"><label>First Name *</label><input id="ctFirstName" class="form-control" value="${d.first_name||d.firstName||''}"></div>
+                <div class="form-group"><label>Last Name *</label><input id="ctLastName" class="form-control" value="${d.last_name||d.lastName||''}"></div>
+                <div class="form-group full-width"><label>Email *</label><input id="ctEmail" type="email" class="form-control" value="${d.email||''}"></div>
+                <div class="form-group"><label>Mobile</label><input id="ctMobile" class="form-control" placeholder="+91 98765 43210" value="${d.mobile||''}"></div>
+                <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                    <input type="checkbox" id="ctPrimary" ${(d.is_primary===true||d.is_primary==='true'||d.isPrimary===true)?'checked':''}>
+                    <label for="ctPrimary" style="margin:0;cursor:pointer;">Is Primary Contact</label>
+                </div>
+            </div>`;
+        $('modalSaveBtn').dataset.type      = 'contact';
+        $('modalSaveBtn').dataset.accountId = accountId || acState.currentAccountId;
+        openModal();
+    }
+
+    async function saveContact() {
+        const contactId = ($('ctModalId') || {}).value;
+        const accountId = $('modalSaveBtn')?.dataset.accountId;
+        const firstName = ($('ctFirstName') || {}).value?.trim();
+        const lastName  = ($('ctLastName')  || {}).value?.trim();
+        const email     = ($('ctEmail')     || {}).value?.trim();
+        if (!firstName) { showToast('First name is required', 'error'); return; }
+        if (!lastName)  { showToast('Last name is required', 'error'); return; }
+        if (!email)     { showToast('Email is required', 'error'); return; }
+        const payload = {
+            account_id: accountId || undefined,
+            title:      ($('ctTitle')   || {}).value || undefined,
+            first_name: firstName,
+            last_name:  lastName,
+            email,
+            mobile:     ($('ctMobile')  || {}).value?.trim() || undefined,
+            is_primary: ($('ctPrimary') || {}).checked || false
+        };
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        try {
+            if (contactId) {
+                await apiCall('PUT', `${API.contactDetails}/${contactId}`, payload);
+                showToast('Contact updated', 'success');
+            } else {
+                await apiCall('POST', API.contactDetails, payload);
+                showToast('Contact created', 'success');
+            }
+            closeModal();
+            await _loadAccountContacts(acState.currentAccountId);
+            const tbody = $('acDetailContacts');
+            if (tbody) tbody.innerHTML = _renderDetailContacts();
+        } catch(e) { showToast('Failed to save contact: ' + e.message, 'error'); }
+    }
+
+    async function _deleteAccDetailContact(contactId) {
+        if (!confirm('Delete this contact?')) return;
+        try {
+            await apiCall('DELETE', `${API.contactDetails}/${contactId}`);
+            showToast('Contact deleted', 'success');
+            acState.currentContacts = acState.currentContacts.filter(c => String(c.id) !== String(contactId));
+            const tbody = $('acDetailContacts');
+            if (tbody) tbody.innerHTML = _renderDetailContacts();
+        } catch(e) { showToast('Failed to delete: ' + e.message, 'error'); }
+    }
+
+    // ============================================================
     // QUOTES
     // ============================================================
-    const QUOTE_TYPES = ['New', 'Renewal', 'Add-on', 'Extension', 'Upgrade'];
-    const QUOTE_APPROVAL_STATUSES = ['Draft', 'Submitted', 'Approved', 'Rejected'];
-    const QUOTE_STATUSES = ['Not Sent', 'Sent', 'Accepted', 'Cancelled'];
-    const RENEWAL_OPTIONS = ['None', 'Monthly', 'Quarterly', 'Half Yearly', 'Yearly'];
+    // UUID ↔ Label maps (must match backend enums exactly)
+    const QUOTE_TYPE_MAP = {
+        'b2c3d4e5-f6a7-8901-bcde-200000000001': 'New',
+        'b2c3d4e5-f6a7-8901-bcde-200000000002': 'Renewal'
+    };
+    const QUOTE_APPROVAL_MAP = {
+        'b408d606-f682-45ea-8659-91b7af3ecec5': 'Draft',
+        '598283a9-c53a-4d74-afbc-3ec48df762e9': 'Submitted',
+        'fe07e71d-cba4-4316-9c7c-4935c3adec34': 'Approved',
+        '13a30e5b-0b42-42f7-b3bc-cf121becbf1a': 'Rejected',
+        'c9c2260f-d74e-4660-9a7f-91e6902488d8': 'In Progress'
+    };
+    const QUOTE_STATUS_MAP = {
+        'a1b2c3d4-e5f6-7890-abcd-100000000001': 'Not Sent',
+        'a1b2c3d4-e5f6-7890-abcd-100000000002': 'Presented',
+        'a1b2c3d4-e5f6-7890-abcd-100000000003': 'Accepted',
+        'a1b2c3d4-e5f6-7890-abcd-100000000004': 'Rejected',
+        'a1b2c3d4-e5f6-7890-abcd-100000000005': 'Expired'
+    };
+    const QUOTE_RENEWAL_MAP = {
+        'c3d4e5f6-a7b8-9012-cdef-300000000001': 'None',
+        'c3d4e5f6-a7b8-9012-cdef-300000000002': 'Auto',
+        'c3d4e5f6-a7b8-9012-cdef-300000000003': 'Manual'
+    };
+    // Reverse: label → UUID
+    const _qtTypeUUID     = lbl => Object.keys(QUOTE_TYPE_MAP).find(k => QUOTE_TYPE_MAP[k] === lbl)     || lbl;
+    const _qtApprovalUUID = lbl => Object.keys(QUOTE_APPROVAL_MAP).find(k => QUOTE_APPROVAL_MAP[k] === lbl) || lbl;
+    const _qtStatusUUID   = lbl => Object.keys(QUOTE_STATUS_MAP).find(k => QUOTE_STATUS_MAP[k] === lbl)   || lbl;
+    const _qtRenewalUUID  = lbl => Object.keys(QUOTE_RENEWAL_MAP).find(k => QUOTE_RENEWAL_MAP[k] === lbl) || lbl;
+    // Resolve UUID → label (falls back gracefully if a label was stored instead of UUID)
+    const _qtTypeLabel     = v => QUOTE_TYPE_MAP[v]     || v || 'New';
+    const _qtApprovalLabel = v => QUOTE_APPROVAL_MAP[v] || v || 'Draft';
+    const _qtStatusLabel   = v => QUOTE_STATUS_MAP[v]   || v || 'Not Sent';
+    const _qtRenewalLabel  = v => QUOTE_RENEWAL_MAP[v]  || v || 'None';
 
     let qtState = { quotes: [], currentQuote: null };
 
@@ -5012,14 +5956,16 @@ VALIDATION_INFO
 
     function _qtApprovalBadge(v) {
         if (!v) return '';
-        const dark = ['Approved', 'Accepted'].includes(v);
-        return `<span class="qt-badge${dark?' dark':''}">${v}</span>`;
+        const lbl = _qtApprovalLabel(v);
+        const dark = ['Approved', 'Accepted'].includes(lbl);
+        return `<span class="qt-badge${dark?' dark':''}">${lbl}</span>`;
     }
 
     function _qtStatusBadge(v) {
         if (!v) return '';
-        const dark = ['Accepted'].includes(v);
-        return `<span class="qt-badge${dark?' dark':''}">${v}</span>`;
+        const lbl = _qtStatusLabel(v);
+        const dark = ['Accepted'].includes(lbl);
+        return `<span class="qt-badge${dark?' dark':''}">${lbl}</span>`;
     }
 
     function _qtFmtDate(d) {
@@ -5036,6 +5982,140 @@ VALIDATION_INFO
         let opts = `<option value="">Select account</option>`;
         opts += acState.accounts.map(a => { const d = a.data||{}; const label = d.name||d.number||String(a.id).slice(0,8); return `<option value="${a.id}" data-name="${label}" ${String(a.id)===String(sel)?'selected':''}>${label}</option>`; }).join('');
         return opts;
+    }
+
+    // ============================================================
+    // SUPPLIER ADDRESSES
+    // ============================================================
+
+    async function loadSupplierAddresses() {
+        try {
+            const res = await apiCall('GET', API.supplierAddresses + '?page=0&size=200');
+            const page = res?.data || res;
+            const content = page?.content || page || [];
+            saState.addresses = Array.isArray(content) ? content : [];
+        } catch(e) {
+            saState.addresses = [];
+            console.warn('Failed to load supplier addresses:', e.message);
+        }
+        renderSupplierAddressList();
+    }
+
+    function _saLabel(sa) {
+        const parts = [sa.line1, sa.city, sa.state, sa.zip_code].filter(Boolean);
+        return parts.length ? parts.join(', ') : String(sa.id).slice(0, 8);
+    }
+
+    function renderSupplierAddressList() {
+        const tbody = $('supplierAddrTableBody');
+        if (!tbody) return;
+        if (!saState.addresses.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">No supplier addresses yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = saState.addresses.map(sa => `<tr>
+                <td>${sa.line1||'—'}</td>
+                <td>${sa.city||'—'}</td>
+                <td>${sa.state||'—'}</td>
+                <td>${sa.zip_code||'—'}</td>
+                <td>${sa.tax_id||'—'}</td>
+                <td>
+                    <button class="btn btn-sm" onclick="showSupplierAddressModal('${sa.id}')">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSupplierAddress('${sa.id}')">Delete</button>
+                </td>
+            </tr>`).join('');
+    }
+
+    async function showSupplierAddressModal(addrId) {
+        let d = {};
+        if (addrId) {
+            const found = saState.addresses.find(a => String(a.id) === String(addrId));
+            d = found || {};
+        }
+        $('modalTitle').textContent = addrId ? 'Edit Supplier Address' : 'Add Supplier Address';
+        $('modalBody').innerHTML = `
+            <input type="hidden" id="saModalId" value="${addrId||''}">
+            <div class="seg-modal-form">
+                <div class="form-group full-width">
+                    <label>Address Line 1</label>
+                    <input id="saLine1" class="form-control" placeholder="Street address" value="${d.line1||''}">
+                </div>
+                <div class="form-group full-width">
+                    <label>Address Line 2</label>
+                    <input id="saLine2" class="form-control" placeholder="Suite, floor, etc." value="${d.line2||''}">
+                </div>
+                <div class="form-group full-width">
+                    <label>Address Line 3</label>
+                    <input id="saLine3" class="form-control" placeholder="Additional line" value="${d.line3||''}">
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input id="saCity" class="form-control" placeholder="City" value="${d.city||''}">
+                </div>
+                <div class="form-group">
+                    <label>State / Province</label>
+                    <input id="saState" class="form-control" placeholder="State or province" value="${d.state||''}">
+                </div>
+                <div class="form-group">
+                    <label>Zip / Postal Code</label>
+                    <input id="saZip" class="form-control" placeholder="Zip code" value="${d.zip_code||''}">
+                </div>
+                <div class="form-group">
+                    <label>Tax ID</label>
+                    <input id="saTaxId" class="form-control" placeholder="Tax identification number" value="${d.tax_id||''}">
+                </div>
+            </div>`;
+        $('modalSaveBtn').dataset.type = 'supplierAddress';
+        openModal();
+    }
+
+    async function saveSupplierAddress() {
+        const addrId = ($('saModalId')||{}).value;
+        const line1  = ($('saLine1')||{}).value?.trim();
+        if (!line1) { showToast('Address Line 1 is required', 'error'); return; }
+        const payload = {
+            line1,
+            line2:    ($('saLine2')||{}).value?.trim() || undefined,
+            line3:    ($('saLine3')||{}).value?.trim() || undefined,
+            city:     ($('saCity')||{}).value?.trim()  || undefined,
+            state:    ($('saState')||{}).value?.trim() || undefined,
+            zip_code: ($('saZip')||{}).value?.trim()   || undefined,
+            tax_id:   ($('saTaxId')||{}).value?.trim() || undefined
+        };
+        Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+        try {
+            if (addrId) {
+                await apiCall('PUT', `${API.supplierAddresses}/${addrId}`, payload);
+                showToast('Supplier address updated', 'success');
+            } else {
+                await apiCall('POST', API.supplierAddresses, payload);
+                showToast('Supplier address created', 'success');
+            }
+            closeModal();
+            await loadSupplierAddresses();
+        } catch(e) {
+            showToast('Failed to save: ' + e.message, 'error');
+        }
+    }
+
+    async function deleteSupplierAddress(addrId) {
+        if (!confirm('Delete this supplier address?')) return;
+        try {
+            await apiCall('DELETE', `${API.supplierAddresses}/${addrId}`);
+            showToast('Deleted', 'success');
+            saState.addresses = saState.addresses.filter(a => String(a.id) !== String(addrId));
+            renderSupplierAddressList();
+        } catch(e) {
+            showToast('Delete failed: ' + e.message, 'error');
+        }
+    }
+
+    // Returns <option> list for supplierAddressId dropdowns (e.g. in segment modal)
+    function _saAddressOpts(selected) {
+        const blank = `<option value="">— None —</option>`;
+        return blank + saState.addresses.map(sa =>
+            `<option value="${sa.id}" ${String(sa.id)===String(selected)?'selected':''}>${_saLabel(sa)}</option>`
+        ).join('');
     }
 
     async function loadQuotes() {
@@ -5065,12 +6145,12 @@ VALIDATION_INFO
             return `<tr style="cursor:pointer;" onclick="viewQuote('${q.id}')">
                 <td style="font-weight:600;color:#1a1a2e;">${q.quoteNumber||'—'}</td>
                 <td>${q.accountName||'—'}</td>
-                <td>${q.quoteType||'New'}</td>
-                <td>${_qtApprovalBadge(q.approvalStatus||'Draft')}</td>
-                <td>${_qtStatusBadge(q.quoteStatus||'Not Sent')}</td>
+                <td>${_qtTypeLabel(q.quoteType)}</td>
+                <td>${_qtApprovalBadge(_qtApprovalLabel(q.approvalStatus))}</td>
+                <td>${_qtStatusBadge(_qtStatusLabel(q.quoteStatus))}</td>
                 <td>${_qtFmtDate(q.startDate)}</td>
                 <td>${_qtFmtDate(q.endDate)}</td>
-                <td>${q.renewal||'None'}</td>
+                <td>${_qtRenewalLabel(q.renewal)}</td>
                 <td>${productCount} ${productCount===1?'product':'products'}</td>
                 <td onclick="event.stopPropagation()">
                     <button class="btn btn-sm btn-danger" onclick="deleteQuote('${q.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
@@ -5208,6 +6288,7 @@ VALIDATION_INFO
                     <div class="qt-seg-info-field"><label>Service Account</label><span>${q.accountName||'—'}</span></div>
                     <div class="qt-seg-info-field"><label>Billing Address</label><span>—</span></div>
                     <div class="qt-seg-info-field"><label>Service Address</label><span>—</span></div>
+                    <div class="qt-seg-info-field"><label>Supplier Address</label><span>${(() => { const sa = saState.addresses.find(a => String(a.id) === String(seg.supplierAddressId)); return sa ? _saLabel(sa) : '—'; })()}</span></div>
                     <div class="qt-seg-info-field"><label>Renewal</label><span>${q.renewal||'None'}</span></div>
                     <div class="qt-seg-info-field"><label>Discount % / Uplift %</label><span>${disc}% / ${uplift}%</span></div>
                 </div>
@@ -5257,14 +6338,15 @@ VALIDATION_INFO
                     </button>
                     Quote ${q.quoteNumber||'—'}
                     <div style="flex:1;"></div>
-                    <button class="qt-recalc-btn" onclick="recalculateQuote('${q.id}')">⟳ Recalculate</button>
+                    <button id="qt-reprice-btn" class="qt-recalc-btn" onclick="repriceQuote('${q.id}')" title="Resolve prices for all items from pricing matrices" style="background:#0052cc;color:#fff;border-color:#0052cc;">$ Reprice</button>
+                    <button class="qt-recalc-btn" onclick="recalculateQuote('${q.id}')" style="margin-left:8px;">⟳ Recalculate</button>
                     <button onclick="showQuoteModal('${q.id}')" title="Edit" style="margin-left:8px;background:none;border:1px solid #e0e0e0;border-radius:8px;padding:6px 10px;cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;vertical-align:middle;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                 </div>
                 <div class="qt-subtitle">${q.accountName||'—'} · ${_qtFmtDate(q.startDate)} — ${_qtFmtDate(q.endDate)}</div>
                 <div class="qt-badges">
-                    <span class="qt-badge">${q.quoteType||'New'}</span>
-                    ${q.approvalStatus ? `<span class="qt-badge dark">${q.approvalStatus}</span>` : ''}
-                    ${q.quoteStatus ? `<span class="qt-badge dark">${q.quoteStatus}</span>` : ''}
+                    <span class="qt-badge">${_qtTypeLabel(q.quoteType)}</span>
+                    ${q.approvalStatus ? `<span class="qt-badge dark">${_qtApprovalLabel(q.approvalStatus)}</span>` : ''}
+                    ${q.quoteStatus ? `<span class="qt-badge dark">${_qtStatusLabel(q.quoteStatus)}</span>` : ''}
                     <span class="qt-badge blue">${segmentCount} segment${segmentCount!==1?'s':''}</span>
                     <span class="qt-badge blue">${productCount} product${productCount!==1?'s':''}</span>
                 </div>
@@ -5293,6 +6375,10 @@ VALIDATION_INFO
         let seg = {};
         if (segmentId && qtState.currentQuote) {
             seg = (qtState.currentQuote.segments||[]).find(s => String(s.id)===String(segmentId)) || {};
+        }
+        // Ensure supplier addresses are loaded for the dropdown
+        if (!saState.addresses.length) {
+            try { await loadSupplierAddresses(); } catch(e) {}
         }
         $('modalTitle').textContent = segmentId ? 'Edit Segment' : 'Add Segment';
         $('modalBody').innerHTML = `
@@ -5323,6 +6409,15 @@ VALIDATION_INFO
                     <label>Sort Order</label>
                     <input id="segSortOrder" type="number" min="0" class="form-control" value="${seg.sortOrder||0}">
                 </div>
+                <div class="form-group full-width">
+                    <label>Supplier Address</label>
+                    <select id="segSupplierAddress" class="form-control">
+                        ${_saAddressOpts(seg.supplierAddressId||'')}
+                    </select>
+                    <div style="margin-top:6px;">
+                        <a href="#" onclick="event.preventDefault();showSupplierAddressModal(null);" style="font-size:12px;color:#0052cc;">+ New Supplier Address</a>
+                    </div>
+                </div>
                 ${!segmentId ? `<div class="form-group">
                     <label>Is Root Segment</label>
                     <select id="segIsRoot" class="form-control">
@@ -5341,13 +6436,15 @@ VALIDATION_INFO
         const name = ($('segName')||{}).value?.trim();
         if (!name) { showToast('Segment name is required', 'error'); return; }
 
+        const supplierAddrVal = ($('segSupplierAddress')||{}).value || null;
         const payload = {
             name,
             startDate: ($('segStartDate')||{}).value || null,
             endDate: ($('segEndDate')||{}).value || null,
             defaultDiscountPct: parseFloat(($('segDiscount')||{}).value||0),
             defaultUpliftPct: parseFloat(($('segUplift')||{}).value||0),
-            sortOrder: parseInt(($('segSortOrder')||{}).value||0)
+            sortOrder: parseInt(($('segSortOrder')||{}).value||0),
+            supplierAddressId: supplierAddrVal || null
         };
 
         try {
@@ -5381,24 +6478,47 @@ VALIDATION_INFO
         if (!selEl || !selEl.value) { showToast('Please select a product', 'error'); return; }
 
         const opt = selEl.options[selEl.selectedIndex];
+        const productId = selEl.value;
+
+        const btn = document.querySelector(`#seg-${segId} .qt-inline-add-btn`);
+        if (btn) { btn.disabled = true; btn.textContent = 'Pricing...'; }
+
+        // Resolve list price and cost from pricing matrices
+        let listPrice = 0, costPrice = 0;
+        try {
+            const quote = qtState.currentQuote;
+            const resolveReq = {
+                accountId: quote?.accountId || null,
+                effectiveDate: new Date().toISOString().split('T')[0],
+                selections: [{ productId, quantity: 1 }]
+            };
+            const resolveRes = await apiCall('POST', API.pricingResolve, resolveReq);
+            const resolveData = resolveRes?.data || resolveRes;
+            const resolved = (resolveData?.prices || []).find(p => String(p.productId) === String(productId));
+            if (resolved) {
+                listPrice = resolved.unitListPrice || 0;
+                costPrice = resolved.unitMspPrice || 0;
+            }
+        } catch (e) {
+            console.warn('Price resolve failed, using 0:', e.message);
+        }
 
         const payload = {
-            productId: selEl.value,
+            productId,
             productLabel: opt.dataset.label || opt.text.split(' —')[0].trim(),
             sku: opt.dataset.sku || '',
             productType: opt.dataset.typeid || _QT_BUNDLE_UUID,
             chargeType: opt.dataset.chargetype || null,
             usageUom: opt.dataset.uom || null,
             quantity: 1,
-            listPrice: parseFloat(opt.dataset.price||0),
-            costPrice: parseFloat(opt.dataset.cost||0),
+            listPrice,
+            costPrice,
             discountPct: 0,
             upliftPct: 0,
             sortOrder: 0
         };
 
-        const btn = document.querySelector(`#seg-${segId} .qt-inline-add-btn`);
-        if (btn) { btn.disabled = true; btn.textContent = '...'; }
+        if (btn) btn.textContent = 'Adding...';
         try {
             await apiCall('POST', `${API.quotes}/${quoteId}/segments/${segId}/items`, payload);
             showToast('Product added', 'success');
@@ -5406,6 +6526,49 @@ VALIDATION_INFO
         } catch(e) {
             showToast('Failed to add product: ' + e.message, 'error');
             if (btn) { btn.disabled = false; btn.textContent = '+ Add'; }
+        }
+    }
+
+    // ── Reprice all items in a quote from pricing matrices ───────────────────
+    async function repriceQuote(quoteId) {
+        const q = qtState.currentQuote;
+        if (!q) return;
+        const btn = document.getElementById('qt-reprice-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Repricing...'; }
+        try {
+            let updated = 0;
+            for (const seg of (q.segments || [])) {
+                for (const item of (seg.items || [])) {
+                    try {
+                        const resolveReq = {
+                            accountId: q.accountId || null,
+                            effectiveDate: new Date().toISOString().split('T')[0],
+                            selections: [{ productId: item.productId, quantity: item.quantity || 1 }]
+                        };
+                        const resolveRes = await apiCall('POST', API.pricingResolve, resolveReq);
+                        const resolveData = resolveRes?.data || resolveRes;
+                        const resolved = (resolveData?.prices || []).find(p => String(p.productId) === String(item.productId));
+                        if (resolved && (resolved.unitListPrice > 0 || resolved.unitMspPrice > 0)) {
+                            await apiCall('PUT', `${API.quotes}/${quoteId}/segments/${seg.id}/items/${item.id}`, {
+                                listPrice: resolved.unitListPrice || 0,
+                                costPrice: resolved.unitMspPrice || 0
+                            });
+                            updated++;
+                        }
+                    } catch (e) {
+                        console.warn(`Reprice failed for item ${item.id}:`, e.message);
+                    }
+                }
+            }
+            if (updated > 0) {
+                try { await apiCall('POST', `${API.quotes}/${quoteId}/recalculate`); } catch(e) {}
+            }
+            showToast(`Repriced ${updated} item(s) from pricing matrices`, 'success');
+            await viewQuote(quoteId);
+        } catch (e) {
+            showToast('Reprice failed: ' + e.message, 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '$ Reprice'; }
         }
     }
 
@@ -5500,10 +6663,14 @@ VALIDATION_INFO
         if (quoteId) { raw = qtState.quotes.find(x => String(x.id)===String(quoteId)) || qtState.currentQuote || {}; }
         const q = _qtNorm(raw);
 
-        const typeOpts = QUOTE_TYPES.map(t => `<option value="${t}" ${(q.quoteType||'New')===t?'selected':''}>${t}</option>`).join('');
-        const approvalOpts = QUOTE_APPROVAL_STATUSES.map(s => `<option value="${s}" ${(q.approvalStatus||'Draft')===s?'selected':''}>${s}</option>`).join('');
-        const statusOpts = QUOTE_STATUSES.map(s => `<option value="${s}" ${(q.quoteStatus||'Not Sent')===s?'selected':''}>${s}</option>`).join('');
-        const renewalOpts = RENEWAL_OPTIONS.map(r => `<option value="${r}" ${(q.renewal||'None')===r?'selected':''}>${r}</option>`).join('');
+        const typeOpts     = Object.entries(QUOTE_TYPE_MAP).map(([uuid, lbl]) =>
+            `<option value="${uuid}" ${uuid===(q.quoteType||_qtTypeUUID('New'))?'selected':''}>${lbl}</option>`).join('');
+        const approvalOpts = Object.entries(QUOTE_APPROVAL_MAP).map(([uuid, lbl]) =>
+            `<option value="${uuid}" ${uuid===(q.approvalStatus||_qtApprovalUUID('Draft'))?'selected':''}>${lbl}</option>`).join('');
+        const statusOpts   = Object.entries(QUOTE_STATUS_MAP).map(([uuid, lbl]) =>
+            `<option value="${uuid}" ${uuid===(q.quoteStatus||_qtStatusUUID('Not Sent'))?'selected':''}>${lbl}</option>`).join('');
+        const renewalOpts  = Object.entries(QUOTE_RENEWAL_MAP).map(([uuid, lbl]) =>
+            `<option value="${uuid}" ${uuid===(q.renewal||_qtRenewalUUID('None'))?'selected':''}>${lbl}</option>`).join('');
 
         $('modalTitle').textContent = quoteId ? 'Edit Quote' : 'Add Quote';
         $('modalBody').innerHTML = `
@@ -5536,10 +6703,10 @@ VALIDATION_INFO
 
         const payload = {
             accountId, accountName,
-            quoteType: $('qtType')?.value || 'New',
-            approvalStatus: $('qtApproval')?.value || 'Draft',
-            quoteStatus: $('qtStatus')?.value || 'Not Sent',
-            renewal: $('qtRenewal')?.value || 'None',
+            quoteType:      $('qtType')?.value     || _qtTypeUUID('New'),
+            approvalStatus: $('qtApproval')?.value || _qtApprovalUUID('Draft'),
+            quoteStatus:    $('qtStatus')?.value   || _qtStatusUUID('Not Sent'),
+            renewal:        $('qtRenewal')?.value  || _qtRenewalUUID('None'),
             startDate: $('qtStartDate')?.value || undefined,
             endDate: $('qtEndDate')?.value || undefined,
             expiryDate: $('qtExpiryDate')?.value || undefined
