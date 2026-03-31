@@ -51,12 +51,14 @@
         .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
         .btn-primary { background: #1e3a5f; color: white; }
         .btn-primary:hover { background: #2d5a87; }
-        .btn-success { background: #1a1a2e; color: white; }
-        .btn-success:hover { background: #2d2d4e; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
         .btn-danger { background: #dc3545; color: white; }
         .btn-danger:hover { background: #c82333; }
         .btn-warning { background: #ffc107; color: #333; }
         .btn-warning:hover { background: #e0a800; }
+        .dropdown-item:hover { background: #f5f5f5; }
+        .dropdown-item:active { background: #e8e8e8; }
         .btn-info { background: #17a2b8; color: white; }
         .btn-info:hover { background: #138496; }
         .btn-outline { background: white; border: 1px solid #ddd; color: #666; }
@@ -638,7 +640,7 @@
 
     <div class="sidebar-footer">
         <input type="text" id="token" placeholder="JWT Token...">
-        <input type="text" id="baseUrl" value="http://localhost:8081" placeholder="API Base URL">
+        <input type="text" id="baseUrl" value="http://localhost:8080" placeholder="API Base URL">
         <button class="btn" onclick="loadAllData()">Load All Data</button>
     </div>
 </div>
@@ -1255,11 +1257,30 @@ VALIDATION_INFO
 
     <!-- ============= ORDERS ============= -->
     <div class="page-section" id="page-orders">
-        <div class="page-header"><div><div class="page-title">Orders</div><div class="page-subtitle">Manage sales orders</div></div></div>
-        <div style="text-align:center;padding:80px;color:#aaa;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;margin-bottom:16px;opacity:0.4;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-            <div style="font-size:16px;font-weight:500;">Orders coming soon</div>
+        <div id="ordListView">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Orders</div>
+                    <div class="page-subtitle">Manage sales orders</div>
+                </div>
+                <button class="btn btn-outline" onclick="loadOrders()">Refresh</button>
+            </div>
+            <table class="data-table" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Order #</th><th>Quote</th><th>Account</th><th>Status</th>
+                    <th style="text-align:right;">Total Price</th>
+                    <th style="text-align:right;">Total Cost</th>
+                    <th style="text-align:right;">Margin %</th>
+                    <th>Created</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="ordTableBody">
+                <tr><td colspan="9" style="text-align:center;color:#aaa;padding:32px;">Loading…</td></tr>
+                </tbody>
+            </table>
         </div>
+        <div id="ordDetailView" style="display:none;"></div>
     </div>
 
     <!-- ============= ASSETS ============= -->
@@ -1366,7 +1387,8 @@ VALIDATION_INFO
         pricingResolve: '/api/v1/cpq/pricing/resolve',
         supplierAddresses: '/api/v1/cpq/supplier-addresses',
         contactDetails: '/api/v1/cpq/contact-details',
-        accountAddresses: '/api/v1/cpq/account-addresses'
+        accountAddresses: '/api/v1/cpq/account-addresses',
+        orders: '/api/v1/cpq/orders'
     };
 
     // Default page size for pagination
@@ -1503,6 +1525,7 @@ VALIDATION_INFO
             if (page === 'accounts') loadAccounts();
             if (page === 'supplier-addresses') loadSupplierAddresses();
             if (page === 'quotes') loadQuotes();
+            if (page === 'orders') loadOrders();
         });
     });
 
@@ -1627,9 +1650,8 @@ VALIDATION_INFO
             return l.name?.toLowerCase().includes(search) && (!familyFilter || fId === familyFilter);
         });
         $('productLineTable').innerHTML = filtered.length ? filtered.map(l => {
-            const fId = l.prodFamilyId || l.prod_family_id;
-            const family = state.families.find(f => f.id === fId);
-            return `<tr><td><strong>${l.name || ''}</strong></td><td>${family?.name || '-'}</td><td>${l.description || '-'}</td>
+            const familyName = l.prod_family_id__r || l.prodFamilyLabel || '-';
+            return `<tr><td><strong>${l.name || ''}</strong></td><td>${familyName}</td><td>${l.description || '-'}</td>
             <td><span class="badge ${l.status__r === 'Active' ? 'badge-success' : 'badge-secondary'}">${l.status__r || '-'}</span></td>
             <td>${l.created_by__r || '-'}</td>
             <td>${l.updated_at ? new Date(l.updated_at).toLocaleDateString() : '-'}</td>
@@ -6147,18 +6169,42 @@ VALIDATION_INFO
         if (!qtState.quotes.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#aaa;padding:40px;">No quotes yet. Click "+ Add Quote" to create one.</td></tr>'; return; }
         tbody.innerHTML = qtState.quotes.map(q => {
             const productCount = _qtProductCount(q);
+            const approvalLabel = _qtApprovalLabel(q.approvalStatus);
+            const isDraft = approvalLabel === 'Draft';
+            const isSubmitted = approvalLabel === 'Submitted' || approvalLabel === 'In Progress';
+            const isApproved = approvalLabel === 'Approved';
+            const disabledStyle = 'opacity:0.4;cursor:not-allowed;pointer-events:none;';
             return `<tr style="cursor:pointer;" onclick="viewQuote('${q.id}')">
                 <td style="font-weight:600;color:#1a1a2e;">${q.quoteNumber||'—'}</td>
                 <td>${q.accountName||'—'}</td>
                 <td>${_qtTypeLabel(q.quoteType)}</td>
-                <td>${_qtApprovalBadge(_qtApprovalLabel(q.approvalStatus))}</td>
+                <td>${_qtApprovalBadge(approvalLabel)}</td>
                 <td>${_qtStatusBadge(_qtStatusLabel(q.quoteStatus))}</td>
                 <td>${_qtFmtDate(q.startDate)}</td>
                 <td>${_qtFmtDate(q.endDate)}</td>
                 <td>${_qtRenewalLabel(q.renewal)}</td>
                 <td>${productCount} ${productCount===1?'product':'products'}</td>
                 <td onclick="event.stopPropagation()">
-                    <button class="btn btn-sm btn-danger" onclick="deleteQuote('${q.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+                    <div style="display:flex;gap:4px;align-items:center;">
+                        <button class="btn btn-sm btn-warning" onclick="showQuoteModal('${q.id}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteQuote('${q.id}')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+                        <div class="dropdown" style="position:relative;">
+                            <button class="btn btn-sm btn-outline" onclick="toggleQuoteDropdown(event,'${q.id}')" title="More Actions" style="padding:4px 8px;">
+                                <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                            </button>
+                            <div id="quoteDropdown-${q.id}" class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;background:white;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:180px;z-index:1000;">
+                                <button class="dropdown-item" onclick="${isDraft ? `submitQuoteForApproval('${q.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!isDraft ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>Submit for Approval
+                                </button>
+                                <button class="dropdown-item" onclick="${isSubmitted ? `approveQuote('${q.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!isSubmitted ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Approve
+                                </button>
+                                <button class="dropdown-item" onclick="${isApproved ? `convertQuoteToOrder('${q.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!isApproved ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Convert to Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </tr>`;
         }).join('');
@@ -6194,6 +6240,164 @@ VALIDATION_INFO
         } catch(e) { return '—'; }
     }
 
+    // Keys to skip (UUIDs and internal IDs that aren't useful to display)
+    const _SKIP_CONFIG_KEYS = ['account_id', 'accountid', 'bundle_id', 'bundleid', 'product_id', 'productid',
+        'feature_id', 'featureid', 'config_session_id', 'configsessionid', 'instance_id', 'instanceid',
+        'segment_id', 'segmentid', 'quote_id', 'quoteid', 'order_id', 'orderid', 'id', 'uuid'];
+
+    // Check if item has any configuration data (check both camelCase and snake_case)
+    function _hasConfigData(item) {
+        const attrSel = item.attributeSelections || item.attribute_selections;
+        const bundleCfg = item.bundleConfig || item.bundle_config;
+        if (attrSel && typeof attrSel === 'object' && Object.keys(attrSel).length > 0) return true;
+        if (bundleCfg && typeof bundleCfg === 'object' && Object.keys(bundleCfg).length > 0) return true;
+        return false;
+    }
+
+    // Check if value looks like a UUID
+    function _isUUID(val) {
+        if (typeof val !== 'string') return false;
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    }
+
+    // Format attribute key to readable label
+    function _formatAttrKey(key) {
+        return key
+            .replace(/_/g, ' ')
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/\b\w/g, c => c.toUpperCase())
+            .trim();
+    }
+
+    // Format attribute value to readable text
+    function _formatAttrValue(val, key) {
+        if (val === null || val === undefined) return '—';
+        if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+        if (typeof val === 'number') return val.toLocaleString();
+        if (_isUUID(val)) return null; // Skip UUID values
+        if (Array.isArray(val)) {
+            if (val.length === 0) return 'None';
+            // Filter out objects that are just IDs
+            const formatted = val.map(v => {
+                if (typeof v === 'object') {
+                    // For selection objects, try to get meaningful info
+                    if (v.name) return v.name;
+                    if (v.label) return v.label;
+                    if (v.productName) return v.productName;
+                    if (v.featureName) return v.featureName;
+                    // Skip if it's just IDs
+                    const nonIdKeys = Object.keys(v).filter(k => !_SKIP_CONFIG_KEYS.includes(k) && !_isUUID(v[k]));
+                    if (nonIdKeys.length === 0) return null;
+                    return nonIdKeys.map(k => `${_formatAttrKey(k)}: ${v[k]}`).join(', ');
+                }
+                return _isUUID(v) ? null : v;
+            }).filter(v => v !== null);
+            return formatted.length > 0 ? formatted.join('; ') : null;
+        }
+        if (typeof val === 'object') {
+            if (val.name) return val.name;
+            if (val.label) return val.label;
+            if (val.value !== undefined) return String(val.value);
+            // Filter out ID fields
+            const entries = Object.entries(val).filter(([k, v]) => !_SKIP_CONFIG_KEYS.includes(k) && !_isUUID(v));
+            if (entries.length === 0) return null;
+            return entries.map(([k, v]) => {
+                const formatted = _formatAttrValue(v, k);
+                return formatted ? `${_formatAttrKey(k)}: ${formatted}` : null;
+            }).filter(v => v !== null).join(', ');
+        }
+        return String(val);
+    }
+
+    // Build configuration tooltip summary - single line with pipe separators
+    function _buildConfigTooltip(item) {
+        const parts = [];
+
+        // Process bundle config (check both camelCase and snake_case)
+        const bundleCfg = item.bundleConfig || item.bundle_config;
+        if (bundleCfg && typeof bundleCfg === 'object') {
+            // Check for pricing.featureBreakdown (main bundle config structure)
+            const pricing = bundleCfg.pricing;
+            if (pricing && pricing.featureBreakdown && Array.isArray(pricing.featureBreakdown)) {
+                pricing.featureBreakdown.forEach(feature => {
+                    const featureLabel = feature.featureLabel || feature.feature_label || '';
+                    const productName = feature.selectedProductName || feature.selected_product_name || feature.productName || '';
+                    const mrc = feature.mrc;
+                    const otc = feature.otc;
+
+                    if (featureLabel && productName) {
+                        let priceInfo = '';
+                        if (mrc && mrc > 0) priceInfo = `$${mrc.toLocaleString()}/mo`;
+                        else if (otc && otc > 0) priceInfo = `$${otc.toLocaleString()} one-time`;
+
+                        parts.push(priceInfo ? `${featureLabel}: ${productName} (${priceInfo})` : `${featureLabel}: ${productName}`);
+                    } else if (productName) {
+                        parts.push(productName);
+                    }
+                });
+            }
+
+            // Check for components/items/children arrays
+            const components = bundleCfg.components || bundleCfg.items || bundleCfg.children;
+            if (Array.isArray(components) && components.length > 0 && parts.length === 0) {
+                components.forEach(comp => {
+                    const name = comp.name || comp.productName || comp.label || comp.sku;
+                    if (name) {
+                        const qty = comp.quantity || comp.qty;
+                        const price = comp.price || comp.mrc || comp.listPrice;
+                        let details = [];
+                        if (qty && qty > 1) details.push(`Qty: ${qty}`);
+                        if (price) details.push(`$${price.toLocaleString()}`);
+                        parts.push(details.length > 0 ? `${name} (${details.join(', ')})` : name);
+                    }
+                });
+            }
+        }
+
+        // Process attribute selections (check both camelCase and snake_case)
+        const attrSel = item.attributeSelections || item.attribute_selections;
+        if (attrSel && typeof attrSel === 'object' && parts.length === 0) {
+            Object.entries(attrSel).forEach(([key, val]) => {
+                // Skip internal fields starting with _
+                if (key.startsWith('_')) return;
+                if (_SKIP_CONFIG_KEYS.includes(key.toLowerCase())) return;
+                if (typeof val === 'string' && _isUUID(val)) return;
+
+                if (val !== null && val !== undefined) {
+                    const label = _formatAttrKey(key);
+                    if (typeof val === 'object') {
+                        const name = val.name || val.label || val.value;
+                        if (name) parts.push(`${label}: ${name}`);
+                    } else {
+                        parts.push(`${label}: ${val}`);
+                    }
+                }
+            });
+        }
+
+        return parts.length > 0 ? parts.join(' | ') : '';
+    }
+
+    // Build configuration display with eye icon and tooltip
+    function _buildConfigDisplay(item, itemRowId) {
+        const tooltip = _buildConfigTooltip(item);
+        if (!tooltip) return '<span style="color:#aaa;">—</span>';
+
+        return `
+            <div class="config-tooltip-wrapper" style="position:relative;display:inline-flex;align-items:center;gap:6px;">
+                <span style="background:#e3f2fd;color:#1976d2;font-size:10px;padding:2px 8px;border-radius:10px;">Configured</span>
+                <button class="config-eye-btn" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;"
+                    onmouseenter="showConfigTooltip(this, '${tooltip.replace(/'/g, "\\'")}')"
+                    onmouseleave="hideConfigTooltip()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" style="width:16px;height:16px;">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }
+
     const _QT_BUNDLE_UUID  = 'e5f6a7b8-c3d4-6012-def0-345678901234';
     const _QT_DYNAMIC_UUID = 'd4e5f6a7-b2c3-5901-cdef-234567890123';
 
@@ -6208,12 +6412,13 @@ VALIDATION_INFO
 
     function _qtInlineProdOpts() {
         return (state.products||[])
-            .filter(p => _qtProductType(p) === 'Bundle')
+            .filter(p => p.is_orderable === true || p.isOrderable === true)
             .map(p => {
                 const label = p.label || p.name || p.sku || String(p.id).slice(0,8);
                 const sku   = p.sku ? ` (${p.sku})` : '';
                 const typeId = p.product_type || p.productType || _QT_BUNDLE_UUID;
-                return `<option value="${p.id}" data-label="${label}" data-sku="${p.sku||''}" data-price="${p.listPrice||0}" data-cost="${p.costPrice||0}" data-typeid="${typeId}" data-chargetype="${p.defaultChargeType||p.chargeType||''}" data-uom="${p.defaultUsageUom||p.usageUom||''}">${label}${sku}</option>`;
+                const typeLabel = _qtProductType(p);
+                return `<option value="${p.id}" data-label="${label}" data-sku="${p.sku||''}" data-price="${p.listPrice||0}" data-cost="${p.costPrice||0}" data-typeid="${typeId}" data-chargetype="${p.defaultChargeType||p.chargeType||''}" data-uom="${p.defaultUsageUom||p.usageUom||''}">${label}${sku} [${typeLabel}]</option>`;
             }).join('');
     }
 
@@ -6230,15 +6435,20 @@ VALIDATION_INFO
         const title = disc ? `${segName} — ${seg.name ? disc+'%' : ''}`.trim() : segName;
 
         // Inline product rows
-        const rowsHtml = items.map(item => {
-            const cfg = _qtConfigSummary(item);
+        const rowsHtml = items.map((item, itemIdx) => {
+            const hasConfig = _hasConfigData(item);
+            const itemRowId = `qt-item-${seg.id}-${itemIdx}`;
             const matchedProd = (state.products||[]).find(p => String(p.id) === String(item.productId));
             const isBundle = (matchedProd && _qtProductType(matchedProd) === 'Bundle')
                 || (state.bundles||[]).some(b => String(b.id) === String(item.productId))
-                || (cfg && cfg !== '—');
+                || hasConfig;
             const uomOpts = ['MRC','ARC','QRC','OTC'].map(u =>
                 `<option${(item.chargeType||item.usageUom||'MRC')===u?' selected':''}>${u}</option>`
             ).join('');
+
+            // Build config tooltip
+            const configTooltip = hasConfig ? (_buildConfigTooltip(item) || 'Configuration details available') : '';
+
             return `<tr data-item-id="${item.id}">
                 <td><input type="number" class="qt-inline-qty" min="1" value="${item.quantity||1}"
                     onblur="_qtSaveItemField('${quoteId}','${seg.id}','${item.id}','quantity',this.value)"></td>
@@ -6246,7 +6456,21 @@ VALIDATION_INFO
                     <div style="font-weight:500;color:#1a1a2e;font-size:13px;">${item.productLabel||item.sku||'—'}</div>
                     ${item.sku && item.productLabel ? `<div style="font-size:11px;color:#aaa;">${item.sku}</div>` : ''}
                 </td>
-                <td><span class="qt-config-text" title="${cfg}">${cfg}</span></td>
+                <td>
+                    ${hasConfig ? `
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="background:#e3f2fd;color:#1976d2;font-size:10px;padding:2px 8px;border-radius:10px;">Configured</span>
+                            <button style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;"
+                                onmouseenter="showConfigTooltip(this, '${configTooltip.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')"
+                                onmouseleave="hideConfigTooltip()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" style="width:16px;height:16px;">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    ` : '<span style="color:#aaa;">—</span>'}
+                </td>
                 <td><select class="qt-item-uom">${uomOpts}</select></td>
                 <td style="text-align:right;">${(item.listPrice||0).toFixed(2)}</td>
                 <td><input type="number" class="qt-inline-pct" min="0" max="100" step="0.01" value="${item.discountPct||0}"
@@ -6331,6 +6555,62 @@ VALIDATION_INFO
         const chevron = hdrEl.querySelector('.qt-seg-chevron');
         body.classList.toggle('open');
         chevron.classList.toggle('open');
+    }
+
+    function toggleQuoteItemConfig(itemRowId) {
+        const configRow = $(`${itemRowId}-config`);
+        const chevron = $(`${itemRowId}-chevron`);
+        if (configRow.style.display === 'none') {
+            configRow.style.display = 'table-row';
+            chevron.style.transform = 'rotate(90deg)';
+        } else {
+            configRow.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Configuration tooltip
+    let configTooltipEl = null;
+
+    function showConfigTooltip(btn, text) {
+        hideConfigTooltip();
+        const rect = btn.getBoundingClientRect();
+        configTooltipEl = document.createElement('div');
+        configTooltipEl.className = 'config-tooltip';
+        configTooltipEl.innerHTML = text;
+        configTooltipEl.style.cssText = `
+            position: fixed;
+            left: ${rect.left}px;
+            top: ${rect.bottom + 8}px;
+            background: #1a1a2e;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            max-width: 450px;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            word-wrap: break-word;
+            animation: fadeIn 0.15s ease;
+        `;
+        document.body.appendChild(configTooltipEl);
+
+        // Adjust if tooltip goes off screen
+        const tooltipRect = configTooltipEl.getBoundingClientRect();
+        if (tooltipRect.right > window.innerWidth - 10) {
+            configTooltipEl.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+        }
+        if (tooltipRect.bottom > window.innerHeight - 10) {
+            configTooltipEl.style.top = (rect.top - tooltipRect.height - 8) + 'px';
+        }
+    }
+
+    function hideConfigTooltip() {
+        if (configTooltipEl) {
+            configTooltipEl.remove();
+            configTooltipEl = null;
+        }
     }
 
     function renderQuoteDetail(q) {
@@ -6806,6 +7086,7 @@ VALIDATION_INFO
         let raw = {};
         if (quoteId) { raw = qtState.quotes.find(x => String(x.id)===String(quoteId)) || qtState.currentQuote || {}; }
         const q = _qtNorm(raw);
+        const isEdit = !!quoteId;
 
         const typeOpts     = Object.entries(QUOTE_TYPE_MAP).map(([uuid, lbl]) =>
             `<option value="${uuid}" ${uuid===(q.quoteType||_qtTypeUUID('New'))?'selected':''}>${lbl}</option>`).join('');
@@ -6816,15 +7097,19 @@ VALIDATION_INFO
         const renewalOpts  = Object.entries(QUOTE_RENEWAL_MAP).map(([uuid, lbl]) =>
             `<option value="${uuid}" ${uuid===(q.renewal||_qtRenewalUUID('None'))?'selected':''}>${lbl}</option>`).join('');
 
-        $('modalTitle').textContent = quoteId ? 'Edit Quote' : 'Add Quote';
+        // Type and Approval Status: hidden on Add, read-only on Edit
+        const typeApprovalFields = isEdit ? `
+                <div class="form-group"><label>Type</label><select id="qtType" disabled style="background:#f5f5f5;cursor:not-allowed;">${typeOpts}</select></div>
+                <div class="form-group"><label>Approval Status</label><select id="qtApproval" disabled style="background:#f5f5f5;cursor:not-allowed;">${approvalOpts}</select></div>` : '';
+
+        $('modalTitle').textContent = isEdit ? 'Edit Quote' : 'Add Quote';
         $('modalBody').innerHTML = `
             <div class="ac-modal-form">
                 <div class="form-group full-width">
                     <label>Account</label>
                     <select id="qtAccount">${_qtAccountOpts(q.accountId)}</select>
                 </div>
-                <div class="form-group"><label>Type</label><select id="qtType">${typeOpts}</select></div>
-                <div class="form-group"><label>Approval Status</label><select id="qtApproval">${approvalOpts}</select></div>
+                ${typeApprovalFields}
                 <div class="form-group"><label>Status</label><select id="qtStatus">${statusOpts}</select></div>
                 <div class="form-group"><label>Renewal</label><select id="qtRenewal">${renewalOpts}</select></div>
                 <div class="form-group"><label>Start Date</label><input id="qtStartDate" type="date" value="${q.startDate||''}"></div>
@@ -6833,7 +7118,7 @@ VALIDATION_INFO
             </div>`;
 
         state.currentModal = { type: 'quote', id: quoteId };
-        $('modalSaveBtn').textContent = quoteId ? 'Update' : 'Create';
+        $('modalSaveBtn').textContent = isEdit ? 'Update' : 'Create';
         openModal();
     }
 
@@ -6845,16 +7130,20 @@ VALIDATION_INFO
         const accountName = accountSel?.options[accountSel.selectedIndex]?.dataset?.name || '';
         if (!accountId) { showToast('Please select an account', 'error'); return; }
 
+        const isEdit = !!modal.id;
         const payload = {
             accountId, accountName,
-            quoteType:      $('qtType')?.value     || _qtTypeUUID('New'),
-            approvalStatus: $('qtApproval')?.value || _qtApprovalUUID('Draft'),
             quoteStatus:    $('qtStatus')?.value   || _qtStatusUUID('Not Sent'),
             renewal:        $('qtRenewal')?.value  || _qtRenewalUUID('None'),
             startDate: $('qtStartDate')?.value || undefined,
             endDate: $('qtEndDate')?.value || undefined,
             expiryDate: $('qtExpiryDate')?.value || undefined
         };
+        // Type and Approval Status: only include on edit (read from disabled fields)
+        if (isEdit) {
+            payload.quoteType = $('qtType')?.value || _qtTypeUUID('New');
+            payload.approvalStatus = $('qtApproval')?.value || _qtApprovalUUID('Draft');
+        }
         Object.keys(payload).forEach(k => payload[k]===undefined && delete payload[k]);
 
         try {
@@ -6881,6 +7170,514 @@ VALIDATION_INFO
             renderQuotesList();
             showToast('Quote removed from view (no delete API available)', 'success');
         } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    // ── Quote Action Dropdown ─────────────────────────────────────────────────
+    function toggleQuoteDropdown(event, quoteId) {
+        event.stopPropagation();
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            if (menu.id !== `quoteDropdown-${quoteId}`) menu.style.display = 'none';
+        });
+        const dropdown = $(`quoteDropdown-${quoteId}`);
+        if (dropdown) {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        }
+    });
+
+    async function submitQuoteForApproval(quoteId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Submit this quote for approval?')) return;
+        try {
+            const res = await apiCall('POST', `${API.quotes}/${quoteId}/submit`);
+            if (res) {
+                showToast('Quote submitted for approval', 'success');
+                loadQuotes();
+            }
+        } catch(e) { showToast('Failed to submit quote for approval: ' + e.message, 'error'); }
+    }
+
+    async function approveQuote(quoteId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Approve this quote?')) return;
+        try {
+            const res = await apiCall('POST', `${API.quotes}/${quoteId}/approve`);
+            if (res) {
+                showToast('Quote approved successfully', 'success');
+                loadQuotes();
+            }
+        } catch(e) { showToast('Failed to approve quote: ' + e.message, 'error'); }
+    }
+
+    async function convertQuoteToOrder(quoteId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Convert this quote to an order?')) return;
+        try {
+            const res = await apiCall('POST', API.orders, { quoteId: quoteId });
+            if (res) {
+                showToast('Quote converted to order successfully', 'success');
+                loadQuotes();
+            }
+        } catch(e) { showToast('Failed to convert quote to order: ' + e.message, 'error'); }
+    }
+
+    // ============================================================================
+    // ORDERS
+    // ============================================================================
+
+    // Order status: CartStatus enum UUIDs → labels
+    const ORDER_STATUS_UUID_MAP = {
+        'c6d7e8f9-a0b1-4234-4567-666666666666': 'Pending',
+        'd7e8f9a0-b1c2-4345-5678-777777777777': 'Confirmed',
+        'e8f9a0b1-c2d3-4456-6789-888888888888': 'Fulfilling',
+        'f9a0b1c2-d3e4-4567-7890-999999999999': 'Cancelled'
+    };
+    const ORDER_STATUS_NAME_MAP = {
+        'PENDING': 'Pending',
+        'DRAFT': 'Pending',
+        'Draft': 'Pending',
+        'CONFIRMED': 'Confirmed',
+        'SUBMITTED': 'Confirmed',
+        'Submitted': 'Confirmed',
+        'FULFILLING': 'Fulfilling',
+        'CONVERTED': 'Fulfilling',
+        'Converted': 'Fulfilling',
+        'DELIVERED': 'Delivered',
+        'Delivered': 'Delivered',
+        'CANCELLED': 'Cancelled',
+        'Cancelled': 'Cancelled',
+        'EXPIRED': 'Cancelled',
+        'Expired': 'Cancelled'
+    };
+    function _ordStatusLabel(status) {
+        if (!status) return 'Pending';
+        // Check if it's a UUID
+        if (ORDER_STATUS_UUID_MAP[status]) return ORDER_STATUS_UUID_MAP[status];
+        // Check if it's a name
+        if (ORDER_STATUS_NAME_MAP[status]) return ORDER_STATUS_NAME_MAP[status];
+        // Check if it's already a label
+        if (['Pending','Confirmed','Fulfilling','Delivered','Cancelled'].includes(status)) return status;
+        return status;
+    }
+
+    let ordState = { orders: [], currentOrder: null };
+
+    function _ordStatusBadge(status) {
+        const colors = {
+            'Pending': 'background:#fff3cd;color:#856404;',
+            'Confirmed': 'background:#cce5ff;color:#004085;',
+            'Fulfilling': 'background:#d4edda;color:#155724;',
+            'Delivered': 'background:#28a745;color:white;',
+            'Cancelled': 'background:#f8d7da;color:#721c24;'
+        };
+        const style = colors[status] || 'background:#e9ecef;color:#495057;';
+        return `<span class="badge" style="${style};padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;">${status || '—'}</span>`;
+    }
+
+    async function loadOrders(page = 0) {
+        try {
+            const data = await apiCall('GET', `${API.orders}?page=${page}&size=${PAGE_SIZE}`);
+            if (data) {
+                const result = extractData(data);
+                ordState.orders = result.data || [];
+                renderOrdersList();
+            }
+        } catch(e) {
+            showToast('Failed to load orders: ' + e.message, 'error');
+        }
+    }
+
+    function renderOrdersList() {
+        const tbody = $('ordTableBody');
+        if (!ordState.orders.length) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:40px;">No orders yet. Orders are created by converting approved quotes.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = ordState.orders.map(o => {
+            const status = _ordStatusLabel(o.status__r || o.statusLabel || o.status);
+            const isPending = status === 'Pending';
+            const isConfirmed = status === 'Confirmed';
+            const isFulfilling = status === 'Fulfilling';
+            const isDelivered = status === 'Delivered';
+            const isCancelled = status === 'Cancelled';
+            const canConfirm = isPending;
+            const canFulfill = isConfirmed;
+            const canDeliver = isFulfilling;
+            const canCancel = !isDelivered && !isCancelled;
+            const disabledStyle = 'opacity:0.4;cursor:not-allowed;pointer-events:none;';
+            const quoteNumber = o.quote_number || o.quoteNumber || '';
+            const quoteId = o.quote_id || o.quoteId || '';
+
+            return `<tr>
+                <td style="font-weight:600;color:#1a1a2e;">${o.order_number || o.orderNumber || '—'}</td>
+                <td title="${quoteId}">${quoteNumber || '—'}</td>
+                <td>${o.account_name || o.accountName || '—'}</td>
+                <td>${_ordStatusBadge(status)}</td>
+                <td style="text-align:right;">$${(o.total_final_price || o.totalFinalPrice || 0).toFixed(2)}</td>
+                <td style="text-align:right;">$${(o.total_cost || o.totalCost || 0).toFixed(2)}</td>
+                <td style="text-align:right;">${(o.avg_margin_pct || o.avgMarginPct || 0).toFixed(1)}%</td>
+                <td>${o.created_at ? new Date(o.created_at).toLocaleDateString() : '—'}</td>
+                <td>
+                    <div style="display:flex;gap:4px;align-items:center;">
+                        <button class="btn btn-sm btn-outline" onclick="viewOrder('${o.id}')" title="View Details">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                        <div class="dropdown" style="position:relative;">
+                            <button class="btn btn-sm btn-outline" onclick="toggleOrderDropdown(event,'${o.id}')" title="Actions" style="padding:4px 8px;">
+                                <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                            </button>
+                            <div id="orderDropdown-${o.id}" class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;background:white;border:1px solid #e0e0e0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:150px;z-index:1000;">
+                                <button class="dropdown-item" onclick="${canConfirm ? `confirmOrder('${o.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!canConfirm ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Confirm
+                                </button>
+                                <button class="dropdown-item" onclick="${canFulfill ? `fulfillOrder('${o.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!canFulfill ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Fulfill
+                                </button>
+                                <button class="dropdown-item" onclick="${canDeliver ? `deliverOrder('${o.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;${!canDeliver ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>Deliver
+                                </button>
+                                <div style="height:1px;background:#e0e0e0;margin:4px 0;"></div>
+                                <button class="dropdown-item" onclick="${canCancel ? `cancelOrder('${o.id}')` : 'void(0)'}" style="display:block;width:100%;padding:10px 14px;border:none;background:none;text-align:left;cursor:pointer;font-size:13px;color:#dc3545;${!canCancel ? disabledStyle : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function toggleOrderDropdown(event, orderId) {
+        event.stopPropagation();
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            if (menu.id !== `orderDropdown-${orderId}`) menu.style.display = 'none';
+        });
+        const dropdown = $(`orderDropdown-${orderId}`);
+        if (dropdown) {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    async function viewOrder(orderId) {
+        try {
+            const res = await apiCall('GET', `${API.orders}/${orderId}`);
+            if (!res) return;
+            const o = res.data || res;
+            ordState.currentOrder = o;
+            const status = _ordStatusLabel(o.status__r || o.statusLabel || o.status);
+            const isPending = status === 'Pending';
+            const isConfirmed = status === 'Confirmed';
+            const isFulfilling = status === 'Fulfilling';
+            const isCancelled = status === 'Cancelled';
+
+            $('ordListView').style.display = 'none';
+            $('ordDetailView').style.display = 'block';
+            $('ordDetailView').innerHTML = `
+                <!-- Header -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                    <button class="btn btn-outline" onclick="backToOrdersList()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Back to Orders
+                    </button>
+                    <div style="display:flex;align-items:center;gap:16px;">
+                        <div style="text-align:right;">
+                            <h2 style="margin:0;font-size:22px;font-weight:600;">Order ${o.order_number || o.orderNumber || '—'}</h2>
+                            <div style="color:#666;font-size:14px;">Quote: ${o.quote_number || o.quoteNumber || '—'}</div>
+                        </div>
+                        ${_ordStatusBadge(status)}
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;">
+                    <div class="card" style="padding:16px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:8px;">Account</div>
+                        <div style="font-weight:600;font-size:14px;">${o.account_name || o.accountName || '—'}</div>
+                    </div>
+                    <div class="card" style="padding:16px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:8px;">PO Reference</div>
+                        <div style="font-weight:600;font-size:14px;">${o.po_reference || o.poReference || '—'}</div>
+                    </div>
+                    <div class="card" style="padding:16px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:8px;">Project Reference</div>
+                        <div style="font-weight:600;font-size:14px;">${o.project_reference || o.projectReference || '—'}</div>
+                    </div>
+                    <div class="card" style="padding:16px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:8px;">Total Final Price</div>
+                        <div style="font-weight:700;font-size:18px;color:#28a745;">$${(o.total_final_price || o.totalFinalPrice || 0).toFixed(2)}</div>
+                    </div>
+                    <div class="card" style="padding:16px;text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:8px;">Margin</div>
+                        <div style="font-weight:700;font-size:18px;color:#17a2b8;">${(o.avg_margin_pct || o.avgMarginPct || 0).toFixed(1)}%</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display:flex;gap:12px;margin-bottom:24px;">
+                    <button class="btn btn-outline" onclick="recalculateOrderDetail('${o.id}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Recalculate
+                    </button>
+                    ${isPending ? `
+                        <button class="btn btn-success" onclick="confirmOrderDetail('${o.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Confirm Order
+                        </button>
+                    ` : ''}
+                    ${isConfirmed ? `
+                        <button class="btn btn-success" onclick="fulfillOrderDetail('${o.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                            Start Fulfillment
+                        </button>
+                    ` : ''}
+                    ${isFulfilling ? `
+                        <button class="btn btn-success" onclick="deliverOrderDetail('${o.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                            Mark Delivered
+                        </button>
+                    ` : ''}
+                    ${!isCancelled ? `
+                        <button class="btn btn-outline" style="color:#dc3545;border-color:#dc3545;" onclick="cancelOrderDetail('${o.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                            Cancel Order
+                        </button>
+                    ` : ''}
+                </div>
+
+                <!-- Segments -->
+                ${o.segments && o.segments.length ? `
+                    <div class="card" style="padding:0;overflow:hidden;">
+                        ${o.segments.map((seg, idx) => `
+                            <div class="order-segment" style="border-bottom:${idx < o.segments.length - 1 ? '1px solid #e0e0e0' : 'none'};">
+                                <div onclick="toggleOrderSegment(${idx})" style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#f8f9fa;cursor:pointer;user-select:none;">
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <svg id="ordSegChevron-${idx}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                                        <span style="font-weight:600;font-size:15px;">${seg.name || 'Segment ' + (idx+1)}</span>
+                                        <span style="color:#888;font-size:13px;">(${seg.items ? seg.items.length : 0} items)</span>
+                                    </div>
+                                    <div style="font-weight:600;color:#28a745;">$${(seg.subtotalFinalPrice || seg.subtotal_final_price || 0).toFixed(2)}</div>
+                                </div>
+                                <div id="ordSegContent-${idx}" style="display:block;">
+                                    ${seg.items && seg.items.length ? `
+                                        <table class="data-table" style="margin:0;border:none;border-radius:0;">
+                                            <thead>
+                                                <tr style="background:#fff;">
+                                                    <th style="text-align:left;padding:12px 16px;">Product</th>
+                                                    <th style="text-align:left;padding:12px 16px;">SKU</th>
+                                                    <th style="text-align:center;padding:12px 16px;">Config</th>
+                                                    <th style="text-align:center;padding:12px 16px;">SLID</th>
+                                                    <th style="text-align:center;padding:12px 16px;">Instance ID</th>
+                                                    <th style="text-align:center;padding:12px 16px;">Qty</th>
+                                                    <th style="text-align:right;padding:12px 16px;">List Price</th>
+                                                    <th style="text-align:right;padding:12px 16px;">Discount %</th>
+                                                    <th style="text-align:right;padding:12px 16px;">Uplift %</th>
+                                                    <th style="text-align:right;padding:12px 16px;">Final Price</th>
+                                                    <th style="text-align:right;padding:12px 16px;">Margin %</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${seg.items.map((item, itemIdx) => {
+                                                    const hasConfig = _hasConfigData(item);
+                                                    const configTooltip = hasConfig ? (_buildConfigTooltip(item) || 'Configuration details available') : '';
+                                                    return `
+                                                    <tr>
+                                                        <td style="padding:12px 16px;font-weight:500;">${item.productLabel || '—'}</td>
+                                                        <td style="padding:12px 16px;color:#666;font-size:13px;">${item.sku || '—'}</td>
+                                                        <td style="padding:12px 16px;text-align:center;">
+                                                            ${hasConfig ? `
+                                                                <button style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;display:inline-flex;align-items:center;"
+                                                                    onmouseenter="showConfigTooltip(this, '${configTooltip.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')"
+                                                                    onmouseleave="hideConfigTooltip()">
+                                                                    <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" style="width:18px;height:18px;">
+                                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                                        <circle cx="12" cy="12" r="3"/>
+                                                                    </svg>
+                                                                </button>
+                                                            ` : '<span style="color:#aaa;">—</span>'}
+                                                        </td>
+                                                        <td style="padding:12px 16px;text-align:center;"><span style="background:#f0f0f0;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px;">${item.slId != null ? item.slId : '—'}</span></td>
+                                                        <td style="padding:12px 16px;text-align:center;">${item.instanceId ? `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:11px;" title="${item.instanceId}">${item.instanceId.substring(0,8)}...</span>` : '<span style="color:#aaa;">—</span>'}</td>
+                                                        <td style="padding:12px 16px;text-align:center;">${item.quantity || 1}</td>
+                                                        <td style="padding:12px 16px;text-align:right;">$${(item.listPrice || 0).toFixed(2)}</td>
+                                                        <td style="padding:12px 16px;text-align:right;${item.discountPct > 0 ? 'color:#dc3545;' : ''}">${(item.discountPct || 0).toFixed(1)}%</td>
+                                                        <td style="padding:12px 16px;text-align:right;${item.upliftPct > 0 ? 'color:#28a745;' : ''}">${(item.upliftPct || 0).toFixed(1)}%</td>
+                                                        <td style="padding:12px 16px;text-align:right;font-weight:600;">$${(item.finalPrice || 0).toFixed(2)}</td>
+                                                        <td style="padding:12px 16px;text-align:right;color:${(item.marginPct || 0) >= 20 ? '#28a745' : (item.marginPct || 0) >= 10 ? '#ffc107' : '#dc3545'};">${(item.marginPct || 0).toFixed(1)}%</td>
+                                                    </tr>
+                                                    `;
+                                                }).join('')}
+                                            </tbody>
+                                        </table>
+                                    ` : '<div style="padding:20px;color:#aaa;text-align:center;">No items in this segment</div>'}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<div class="card" style="padding:40px;text-align:center;color:#aaa;">No segments found</div>'}
+
+                <!-- Totals Footer -->
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;padding:20px;background:#f8f9fa;border-radius:8px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Subtotal</div>
+                        <div style="font-size:20px;font-weight:700;">$${(o.total_final_price || o.totalFinalPrice || 0).toFixed(2)}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Total Cost</div>
+                        <div style="font-size:20px;font-weight:700;color:#dc3545;">$${(o.total_cost || o.totalCost || 0).toFixed(2)}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Total Margin</div>
+                        <div style="font-size:20px;font-weight:700;color:#28a745;">$${(o.total_margin || o.totalMargin || 0).toFixed(2)}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Average Margin %</div>
+                        <div style="font-size:20px;font-weight:700;color:#17a2b8;">${(o.avg_margin_pct || o.avgMarginPct || 0).toFixed(1)}%</div>
+                    </div>
+                </div>
+            `;
+        } catch(e) {
+            showToast('Failed to load order details: ' + e.message, 'error');
+        }
+    }
+
+    function toggleOrderSegment(idx) {
+        const content = $(`ordSegContent-${idx}`);
+        const chevron = $(`ordSegChevron-${idx}`);
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            chevron.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.display = 'none';
+            chevron.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    function toggleOrderItemConfig(itemId) {
+        const configRow = $(`${itemId}-config`);
+        const chevron = $(`${itemId}-chevron`);
+        if (configRow.style.display === 'none') {
+            configRow.style.display = 'table-row';
+            chevron.style.transform = 'rotate(90deg)';
+        } else {
+            configRow.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    async function recalculateOrderDetail(orderId) {
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/recalculate`);
+            if (res) {
+                showToast('Order recalculated', 'success');
+                viewOrder(orderId);
+            }
+        } catch(e) { showToast('Failed to recalculate: ' + e.message, 'error'); }
+    }
+
+    async function confirmOrderDetail(orderId) {
+        if (!confirm('Confirm this order?')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/confirm`);
+            if (res) {
+                showToast('Order confirmed', 'success');
+                viewOrder(orderId);
+            }
+        } catch(e) { showToast('Failed to confirm order: ' + e.message, 'error'); }
+    }
+
+    async function fulfillOrderDetail(orderId) {
+        if (!confirm('Start fulfillment for this order? This will create assets.')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/fulfill`);
+            if (res) {
+                showToast('Order fulfillment started', 'success');
+                viewOrder(orderId);
+            }
+        } catch(e) { showToast('Failed to fulfill order: ' + e.message, 'error'); }
+    }
+
+    async function deliverOrderDetail(orderId) {
+        if (!confirm('Mark this order as delivered?')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/deliver`);
+            if (res) {
+                showToast('Order marked as delivered', 'success');
+                viewOrder(orderId);
+            }
+        } catch(e) { showToast('Failed to deliver order: ' + e.message, 'error'); }
+    }
+
+    async function cancelOrderDetail(orderId) {
+        if (!confirm('Cancel this order? This action cannot be undone.')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/cancel`);
+            if (res) {
+                showToast('Order cancelled', 'success');
+                viewOrder(orderId);
+            }
+        } catch(e) { showToast('Failed to cancel order: ' + e.message, 'error'); }
+    }
+
+    function backToOrdersList() {
+        $('ordDetailView').style.display = 'none';
+        $('ordListView').style.display = 'block';
+        ordState.currentOrder = null;
+    }
+
+    async function confirmOrder(orderId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Confirm this order?')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/confirm`);
+            if (res) {
+                showToast('Order confirmed', 'success');
+                loadOrders();
+            }
+        } catch(e) { showToast('Failed to confirm order: ' + e.message, 'error'); }
+    }
+
+    async function fulfillOrder(orderId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Start fulfillment for this order? This will create assets.')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/fulfill`);
+            if (res) {
+                showToast('Order fulfillment started', 'success');
+                loadOrders();
+            }
+        } catch(e) { showToast('Failed to fulfill order: ' + e.message, 'error'); }
+    }
+
+    async function deliverOrder(orderId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Mark this order as delivered?')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/deliver`);
+            if (res) {
+                showToast('Order marked as delivered', 'success');
+                loadOrders();
+            }
+        } catch(e) { showToast('Failed to deliver order: ' + e.message, 'error'); }
+    }
+
+    async function cancelOrder(orderId) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        if (!confirm('Cancel this order? This action cannot be undone.')) return;
+        try {
+            const res = await apiCall('POST', `${API.orders}/${orderId}/cancel`);
+            if (res) {
+                showToast('Order cancelled', 'success');
+                loadOrders();
+            }
+        } catch(e) { showToast('Failed to cancel order: ' + e.message, 'error'); }
     }
 
     console.log('CPQ Console ready. Enter JWT token and click Load All Data.');
