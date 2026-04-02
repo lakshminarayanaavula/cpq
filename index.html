@@ -6441,8 +6441,8 @@ VALIDATION_INFO
             const isBundle = (matchedProd && _qtProductType(matchedProd) === 'Bundle')
                 || (state.bundles||[]).some(b => String(b.id) === String(item.productId))
                 || hasConfig;
-            const uomOpts = _CHARGE_TYPES.map(ct =>
-                `<option value="${ct.id}"${(item.chargeType||item.usageUom)=== ct.id?' selected':''}>${ct.label}</option>`
+            const uomOpts = UOM_OPTIONS.map(u =>
+                `<option value="${u.id}"${(item.chargeType||item.usageUom)===u.id?' selected':''}>${u.label}</option>`
             ).join('');
 
             // Build config tooltip
@@ -6663,14 +6663,6 @@ VALIDATION_INFO
     // ── Segment Modal ────────────────────────────────────────────────────────────
     const _SEG_TYPE_ROOT   = 'd7e8f9a0-b1c2-4345-9012-100000000001';
     const _SEG_TYPE_LINKED = 'd7e8f9a0-b1c2-4345-9012-100000000002';
-
-    // ── Charge Type Constants ────────────────────────────────────────────────────
-    const _CHARGE_TYPES = [
-        { id: 'd1e2f3a4-b5c6-4789-3456-111111111111', label: 'Hourly' },
-        { id: 'a4b5c6d7-e8f9-4012-6789-444444444444', label: 'OTC' },
-        { id: 'b5c6d7e8-f9a0-4123-7890-555555555555', label: 'MRC' },
-        { id: 'c6d7e8f9-a0b1-4234-8901-666666666666', label: 'ARC' }
-    ];
 
     function _acctAddrLabel(a) {
         const d = a.data || a;
